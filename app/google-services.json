@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "324829421621",
+    "firebase_url": "https://meridairy-e0fbc.firebaseio.com",
+    "project_id": "meridairy-e0fbc",
+    "storage_bucket": "meridairy-e0fbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324829421621:android:29af64746271fd216fd17c",
+        "android_client_info": {
+          "package_name": "com.example.dixitlamba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324829421621-f1e3j1bp51cine7bh6uf42frbhpl9doc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dixitlamba",
+            "certificate_hash": "4e9f51ca32fbd7b9c993b3173d80460e47164fd5"
+          }
+        },
+        {
+          "client_id": "324829421621-pd4fdo5htc5vr44rq4h3qln4i5jomucr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkf9eNj7jUzDbhXB0-98fSDFm5lJMOuF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324829421621-pd4fdo5htc5vr44rq4h3qln4i5jomucr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
