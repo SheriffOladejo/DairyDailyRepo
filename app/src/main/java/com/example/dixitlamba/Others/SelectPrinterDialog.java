@@ -13,8 +13,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.dixitlamba.R;
+import com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity;
 
-import static com.example.dixitlamba.UI.BuyMilkActivity.deviceList;
+import io.paperdb.Paper;
+
+import static com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity.deviceList;
 
 public class SelectPrinterDialog extends Dialog implements View.OnClickListener {
 
@@ -39,6 +42,8 @@ public class SelectPrinterDialog extends Dialog implements View.OnClickListener 
         connect = findViewById(R.id.connect);
         connect.setOnClickListener(this);
 
+        Paper.init(context);
+
         // Initialize spinner object
         Spinner spinner = findViewById(R.id.spinner);
 
@@ -53,6 +58,7 @@ public class SelectPrinterDialog extends Dialog implements View.OnClickListener 
                 clickedItem =(SpinnerItem) parent.getItemAtPosition(position);
                 clickedDeviceName = clickedItem.getDevice_name();
                 textView.setText(clickedDeviceName);
+                Paper.book().write(Prevalent.selected_device, clickedDeviceName);
             }
 
             @Override
@@ -67,7 +73,10 @@ public class SelectPrinterDialog extends Dialog implements View.OnClickListener 
         switch (v.getId()){
             case R.id.connect:
                 // Connect Device here
-
+                BuyMilkActivity.connect(clickedDeviceName);
+                dismiss();
+                break;
+            case R.id.close:
                 dismiss();
                 break;
             default:

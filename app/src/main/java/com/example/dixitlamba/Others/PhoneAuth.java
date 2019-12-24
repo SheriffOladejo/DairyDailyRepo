@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.example.dixitlamba.R;
-import com.example.dixitlamba.UI.BuyMilkActivity;
+import com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.example.dixitlamba.UI.SendOtpActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

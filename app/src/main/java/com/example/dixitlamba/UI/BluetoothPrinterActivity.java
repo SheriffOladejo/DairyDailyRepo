@@ -39,6 +39,8 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
     Thread thread;
 
     public static ArrayList<SpinnerItem> deviceList;
+
+    // A set of all bluetooth devices ever paired to the device
     Set<BluetoothDevice> pairedDevice;
 
     byte[] readBuffer;
@@ -77,7 +79,6 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                 try{
                     findBluetoothDevice();
                     openBluetoothPrinter();
-
                 }
                 catch(Exception e){
 
@@ -140,7 +141,7 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
             }
         }
         catch(Exception e){
-
+            Toast.makeText(BluetoothPrinterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -156,7 +157,7 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
         try {
             openBluetoothPrinter();
         } catch (IOException e) {
-            e.printStackTrace();
+            Toast.makeText(BluetoothPrinterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

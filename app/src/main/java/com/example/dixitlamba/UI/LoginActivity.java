@@ -23,11 +23,12 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.dixitlamba.Others.Prevalent;
 import com.example.dixitlamba.R;
+import com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity;
+import com.example.dixitlamba.UI.Dashboard.DashboardActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -103,8 +104,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText lastname;
     EditText signupPassword;
     EditText confirmPasswrd;
-    Spinner selectState;
-    Spinner selectCity;
     EditText address;
     Button signup;
     EditText signup_country_code;
@@ -125,6 +124,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
         login_view = findViewById(R.id.login_view);
         sign_up_view = findViewById(R.id.sign_up_view);
@@ -219,7 +220,7 @@ public class LoginActivity extends AppCompatActivity {
         work_offline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                startActivity(new Intent(LoginActivity.this, BuyMilkActivity.class));
             }
         });
 
@@ -291,13 +292,17 @@ public class LoginActivity extends AppCompatActivity {
                         String password = dataSnapshot.child("Password").getValue().toString();
                         if(password.equals(login_password)){
                             progressDialog.dismiss();
-                            startActivity(new Intent(LoginActivity.this, BuyMilkActivity.class));
+                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                             finish();
                         }
                         else{
                             progressDialog.dismiss();
                             useSnackBar("Incorrect password", frameLayout);
                         }
+                    }
+                    else{
+                        progressDialog.dismiss();
+                        useSnackBar("Phone not found", frameLayout);
                     }
                 }
 

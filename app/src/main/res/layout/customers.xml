@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:text="Buyers"
+            android:textAllCaps="false"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:background="@drawable/rectangle_border"
+            android:backgroundTint="@color/colorAccent"
+            android:layout_margin="20dp"
+            android:textSize="18sp"/>
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:text="Sellers"
+            android:textAllCaps="false"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:background="@drawable/rectangle_border"
+            android:layout_margin="20dp"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

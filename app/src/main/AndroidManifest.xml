@@ -17,7 +17,7 @@
         <activity android:name=".UI.SendOtpActivity"></activity>
         <activity android:name=".UI.BluetoothPrinterActivity"></activity>
         <activity android:name=".Others.PhoneAuth"></activity>
-        <activity android:name=".UI.BuyMilkActivity"></activity>
+        <activity android:name=".UI.Dashboard.BuyMilk.BuyMilkActivity"></activity>
         <activity android:name=".UI.MainActivity" />
         <activity android:name=".UI.SignUpActivity" />
         <activity android:name=".UI.LoginActivity">
@@ -28,8 +28,20 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestCode.StateCityViews" />
-        <activity android:name=".UI.MilkBuyEntryActivity" />
-        <activity android:name=".UI.DashboardActivity" />
+        <activity android:name=".UI.Dashboard.BuyMilk.MilkBuyEntryActivity" />
+        <activity android:name=".UI.Dashboard.DashboardActivity" />
+        <activity android:name=".UI.Dashboard.SellMilk.SellMilkActivity"
+            android:parentActivityName=".UI.LoginActivity"/>
+        <activity android:name=".UI.Dashboard.ViewReport.CustomerReportActivity"
+            android:parentActivityName=".UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name=".UI.Dashboard.ViewReport.ViewReportActivity"
+            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
+        <activity android:name=".UI.Dashboard.ViewReport.PaymentRegisterActivity"
+            android:parentActivityName=".UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name=".UI.Dashboard.ViewReport.DuplicateSlipActivity"
+            android:parentActivityName=".UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name=".UI.Dashboard.ViewReport.ShiftReportActivity"
+            android:parentActivityName=".UI.Dashboard.ViewReport.ViewReportActivity"/>
     </application>
 
 </manifest>
