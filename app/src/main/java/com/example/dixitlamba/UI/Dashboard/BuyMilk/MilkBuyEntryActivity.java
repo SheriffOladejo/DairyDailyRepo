@@ -19,7 +19,7 @@ import static com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity.printD
 
 public class MilkBuyEntryActivity extends AppCompatActivity {
 
-    String shift;
+    String shift, date;
 
     MenuItem day, evening;
     @Override
@@ -30,7 +30,7 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         hideKeyboard(MilkBuyEntryActivity.this);
 
-        getSupportActionBar().setTitle("Entry");
+        getSupportActionBar().setTitle("Buy Milk Entry");
         getSupportActionBar().setHomeButtonEnabled(true);
 
         Button save = findViewById(R.id.save);
@@ -46,6 +46,7 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
         });
 
         shift = getIntent().getStringExtra("Shift");
+        date = getIntent().getStringExtra("Date");
     }
 
     @Override
@@ -54,13 +55,16 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
         inflater.inflate( R.menu.buy_milk_printer_shift, menu );
         day = menu.findItem(R.id.day);
         evening = menu.findItem(R.id.evening);
-        Toast.makeText(MilkBuyEntryActivity.this, shift, Toast.LENGTH_SHORT).show();
+        MenuItem dateItem = menu.findItem(R.id.date);
+        dateItem.setTitle(date);
+
         if(shift.equals("AM")){
             Toast.makeText(MilkBuyEntryActivity.this, shift, Toast.LENGTH_SHORT).show();
             evening.setVisible(false);
             day.setVisible(true);
         }
         else if(shift.equals("PM")){
+            Toast.makeText(MilkBuyEntryActivity.this, shift, Toast.LENGTH_SHORT).show();
             evening.setVisible(true);
             day.setVisible(false);
         }

@@ -8,6 +8,11 @@
         android:title="Printer"/>
 
     <item
+        android:id="@+id/date"
+        app:showAsAction="always"
+        android:title="Date" />
+
+    <item
         android:id="@+id/evening"
         app:showAsAction="always"
         android:title="Evening"

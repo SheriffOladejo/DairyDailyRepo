@@ -154,9 +154,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Date              FAT      SNF         Wt        Amount"
+                android:text="Date               FAT           SNF         Wt          Amount"
                 android:textColor="@android:color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="center"/>
 

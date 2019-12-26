@@ -13,10 +13,8 @@ import android.widget.ScrollView;
 import android.widget.Switch;
 
 import com.example.dixitlamba.R;
-import com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.example.dixitlamba.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.example.dixitlamba.UI.Dashboard.DashboardActivity;
-import com.example.dixitlamba.UI.LoginActivity;
 
 import java.util.Calendar;
 

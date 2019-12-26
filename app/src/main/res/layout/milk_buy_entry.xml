@@ -37,7 +37,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Sellers"
+                android:text="All Sellers"
                 android:textAlignment="center"
                 android:textColor="#ffffff"
                 android:textSize="18sp"
@@ -152,9 +152,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ID    Name     Weight    SNF   Rate    Amount"
-            android:textSize="18sp"
-            android:layout_margin="10dp"
+            android:text="Date         Name       Weight       SNF       Rate       Amount"
+            android:textSize="16sp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
             android:textColor="#ffffff"/>
 
     </LinearLayout>

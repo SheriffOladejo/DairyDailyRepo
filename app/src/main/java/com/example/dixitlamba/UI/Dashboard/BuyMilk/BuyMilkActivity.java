@@ -31,6 +31,7 @@ import com.example.dixitlamba.Others.SpinnerItem;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Set;
@@ -53,6 +54,8 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
     static Thread thread;
 
     private Button proceed;
+
+    String date;
 
     public static ArrayList<SpinnerItem> deviceList;
     static Set<BluetoothDevice> pairedDevice;
@@ -94,6 +97,9 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Buy Milk");
+
+        date = SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime());
+        dateView.setText(date);
 
         // Check time whether its morning or evening and check shift switches accordingly
         am_pm = "";
@@ -157,6 +163,7 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
                 else{
                     Intent intent = new Intent(BuyMilkActivity.this, MilkBuyEntryActivity.class);
                     intent.putExtra("Shift", morning_switch.isChecked() ? "AM" : "PM");
+                    intent.putExtra("Date", date);
                     startActivity(intent);
                 }
             }
@@ -361,6 +368,6 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
                 break;
         }
         dateView.setText(mMonth + " " + dayOfMonth + ", " + year);
-        Toast.makeText(BuyMilkActivity.this, year + " " + month + " " + dayOfMonth, Toast.LENGTH_LONG).show();
+        date = mMonth + " " + dayOfMonth + ", " +year;
     }
 }
