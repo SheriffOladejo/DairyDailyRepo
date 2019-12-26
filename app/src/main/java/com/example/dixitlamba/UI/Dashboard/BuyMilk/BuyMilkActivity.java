@@ -70,6 +70,8 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
     TextView dateView;
     Switch online_switch, print_switch, morning_switch, evening_switch;
 
+    private String am_pm;
+
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
@@ -86,13 +88,15 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
         scrollview = findViewById(R.id.scrollview);
         proceed = findViewById(R.id.proceed);
 
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
         Paper.init(this);
 
+        getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Buy Milk");
 
         // Check time whether its morning or evening and check shift switches accordingly
-        String am_pm = "";
+        am_pm = "";
         Calendar dateTime = Calendar.getInstance();
         if(dateTime.get(Calendar.AM_PM) == Calendar.AM){
             am_pm = "AM";
@@ -147,11 +151,13 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(BuyMilkActivity.this, MilkBuyEntryActivity.class));
-                try {
-                    printData("Hello World");
-                } catch (IOException e) {
-                    useSnackBar(e.getMessage(), scrollview);
+                if(!morning_switch.isChecked() && !evening_switch.isChecked()){
+                    useSnackBar("Select Shift", scrollview);
+                }
+                else{
+                    Intent intent = new Intent(BuyMilkActivity.this, MilkBuyEntryActivity.class);
+                    intent.putExtra("Shift", morning_switch.isChecked() ? "AM" : "PM");
+                    startActivity(intent);
                 }
             }
         });

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/printer"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_printer"
+        android:title="Printer"/>
+
+    <item
+        android:id="@+id/evening"
+        app:showAsAction="always"
+        android:title="Evening"
+        android:icon="@drawable/ic_moon_phase_outline"/>
+
+    <item
+        android:id="@+id/day"
+        app:showAsAction="always"
+        android:title="Day"
+        android:icon="@drawable/ic_lights"/>
+</menu>

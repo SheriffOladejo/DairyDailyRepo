@@ -159,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
         actState = findViewById(R.id.actState);
         actCity = findViewById(R.id.actCity);
 
-        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.anim.animation_sequential);
+        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.anim.animation_rotate);
         logoImage.startAnimation(hyperspaceJumpAnimation);
 
         // Initially hide the sign up view
@@ -180,8 +180,13 @@ public class LoginActivity extends AppCompatActivity {
                     progressDialog.show();
                     String password = loginPhoneNumber.getText().toString();
                     String confirm_password = loginPassword.getText().toString();
+                    if(password.isEmpty() || confirm_password.isEmpty()){
+                        progressDialog.dismiss();
+                        useSnackBar("Fields should not be empty", frameLayout);
+                    }
                     if(!password.equals(confirm_password)){
                         useSnackBar("Passwords don't match", frameLayout);
+                        progressDialog.dismiss();
                     }
                     else{
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number).child("Password");
@@ -249,8 +254,8 @@ public class LoginActivity extends AppCompatActivity {
         Paper.init(this);
 
         String remember = Paper.book().read(Prevalent.remember_me);
-        if(remember == "True"){
-            startActivity(new Intent(LoginActivity.this, BuyMilkActivity.class));
+        if(remember.equals("True")){
+            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
             finish();
         }
 
@@ -271,10 +276,6 @@ public class LoginActivity extends AppCompatActivity {
         login_country_code_string += login_phone_number;
         login_phone_number = login_country_code_string;
 
-        if(remember_me){
-            Paper.book().write(Prevalent.remember_me, "True");
-        }
-
         if(login_phone_number.isEmpty() || login_password.isEmpty() || login_country_code_string.isEmpty()){
             useSnackBar("All fields are required", frameLayout);
         }
@@ -291,6 +292,9 @@ public class LoginActivity extends AppCompatActivity {
                     if(dataSnapshot.exists()){
                         String password = dataSnapshot.child("Password").getValue().toString();
                         if(password.equals(login_password)){
+                            if(remember_me){
+                                Paper.book().write(Prevalent.remember_me, "True");
+                            }
                             progressDialog.dismiss();
                             startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                             finish();
@@ -447,6 +451,11 @@ public class LoginActivity extends AppCompatActivity {
         login_phone_number = login_country_code_string;
         // This will now hold the user email
         login_password = loginPassword.getText().toString();
+
+        if(login_password.isEmpty() || login_country_code_string.isEmpty() || login_phone_number.isEmpty()){
+            useSnackBar("All fields are required", frameLayout);
+            progressDialog.dismiss();
+        }
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
         ref.addValueEventListener(new ValueEventListener() {

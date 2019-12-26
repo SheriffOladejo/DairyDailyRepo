@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.example.dixitlamba.R;
 import com.example.dixitlamba.UI.Dashboard.BuyMilk.BuyMilkActivity;
@@ -14,13 +15,13 @@ import com.example.dixitlamba.UI.Dashboard.ViewReport.ViewReportActivity;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    ImageView view_report;
-    ImageView buy_milk, sell_milk;
+    CardView view_report;
+    CardView buy_milk, sell_milk;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dashboard_activity);
+        setContentView(R.layout.test_dashboard);
 
         getSupportActionBar().setTitle("Dashboard");
 

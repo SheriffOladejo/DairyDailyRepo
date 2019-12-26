@@ -6,15 +6,16 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.example.dixitlamba.R;
 
 public class ViewReportActivity extends AppCompatActivity {
 
-    ImageView payment_register;
-    ImageView customer_report;
-    ImageView shift_report;
-    ImageView duplicate_slip;
+    LinearLayout payment_register;
+    LinearLayout customer_report;
+    LinearLayout shift_report;
+    LinearLayout duplicate_slip;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,7 +27,7 @@ public class ViewReportActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("View Report");
 
 
-        payment_register = findViewById(R.id.payment_register);
+        payment_register = findViewById(R.id.payment_report);
         customer_report = findViewById(R.id.customer_report);
         shift_report = findViewById(R.id.shift_report);
         duplicate_slip = findViewById(R.id.duplicate_slip);

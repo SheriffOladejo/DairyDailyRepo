@@ -37,7 +37,6 @@
         android:pivotY="55%"
         android:repeatCount="infinite"
         android:repeatMode="restart"
-        android:startOffset="3700"
-         />
+        android:startOffset="3700" />
 
 </set>
