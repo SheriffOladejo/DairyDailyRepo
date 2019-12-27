@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MeriDairy</string>
+    <string name="app_name">DairyDaily</string>
     <string name="phone_number">Phone Number</string>
     <string name="select_printer">Select Printer</string>
 </resources>

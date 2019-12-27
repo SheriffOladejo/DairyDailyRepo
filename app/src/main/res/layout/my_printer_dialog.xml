@@ -6,13 +6,7 @@
     android:layout_height="220dp"
     >
 
-    <ImageView
-        android:id="@+id/close"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_close"
-        android:layout_marginStart="280dp"
-        android:layout_marginTop="30dp"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,22 +15,36 @@
         android:layout_marginTop="30dp">
 
         <LinearLayout
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:orientation="vertical"
-            android:background="@drawable/rectangle_border"
-            android:layout_marginStart="70dp"
-            android:backgroundTint="@color/colorAccent">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_printer"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"/>
+            <LinearLayout
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:orientation="vertical"
+                android:background="@drawable/rectangle_border"
+                android:layout_marginStart="40dp"
+                android:backgroundTint="@color/colorAccent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_printer"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/close"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_close"
+                android:layout_marginStart="40dp"/>
 
         </LinearLayout>
 
@@ -57,7 +65,7 @@
                     android:id="@+id/device_text"
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
-                    android:text="SM-108 Bt"
+                    android:text=""
                     android:textSize="16sp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="20dp"/>
