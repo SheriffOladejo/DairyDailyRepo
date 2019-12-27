@@ -125,15 +125,18 @@ public class SendOtpActivity extends AppCompatActivity {
                 // for instance if the the phone number format is not valid.
 
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                    Log.d(TAG, "onVerificationFailed: " + "Ran out of quota");
                     useSnackBar("Ran out of quota", linearLayout);
                 } else if (e instanceof FirebaseTooManyRequestsException) {
                     // An Error 419 means too many requests have been made and you ahve to upgrade plan.
+                    Log.d(TAG, "onVerificationFailed: " + "Error 419");
                     useSnackBar("Error 419", linearLayout);
                 }
+                Log.d(TAG, "onVerificationFailed: " + e.getMessage());
                 useSnackBar("Unable to Sign Up. Invalid Phone Number", linearLayout);
                 progressDialog.dismiss();
-                startActivity(new Intent(SendOtpActivity.this, LoginActivity.class));
-                finish();
+                //startActivity(new Intent(SendOtpActivity.this, LoginActivity.class));
+                //finish();
             }
 
             @Override

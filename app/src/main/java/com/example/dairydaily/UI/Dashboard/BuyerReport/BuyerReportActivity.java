@@ -10,7 +10,7 @@ public class BuyerReportActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_buyer_report);
+        setContentView(R.layout.activity_buyer_report_by_date);
 
         getSupportActionBar().setTitle("Buyer Report");
         getSupportActionBar().setHomeButtonEnabled(true);
