@@ -93,20 +93,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:hint="SNF"
-            android:textColor="#ffffff"
-            android:textColorHint="#ffffff"
-            android:textAlignment="center"
-            android:paddingStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"/>
-
         <LinearLayout
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
             android:layout_marginEnd="20dp"
@@ -150,7 +138,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date         Name       Weight       SNF       Rate       Amount"
+            android:text="Sr        Name                   Weight        Rate       Amount"
             android:textSize="16sp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"

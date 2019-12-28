@@ -152,7 +152,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date         Name       Weight       SNF       Rate       Amount"
+            android:text="Sr         Name       Weight       SNF       Rate       Amount"
             android:textSize="16sp"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"

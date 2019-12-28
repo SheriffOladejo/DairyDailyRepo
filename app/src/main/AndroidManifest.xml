@@ -48,12 +48,14 @@
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
         <activity android:name=".UI.Dashboard.Customers.AddCustomers"
             android:parentActivityName=".UI.Dashboard.Customers.CustomersActivity"/>
-        <activity android:name=".UI.Dashboard.SetMilkRate.SetMilkRateActivity"
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.SetMilkRateActivity"
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
-        <activity android:name=".UI.Dashboard.BuyerReport.BuyerReportActivity"
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
         <activity android:name=".UI.Dashboard.SellMilk.MilkSaleEntryActivity"
             android:parentActivityName=".UI.Dashboard.SellMilk.SellMilkActivity"/>
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity" />
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.ReceiveCashActivity" />
     </application>
 
 </manifest>

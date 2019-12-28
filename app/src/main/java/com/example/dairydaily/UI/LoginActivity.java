@@ -251,15 +251,15 @@ public class LoginActivity extends AppCompatActivity {
         });
         callAll();
 
-//        Paper.init(this);
-//
-//        String remember = Paper.book().read(Prevalent.remember_me);
-//        if(remember != null){
-//            if(remember.equals("True")){
-//                startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
-//                finish();
-//            }
-//        }
+        Paper.init(this);
+
+        String remember = Paper.book().read(Prevalent.remember_me);
+        if(remember != null){
+            if(remember.equals("True")){
+                startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                finish();
+            }
+        }
 
         hideKeyboard(LoginActivity.this);
 
