@@ -13,92 +13,121 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:background="#ffffff">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="      ID                  Rs/Ltr                   Wt                      Rs"
-                android:textSize="16sp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="15dp"
-                android:textColor="#000000"/>
-
-        </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </android.support.v7.widget.RecyclerView>
-
-        <LinearLayout
-            android:layout_marginTop="20dp"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="       Total: "
+                android:text="Start Date"
                 android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"/>
 
-            <LinearLayout
-                android:layout_marginStart="30dp"
+            <ImageView
+                android:id="@+id/start_date_image"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_calendar"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="End Date"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="105dp"
+                android:layout_marginTop="20dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="       Wt"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:text="         30.2"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_marginStart="30dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="        Amount"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:text="             30.2"/>
-
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/end_date_image_view"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_calendar"
+                android:layout_marginStart="10dp"/>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/start_date_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dec 12,2019"
+                android:textSize="20sp"
+                android:textStyle="normal"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:id="@+id/end_date_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dec 20, 2019"
+                android:textSize="20sp"
+                android:textStyle="normal"
+                android:layout_marginStart="120dp"
+                android:layout_marginTop="10dp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="#000000"
+            android:background="?android:attr/listDivider" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/colorAccent"
+            android:text="GO"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/rectangle_border"
+            android:layout_marginTop="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/colorPrimary"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=" ID          Name              Total Weight         Total Amount"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="381dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp"
-            android:paddingStart="60dp"
+            android:paddingStart="20dp"
             android:layout_marginBottom="30dp">
 
             <Button
@@ -116,7 +145,17 @@
                 android:layout_height="50dp"
                 android:text="Print"
                 android:textColor="@android:color/white"
-                android:layout_marginStart="40dp"
+                android:layout_marginStart="20dp"
+                android:textAllCaps="false"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="@color/colorPrimaryDark"/>
+
+            <Button
+                android:layout_width="90dp"
+                android:layout_height="50dp"
+                android:text="Send MSG"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="20dp"
                 android:textAllCaps="false"
                 android:background="@drawable/rectangle_border"
                 android:backgroundTint="@color/colorPrimaryDark"/>

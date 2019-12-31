@@ -44,8 +44,6 @@
             android:parentActivityName="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
         <activity android:name="com.example.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity"
             android:parentActivityName="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
-        <activity android:name=".UI.Dashboard.Customers.CustomersActivity"
-            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
         <activity android:name=".UI.Dashboard.Customers.AddCustomers"
             android:parentActivityName=".UI.Dashboard.Customers.CustomersActivity"/>
         <activity android:name=".UI.Dashboard.ViewBuyerReport.SetMilkRateActivity"
@@ -54,8 +52,20 @@
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
         <activity android:name=".UI.Dashboard.SellMilk.MilkSaleEntryActivity"
             android:parentActivityName=".UI.Dashboard.SellMilk.SellMilkActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity" />
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.ReceiveCashActivity" />
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity"
+            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.ReceiveCashActivity"
+            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity"
+            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name=".UI.Dashboard.ViewBuyerReport.InvoiceActivity"
+            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name=".UI.Dashboard.AddProducts.AddProductActivity"
+            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
+        <activity android:name=".UI.Dashboard.Customers.CustomersActivity"
+            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
+        <activity android:name=".UI.Dashboard.ProductSale.ProductSaleActivity"
+            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
     </application>
 
 </manifest>

@@ -178,15 +178,16 @@
         <LinearLayout
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimary">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total: "
-                android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:text="    Total: "
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:layout_marginStart="45dp"
@@ -198,12 +199,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FAT"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:text="30.2"/>
 
@@ -219,13 +221,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="SNF"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@android:color/white"
                     android:text="30.2"/>
 
             </LinearLayout>
@@ -241,13 +244,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Wt"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@android:color/white"
                     android:text="30.2"/>
 
             </LinearLayout>
@@ -263,12 +267,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Amount"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:text="30.2"/>
 

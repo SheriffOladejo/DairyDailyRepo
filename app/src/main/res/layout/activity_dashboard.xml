@@ -136,6 +136,7 @@
                 </LinearLayout>
             </android.support.v7.widget.CardView>
             <android.support.v7.widget.CardView
+                android:id="@+id/add_product"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:layout_width="160dp"
@@ -259,13 +260,13 @@
 
         </LinearLayout>
         <android.support.v7.widget.CardView
+            android:id="@+id/product_Sale"
             android:foreground="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="13dp">
             <LinearLayout
-                android:id="@+id/add_bonus"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"

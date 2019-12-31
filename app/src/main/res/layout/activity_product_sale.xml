@@ -56,7 +56,7 @@
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
-            android:hint="Weight"
+            android:hint="Units"
             android:textColor="#373737"
             android:textColorHint="#373737"
             android:textAlignment="center"
@@ -78,11 +78,10 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Rs/Ltr"
+                android:text="Choose\n Product"
                 android:textColor="#ffffff"
                 android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_marginTop="15dp" />
+                android:textSize="18sp" />
 
         </LinearLayout>
 
@@ -138,7 +137,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sr        Name                   Weight        Rate       Amount"
+            android:text="              ID                      Product                  Amount"
             android:textSize="16sp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"

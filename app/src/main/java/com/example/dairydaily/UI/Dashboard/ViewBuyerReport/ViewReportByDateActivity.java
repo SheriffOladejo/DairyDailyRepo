@@ -11,5 +11,9 @@ public class ViewReportByDateActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buyer_report_by_date);
+
+        getSupportActionBar().setTitle("Report By Date");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 }

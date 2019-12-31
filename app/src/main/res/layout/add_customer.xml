@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:id="@+id/add_customer"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,12 +17,14 @@
         android:layout_gravity="center">
 
         <RadioGroup
+            android:id="@+id/group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="10dp">
 
             <RadioButton
+                android:id="@+id/buyer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Buyer"
@@ -30,6 +33,7 @@
                 android:layout_marginStart="10dp"/>
 
             <RadioButton
+                android:id="@+id/seller"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Seller"
@@ -43,19 +47,20 @@
     </LinearLayout>
 
     <EditText
-        android:id="@+id/login_password"
+        android:id="@+id/id"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/rectangle_border"
-        android:hint="Phone Number"
+        android:hint="Unique ID"
         android:layout_marginEnd="30dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
-        android:inputType="textPassword"
+        android:inputType="number"
         android:paddingStart="15dp" />
 
     <EditText
+        android:id="@+id/first_name"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/rectangle_border"
@@ -64,10 +69,10 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
-        android:inputType="textPassword"
         android:paddingStart="15dp" />
 
     <EditText
+        android:id="@+id/lastname"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/rectangle_border"
@@ -76,10 +81,23 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
-        android:inputType="textPassword"
         android:paddingStart="15dp" />
 
     <EditText
+        android:id="@+id/phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/rectangle_border"
+        android:hint="Phone Number"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:inputType="number"
+        android:textAlignment="center"
+        android:paddingStart="15dp" />
+
+    <EditText
+        android:id="@+id/address"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/rectangle_border"
@@ -88,11 +106,10 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
-        android:inputType="textPassword"
         android:paddingStart="15dp" />
 
     <Button
-        android:id="@+id/sign_up_button"
+        android:id="@+id/save"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"

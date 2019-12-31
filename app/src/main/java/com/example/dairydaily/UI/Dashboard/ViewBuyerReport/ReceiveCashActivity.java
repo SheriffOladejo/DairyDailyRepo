@@ -11,5 +11,9 @@ public class ReceiveCashActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_cash);
+
+        getSupportActionBar().setTitle("Receive Cash");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 }

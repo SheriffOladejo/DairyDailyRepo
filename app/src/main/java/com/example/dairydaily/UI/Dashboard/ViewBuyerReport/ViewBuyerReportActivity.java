@@ -34,5 +34,29 @@ public class ViewBuyerReportActivity extends AppCompatActivity {
                 startActivity(new Intent(ViewBuyerReportActivity.this, ReceiveCashActivity.class));
             }
         });
+        set_milk_rate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewBuyerReportActivity.this, SetMilkRateActivity.class));
+            }
+        });
+        view_report_by_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewBuyerReportActivity.this, ViewReportByDateActivity.class));
+            }
+        });
+        buyer_register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewBuyerReportActivity.this, BuyerRegisterActivity.class));
+            }
+        });
+        invoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewBuyerReportActivity.this, InvoiceActivity.class));
+            }
+        });
     }
 }

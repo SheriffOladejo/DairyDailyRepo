@@ -30,4 +30,40 @@ public class UtilityMethods {
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    // Converts the first letter in a string to uppercase
+    public static String convertFirstLetter(String name){
+        String result = "";
+        String indexZero = name.substring(0, 1);
+        result = indexZero.toUpperCase();
+        for(int x = 1; x < name.length(); x++){
+            result += name.charAt(x);
+        }
+        return result;
+    }
+
+    // Gets the first name from a fullname
+    public static String getFirstname(String name){
+        String firstname = "";
+        for(int i =0; i < name.length(); i++){
+            firstname += String.valueOf(name.charAt(i));
+            if(String.valueOf(name.charAt(i)).equals(" ")){
+                break;
+            }
+        }
+        return firstname.trim();
+    }
+
+    // Returns the lastname from a fullname
+    public static String getLastname(String name){
+        String lastname = "";
+        for(int i =0; i <= name.length() - 1; i++){
+            if(String.valueOf(name.charAt(i)).equals(" ")){
+                for(int j = i+1; j<name.length(); j++)
+                    lastname += String.valueOf(name.charAt(j));
+                break;
+            }
+        }
+        return lastname.trim();
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.dairydaily.UI.Dashboard.ViewBuyerReport;
+package com.example.dairydaily.UI.Dashboard.ProductSale;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -6,13 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.dairydaily.R;
 
-public class BuyerRegisterActivity extends AppCompatActivity {
+public class ProductSaleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_buyer_register);
+        setContentView(R.layout.activity_product_sale);
 
-        getSupportActionBar().setTitle("Buyer Register");
+        getSupportActionBar().setTitle("Product Sale");
         getSupportActionBar().setHomeButtonEnabled(true);
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }

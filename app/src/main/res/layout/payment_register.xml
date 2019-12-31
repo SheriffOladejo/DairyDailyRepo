@@ -197,31 +197,22 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"></android.support.v7.widget.RecyclerView>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:backgroundTint="#000000"
-            android:background="?android:attr/listDivider" />
-
-
         <LinearLayout
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimary">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total: "
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginStart="10dp"/>
+                android:text="    Total: "
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <LinearLayout
-                android:layout_marginStart="40dp"
+                android:layout_marginStart="45dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -230,12 +221,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FAT"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:text="30.2"/>
 
@@ -251,13 +243,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="SNF"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@android:color/white"
                     android:text="30.2"/>
 
             </LinearLayout>
@@ -273,13 +266,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Wt"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@android:color/white"
                     android:text="30.2"/>
 
             </LinearLayout>
@@ -295,27 +289,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Amount"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:text="30.2"/>
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:backgroundTint="#000000"
-            android:background="?android:attr/listDivider" />
-
 
         <LinearLayout
             android:layout_width="match_parent"

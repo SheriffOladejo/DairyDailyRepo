@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#373737">
+    android:background="#ffffff">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,8 +20,8 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="20dp"
-            android:textColor="#ffffff"
-            android:textColorHint="#ffffff"
+            android:textColor="#373737"
+            android:textColorHint="#373737"
             android:textAlignment="center"/>
 
         <LinearLayout
@@ -30,7 +30,7 @@
             android:background="@drawable/rectangle_border"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:backgroundTint="#AFACAC"
+            android:backgroundTint="#373737"
             android:orientation="vertical"
             android:textAlignment="center">
 
@@ -57,8 +57,8 @@
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
             android:hint="Weight"
-            android:textColor="#ffffff"
-            android:textColorHint="#ffffff"
+            android:textColor="#373737"
+            android:textColorHint="#373737"
             android:textAlignment="center"
             android:paddingStart="10dp"
             android:layout_marginTop="10dp"
@@ -71,7 +71,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="20dp"
-            android:backgroundTint="#AFACAC"
+            android:backgroundTint="#373737"
             android:orientation="vertical"
             android:textAlignment="center">
 
@@ -98,8 +98,8 @@
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
             android:hint="SNF"
-            android:textColor="#ffffff"
-            android:textColorHint="#ffffff"
+            android:textColor="#373737"
+            android:textColorHint="#373737"
             android:textAlignment="center"
             android:paddingStart="10dp"
             android:layout_marginTop="10dp"
@@ -112,7 +112,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="20dp"
-            android:backgroundTint="#AFACAC"
+            android:backgroundTint="#373737"
             android:orientation="vertical"
             android:textAlignment="center">
 

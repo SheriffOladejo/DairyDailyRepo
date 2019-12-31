@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:layout_marginStart="5dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textSize="18sp"
+            android:layout_marginStart="20dp"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:id="@+id/phone_number"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="Phone Number"
+            android:textSize="18sp"
+            android:layout_marginStart="10dp"
+            android:textColor="#000000"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:textColor="#000000"/>
+
+        <ImageView
+            android:id="@+id/options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/ic_more_vert"/>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:backgroundTint="#000000"
+        android:background="?android:attr/listDivider" />
+
+
+</LinearLayout>
