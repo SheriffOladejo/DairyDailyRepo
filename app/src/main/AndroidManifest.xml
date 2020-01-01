@@ -66,6 +66,8 @@
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
         <activity android:name=".UI.Dashboard.ProductSale.ProductSaleActivity"
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
+        <activity android:name=".UI.UsersListActivity"
+            android:parentActivityName=".UI.Dashboard.BuyMilk.BuyMilkActivity"/>
     </application>
 
 </manifest>

@@ -12,6 +12,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/id"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
@@ -35,9 +36,10 @@
             android:textAlignment="center">
 
             <TextView
+                android:id="@+id/seller_display"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="All Sellers"
+                android:text="All Users"
                 android:textAlignment="center"
                 android:textColor="#ffffff"
                 android:textSize="18sp"
@@ -53,6 +55,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/weight"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
@@ -76,6 +79,7 @@
             android:textAlignment="center">
 
             <TextView
+                android:id="@+id/rate_display"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Rs/Ltr"
@@ -94,6 +98,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/snf"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
@@ -117,6 +122,7 @@
             android:textAlignment="center">
 
             <TextView
+                android:id="@+id/amount_display"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Amount"
@@ -133,9 +139,9 @@
         android:id="@+id/save"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/rectangle_border"
         android:backgroundTint="@color/colorAccent"

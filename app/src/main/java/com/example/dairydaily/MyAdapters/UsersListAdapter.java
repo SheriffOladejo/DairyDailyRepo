@@ -19,16 +19,19 @@ import android.widget.Toast;
 import com.example.dairydaily.Models.CustomerModels;
 import com.example.dairydaily.Others.DbHelper;
 import com.example.dairydaily.R;
+import com.example.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.example.dairydaily.UI.Dashboard.Customers.AddCustomers;
 import com.example.dairydaily.UI.Dashboard.Customers.CustomersActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.example.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.example.dairydaily.Others.UtilityMethods.getLastname;
 
-public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHolder> implements Filterable {
+public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.ViewHolder> implements Filterable {
 
     private List<CustomerModels> list;
     private List<CustomerModels> listFull;
@@ -37,7 +40,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
 
     private Context context;
 
-    public CustomerAdapter(List<CustomerModels> list, Context context){
+    public UsersListAdapter(List<CustomerModels> list, Context context){
         this.context = context;
         this.list = list;
         listFull = new ArrayList<>(list);
@@ -109,6 +112,34 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             view = itemView;
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String date, am_pm;
+                    date = SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime());
+
+                    // Check time whether its morning or evening and check shift switches accordingly
+                    am_pm = "";
+                    Calendar dateTime = Calendar.getInstance();
+                    if(dateTime.get(Calendar.AM_PM) == Calendar.AM){
+                        am_pm = "AM";
+                    }
+                    else if(dateTime.get(Calendar.AM_PM) == Calendar.PM){
+                        am_pm = "PM";
+                    }
+                    String name = list.get(getAdapterPosition()).getName();
+                    String phone_number = list.get(getAdapterPosition()).getPhone_number();
+                    Intent intent = new Intent(context, MilkBuyEntryActivity.class);
+                    int id = dbHelper.getSellerId(name, phone_number);
+                    intent.putExtra("name", name);
+                    intent.putExtra("passed", true);
+                    intent.putExtra("Shift", am_pm);
+                    intent.putExtra("Date", date);
+                    intent.putExtra("id", id);
+                    context.startActivity(intent);
+                }
+            });
         }
 
         private void setData(String name, String phone_number, int id, final String status){
@@ -140,10 +171,6 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
                             intent.putExtra("address", addressToPass);
                             intent.putExtra("status", statusToPass);
                             intent.putExtra("update", true);
-//                            if(status.equals("Buyer"))
-//                                dbHelper.deleteBuyer(idToPass);
-//                            else if(status.equals("Seller"))
-//                                dbHelper.deleteSeller(idToPass);
                             context.startActivity(intent);
                             break;
                         case 2:

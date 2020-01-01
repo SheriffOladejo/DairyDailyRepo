@@ -31,7 +31,7 @@ import java.util.List;
 
 import static com.example.dairydaily.Others.UtilityMethods.hideKeyboard;
 
-public class CustomersActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class CustomersActivity extends AppCompatActivity {
 
     LinearLayout seller_layout, buyer_layout;
     EditText search;
@@ -73,6 +73,9 @@ public class CustomersActivity extends AppCompatActivity implements SearchView.O
         populateBuyerView();
         populateSellerView();
 
+        // Get value passed from milkBuyEntryActivity
+        boolean from_milk_entry = getIntent().getBooleanExtra("from_milk_entry", false);
+
         // initially make buyers button colorAccent and sellers to gray
         sellers.setBackgroundColor(getResources().getColor(R.color.lightgray));
         buyers.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -88,7 +91,6 @@ public class CustomersActivity extends AppCompatActivity implements SearchView.O
                 // Hide the buyers view
                 buyer_layout.setVisibility(View.GONE);
                 seller_layout.setVisibility(View.VISIBLE);
-
                 sellers.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                 buyers.setBackgroundColor(getResources().getColor(R.color.lightgray));
             }
@@ -168,7 +170,7 @@ public class CustomersActivity extends AppCompatActivity implements SearchView.O
 
                 CustomerModels model = new CustomerModels(phone_number, name, address, id, status);
                 buyer_list.add(model);
-                Log.d(TAG, "populateBuyerView: " + status);
+                Log.d(TAG, "populateBuyerView: status " + status +" id: " + id);
             }
             buyer_adapter = new CustomerAdapter(buyer_list, this);
             buyers_recyclerview.setAdapter(buyer_adapter);
@@ -209,15 +211,5 @@ public class CustomersActivity extends AppCompatActivity implements SearchView.O
     @Override
     public void onBackPressed() {
         startActivity(new Intent(CustomersActivity.this, DashboardActivity.class));
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
     }
 }

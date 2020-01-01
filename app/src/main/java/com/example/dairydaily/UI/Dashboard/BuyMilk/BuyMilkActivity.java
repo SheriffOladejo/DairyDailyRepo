@@ -53,8 +53,6 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
 
     private Button proceed;
 
-    String date;
-
     public static ArrayList<SpinnerItem> deviceList;
     static Set<BluetoothDevice> pairedDevice;
 
@@ -71,6 +69,7 @@ public class BuyMilkActivity extends AppCompatActivity implements DatePickerDial
     TextView dateView;
     Switch online_switch, print_switch, morning_switch, evening_switch;
 
+    private String date;
     private String am_pm;
 
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");

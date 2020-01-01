@@ -35,6 +35,8 @@ public class AddCustomers extends AppCompatActivity {
     private String status;
     int passId;
 
+    private boolean update = false;
+
     private DbHelper dbHelper;
 
     @Override
@@ -76,13 +78,20 @@ public class AddCustomers extends AppCompatActivity {
         status = getIntent().getStringExtra("status");
         phone_number = getIntent().getStringExtra("phone_number");
         passId = getIntent().getIntExtra("ID", 0);
+        update = getIntent().getBooleanExtra("update", false);
+
+        if(update){
+            if(status.equals("Buyer"))
+                buyer.setChecked(true);
+            else if(status.equals("Seller"))
+                seller.setChecked(true);
+        }
 
         firstnameEdittext.setText(firstname);
         lastnameEdittext.setText(lastname);
         addressEdittext.setText(address);
         phone_numberEdittext.setText(phone_number);
         idEditText.setText(String.valueOf(passId));
-
     }
 
     private void saveEntry(){
@@ -106,20 +115,29 @@ public class AddCustomers extends AppCompatActivity {
         else{
             String fullname = firstname + " " + lastname;
 
-            if(seller.isChecked()){
+            if(update && seller.isChecked()){
+                dbHelper.updateSeller(passId, Integer.valueOf(idEditText.getText().toString()), firstnameEdittext.getText().toString() + " "
+                                + lastnameEdittext.getText().toString(),
+                        phone_numberEdittext.getText().toString(), addressEdittext.getText().toString(),
+                        "Seller");
+                Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
+                startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
+                finish();
+            }
+
+            else if(update && buyer.isChecked()){
+                dbHelper.updateBuyer(passId, Integer.valueOf(idEditText.getText().toString()), firstnameEdittext.getText().toString() + " "
+                                + lastnameEdittext.getText().toString(),
+                        phone_numberEdittext.getText().toString(), addressEdittext.getText().toString(),
+                        "Buyer");
+                Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
+                startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
+                finish();
+            }
+
+            if(seller.isChecked() && !update){
                 status = "Seller";
-                Cursor sellers = dbHelper.getAllSellers();
-                boolean exists = false;
-                if(sellers.getCount() != 0){
-                    while(sellers.moveToNext()){
-                        if(sellers.getInt(0) == Integer.valueOf(id)){
-                            Toast.makeText(AddCustomers.this, "ID has already been taken", Toast.LENGTH_SHORT).show();
-                            exists = true;
-                            break;
-                        }
-                    }
-                }
-                if(!exists){
+                if(!sellerExists(id)){
                     if(dbHelper.addSeller(Integer.valueOf(id), convertFirstLetter(fullname), phone_number, address, status)){
                         startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
                         finish();
@@ -128,22 +146,14 @@ public class AddCustomers extends AppCompatActivity {
                         Toast.makeText(AddCustomers.this, "Unable to add customer", Toast.LENGTH_SHORT).show();
                     }
                 }
+                else{
+                    useSnackBar("Id is already taken", add_customer);
+                }
             }
 
-            else if(buyer.isChecked()){
+            else if(buyer.isChecked() && !update){
                 status = "Buyer";
-                Cursor buyers = dbHelper.getAllBuyers();
-                boolean exists = false;
-                if(buyers.getCount() != 0){
-                    while(buyers.moveToNext()){
-                        if(buyers.getInt(0) == Integer.valueOf(id)){
-                            Toast.makeText(AddCustomers.this, "ID has already been taken", Toast.LENGTH_SHORT).show();
-                            exists = true;
-                            break;
-                        }
-                    }
-                }
-                if(!exists){
+                if(!buyerExists(id)){
                     if(dbHelper.addBuyer(Integer.valueOf(id) ,convertFirstLetter(fullname), phone_number, address, status)){
                         startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
                         Log.d(TAG, "saveEntry: " +status);
@@ -152,8 +162,41 @@ public class AddCustomers extends AppCompatActivity {
                     else
                         Toast.makeText(AddCustomers.this, "Unable to add customer", Toast.LENGTH_SHORT).show();
                 }
+                else{
+                    useSnackBar("Id is already taken", add_customer);
+                }
             }
         }
+    }
+
+    // Checks if the id is already taken by a seller
+    private boolean sellerExists(String id){
+        Cursor sellers = dbHelper.getAllSellers();
+        boolean exists = false;
+        if(sellers.getCount() != 0){
+            while(sellers.moveToNext()){
+                if(sellers.getInt(0) == Integer.valueOf(id)){
+                    exists = true;
+                    break;
+                }
+            }
+        }
+        return exists;
+    }
+
+    // Checks if the id is already taken by a buyer
+    private boolean buyerExists(String id){
+        Cursor buyers = dbHelper.getAllBuyers();
+        boolean exists = false;
+        if(buyers.getCount() != 0){
+            while(buyers.moveToNext()){
+                if(buyers.getInt(0) == Integer.valueOf(id)){
+                    exists = true;
+                    break;
+                }
+            }
+        }
+        return exists;
     }
 
     @Override
