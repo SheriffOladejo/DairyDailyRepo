@@ -1,73 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.dairydaily">
+    package="com.juicebox.dairydaily">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.STORAGE"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.example.dairydaily.UI.SendOtpActivity"></activity>
-        <activity android:name="com.example.dairydaily.UI.BluetoothPrinterActivity"></activity>
-        <activity android:name="com.example.dairydaily.Others.PhoneAuth"></activity>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.DashboardActivity"></activity>
-        <activity android:name="com.example.dairydaily.UI.MainActivity" />
-        <activity android:name="com.example.dairydaily.UI.SignUpActivity" />
-        <activity android:name="com.example.dairydaily.UI.LoginActivity">
+        <activity android:name="com.juicebox.dairydaily.UI.SendOtpActivity"></activity>
+        <activity android:name="com.juicebox.dairydaily.UI.BluetoothPrinterActivity"></activity>
+        <activity android:name="com.juicebox.dairydaily.Others.PhoneAuth"></activity>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.DashboardActivity"></activity>
+        <activity android:name="com.juicebox.dairydaily.UI.MainActivity" />
+        <activity android:name="com.juicebox.dairydaily.UI.SignUpActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW">
+
+                </action>
+            </intent-filter>
+        </activity>
+        <activity android:name=".UI.Dashboard.DashboardActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.dairydaily.TestCode.StateCityViews" />
-        <activity android:name="com.example.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity"/>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.DashboardActivity" />
-        <activity android:name="com.example.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.DashboardActivity"/>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.DashboardActivity"/>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.ViewReport.DuplicateSlipActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
-        <activity android:name="com.example.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity"
-            android:parentActivityName="com.example.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
-        <activity android:name=".UI.Dashboard.Customers.AddCustomers"
-            android:parentActivityName=".UI.Dashboard.Customers.CustomersActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.SetMilkRateActivity"
+        <activity android:name="com.juicebox.dairydaily.TestCode.StateCityViews" />
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity"/>
+        <activity android:name=".UI.Dashboard.SellMilk.SellMilkActivity"
             android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"
-            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
-        <activity android:name=".UI.Dashboard.SellMilk.MilkSaleEntryActivity"
-            android:parentActivityName=".UI.Dashboard.SellMilk.SellMilkActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity"
-            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.ReceiveCashActivity"
-            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity"
-            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
-        <activity android:name=".UI.Dashboard.ViewBuyerReport.InvoiceActivity"
-            android:parentActivityName=".UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
-        <activity android:name=".UI.Dashboard.AddProducts.AddProductActivity"
-            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
-        <activity android:name=".UI.Dashboard.Customers.CustomersActivity"
-            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
-        <activity android:name=".UI.Dashboard.ProductSale.ProductSaleActivity"
-            android:parentActivityName=".UI.Dashboard.DashboardActivity"/>
-        <activity android:name=".UI.UsersListActivity"
-            android:parentActivityName=".UI.Dashboard.BuyMilk.BuyMilkActivity"/>
+        <activity android:name=".UI.LoginActivity" />
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.DashboardActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewReport.DuplicateSlipActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.Customers.AddCustomers"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.Customers.CustomersActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.SetMilkRateActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.DashboardActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.DashboardActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.InvoiceActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.AddProducts.AddProductActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.DashboardActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity"
+            android:parentActivityName="com.juicebox.dairydaily.UI.Dashboard.DashboardActivity"/>
+        <activity android:name="com.juicebox.dairydaily.UI.UsersListActivity" />
+        <activity android:name=".UI.Dashboard.ReadFile" />
+        <activity android:name="com.juicebox.dairydaily.CowChart.CowSNF" />
+        <activity android:name="com.juicebox.dairydaily.UI.Dashboard.Customers.CustomersActivity" />
+        <activity android:name="com.juicebox.dairydaily.RateChart.RateChartOptions" />
     </application>
 
 </manifest>

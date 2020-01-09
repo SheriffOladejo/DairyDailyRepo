@@ -69,6 +69,7 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/morning_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Morning"/>
@@ -87,6 +88,7 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/evening_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Evening"/>

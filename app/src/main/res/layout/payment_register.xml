@@ -21,13 +21,13 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"/>
+                android:layout_marginTop="5dp"/>
 
             <ImageView
                 android:id="@+id/start_date_image"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="5dp"
                 android:src="@drawable/ic_calendar"
                 android:layout_marginStart="10dp"/>
 
@@ -38,13 +38,13 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginStart="120dp"
-                android:layout_marginTop="20dp"/>
+                android:layout_marginTop="5dp"/>
 
             <ImageView
                 android:id="@+id/end_date_image_view"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="5dp"
                 android:src="@drawable/ic_calendar"
                 android:layout_marginStart="10dp"/>
 
@@ -53,7 +53,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="1"
             android:backgroundTint="#000000"
             android:background="?android:attr/listDivider" />
@@ -77,7 +77,7 @@
                     android:textSize="20sp"
                     android:textStyle="normal"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="5dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -86,19 +86,21 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="5dp"/>
 
                 <RadioGroup
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
                     <RadioButton
+                        android:id="@+id/start_morning_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Morning"
                         android:layout_marginStart="20dp"/>
 
                     <RadioButton
+                        android:id="@+id/start_evening_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Evening"
@@ -122,7 +124,7 @@
                     android:textSize="20sp"
                     android:textStyle="normal"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="5dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -131,19 +133,21 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="5dp"/>
 
                 <RadioGroup
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
                     <RadioButton
+                        android:id="@+id/end_morning_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Morning"
                         android:layout_marginStart="20dp"/>
 
                     <RadioButton
+                        android:id="@+id/end_evening_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Evening"
@@ -158,7 +162,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="1"
             android:backgroundTint="#000000"
             android:background="?android:attr/listDivider" />
@@ -172,7 +176,7 @@
             android:backgroundTint="@color/colorAccent"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_gravity="center"
             android:background="@drawable/rectangle_border"/>
 
@@ -180,7 +184,7 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@color/colorPrimary"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="5dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -195,10 +199,10 @@
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="200dp"></android.support.v7.widget.RecyclerView>
+            android:layout_height="354dp"></android.support.v7.widget.RecyclerView>
 
         <LinearLayout
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:orientation="horizontal"
@@ -209,7 +213,8 @@
                 android:layout_height="wrap_content"
                 android:text="    Total: "
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"/>
 
             <LinearLayout
                 android:layout_marginStart="45dp"
@@ -303,44 +308,47 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:paddingStart="40dp"
-            android:layout_marginBottom="30dp">
+            android:layout_marginTop="5dp">
 
             <Button
-                android:layout_width="100dp"
+                android:id="@+id/print"
+                android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:text="Send MSG"
+                android:layout_alignParentEnd="true"
                 android:textColor="@android:color/white"
                 android:textAllCaps="false"
                 android:background="@drawable/rectangle_border"
                 android:backgroundTint="@color/colorPrimaryDark"/>
 
             <Button
-                android:layout_width="70dp"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="PDF"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"
-                android:layout_marginStart="10dp"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/print"
+                android:layout_toEndOf="@+id/send_msg"
                 android:background="@drawable/rectangle_border"
-                android:backgroundTint="@color/colorPrimaryDark"/>
+                android:backgroundTint="@color/colorPrimary"
+                android:text="PDF"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
 
             <Button
-                android:layout_width="90dp"
+                android:id="@+id/send_msg"
+                android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:text="Print"
+                android:layout_alignParentStart="true"
                 android:textColor="@android:color/white"
-                android:layout_marginStart="10dp"
                 android:textAllCaps="false"
                 android:background="@drawable/rectangle_border"
-                android:backgroundTint="@color/colorPrimaryDark"/>
+                android:backgroundTint="@color/colorAccent"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 

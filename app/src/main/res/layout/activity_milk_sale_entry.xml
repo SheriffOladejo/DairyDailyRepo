@@ -12,6 +12,8 @@
         android:orientation="horizontal">
 
         <EditText
+            android:inputType="number"
+            android:id="@+id/id"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
@@ -35,6 +37,7 @@
             android:textAlignment="center">
 
             <TextView
+                android:id="@+id/buyers"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="All Buyers"
@@ -53,6 +56,8 @@
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/weight"
+            android:inputType="numberDecimal"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
@@ -76,6 +81,7 @@
             android:textAlignment="center">
 
             <TextView
+                android:id="@+id/rate_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Rs/Ltr"
@@ -105,6 +111,7 @@
             android:textAlignment="center">
 
             <TextView
+                android:id="@+id/amount_display"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Amount"
@@ -117,6 +124,7 @@
 
     </LinearLayout>
     <Button
+        android:id="@+id/save"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="Save"
@@ -148,6 +156,7 @@
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

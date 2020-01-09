@@ -12,6 +12,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:inputType="number"
             android:id="@+id/id"
             android:layout_width="150dp"
             android:layout_height="50dp"
@@ -55,6 +56,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:inputType="numberDecimal"
             android:id="@+id/weight"
             android:layout_width="150dp"
             android:layout_height="50dp"
@@ -98,11 +100,12 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/snf"
+            android:inputType="numberDecimal"
+            android:id="@+id/fat"
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:background="@drawable/rectangle_border"
-            android:hint="SNF"
+            android:hint="Fat"
             android:textColor="#373737"
             android:textColorHint="#373737"
             android:textAlignment="center"
@@ -130,6 +133,63 @@
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:layout_marginTop="15dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:inputType="numberDecimal"
+            android:id="@+id/snf"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="@drawable/rectangle_border"
+            android:hint="SNF"
+            android:textColor="#373737"
+            android:textColorHint="#373737"
+            android:textAlignment="center"
+            android:paddingStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"/>
+
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="@drawable/rectangle_border"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:backgroundTint="#373737"
+            android:orientation="vertical"
+            android:textAlignment="center">
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:text="Cow"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"/>
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:text="Buffalo"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"/>
+
+            </RadioGroup>
 
         </LinearLayout>
 

@@ -39,7 +39,7 @@
                 android:background="@drawable/rectangle_border"
                 android:backgroundTint="#373737"
                 android:layout_marginTop="20dp"
-                android:layout_marginStart="50dp">
+                android:layout_marginStart="105dp">
 
                 <TextView
                     android:layout_width="match_parent"

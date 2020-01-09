@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+
+    <LinearLayout
+        android:id="@+id/rate_values"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/colorPrimary"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="@color/black"
+            app:tabTextColor="@color/white">
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="470dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp">
+
+        </android.support.v4.view.ViewPager>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+
+            <Button
+                android:id="@+id/load_from_memory"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:text="Load From\n Memory"
+                android:layout_alignParentEnd="true"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="@color/colorPrimaryDark"/>
+
+            <Button
+                android:id="@+id/update_from_server"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/load_from_memory"
+                android:layout_toEndOf="@+id/update"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="Update From\n Server"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/update"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:text="Update"
+                android:layout_alignParentStart="true"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="@color/colorAccent"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/directory_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <ListView
+            android:id="@+id/navigate_phone"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"></ListView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:paddingStart="70dp">
+
+            <Button
+                android:id="@+id/back"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:text="Back"
+                android:layout_alignParentEnd="true"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="@color/colorPrimaryDark"/>
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/back"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</FrameLayout>

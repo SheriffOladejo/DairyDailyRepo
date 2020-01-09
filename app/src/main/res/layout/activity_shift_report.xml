@@ -74,6 +74,7 @@
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/morning_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Morning"/>
@@ -92,6 +93,7 @@
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/evening_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Evening"/>
@@ -150,7 +152,7 @@
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="200dp"></android.support.v7.widget.RecyclerView>
+            android:layout_height="300dp"></android.support.v7.widget.RecyclerView>
 
         <LinearLayout
             android:layout_marginTop="20dp"
@@ -258,45 +260,47 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:paddingStart="40dp"
-            android:layout_marginBottom="30dp">
+            android:layout_marginTop="5dp">
 
             <Button
-                android:layout_width="100dp"
+                android:id="@+id/print"
+                android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:text="Send MSG"
+                android:layout_alignParentEnd="true"
                 android:textColor="@android:color/white"
                 android:textAllCaps="false"
                 android:background="@drawable/rectangle_border"
                 android:backgroundTint="@color/colorPrimaryDark"/>
 
             <Button
-                android:layout_width="70dp"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="PDF"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"
-                android:layout_marginStart="10dp"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/print"
+                android:layout_toEndOf="@+id/send_msg"
                 android:background="@drawable/rectangle_border"
-                android:backgroundTint="@color/colorPrimaryDark"/>
+                android:backgroundTint="@color/colorPrimary"
+                android:text="PDF"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
 
             <Button
-                android:layout_width="90dp"
+                android:id="@+id/send_msg"
+                android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:text="Print"
+                android:layout_alignParentStart="true"
                 android:textColor="@android:color/white"
-                android:layout_marginStart="10dp"
                 android:textAllCaps="false"
                 android:background="@drawable/rectangle_border"
-                android:backgroundTint="@color/colorPrimaryDark"/>
+                android:backgroundTint="@color/colorAccent"/>
 
-        </LinearLayout>
-
+        </RelativeLayout>
     </LinearLayout>
 
 </ScrollView>

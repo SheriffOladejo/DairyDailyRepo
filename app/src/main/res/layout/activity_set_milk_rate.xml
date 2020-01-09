@@ -15,7 +15,7 @@
         android:layout_margin="30dp"
         android:paddingStart="20dp"
         android:layout_gravity="center"
-        android:inputType="number"/>
+        android:inputType="numberDecimal"/>
 
     <Button
         android:id="@+id/save"
