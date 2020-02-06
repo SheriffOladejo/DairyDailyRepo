@@ -1,237 +1,489 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.constraint.ConstraintLayout
+    android:id="@+id/constraintlayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#ffffff">
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/linearLayout11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:inputType="number"
-            android:id="@+id/id"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:hint="ID"
-            android:paddingStart="10dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="20dp"
-            android:textColor="#373737"
-            android:textColorHint="#373737"
-            android:textAlignment="center"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/frameLayout"
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <EditText
+                        android:id="@+id/id"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:inputType="number"
+                        android:background="@drawable/rectangle_border"
+                        android:hint="ID"
+                        android:textAlignment="center"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="120dp"
+                        android:layout_marginTop="7dp"
+                        android:src="@drawable/ic_account_box_black_24dp" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/rectangle_border"
+                    android:backgroundTint="#373737"
+                    android:orientation="vertical"
+                    android:layout_toEndOf="@id/frameLayout"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/seller_display"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="All Users"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/weight"
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rectangle_border"
+                    android:hint="Weight"
+                    android:inputType="numberDecimal"
+                    android:paddingStart="10dp"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rectangle_border"
+                    android:backgroundTint="#373737"
+                    android:orientation="vertical"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/rate_display"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:text="Rs/Ltr"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/fat"
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rectangle_border"
+                    android:hint="Fat"
+                    android:inputType="numberDecimal"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rectangle_border"
+                    android:backgroundTint="#373737"
+                    android:orientation="vertical"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/amount_display"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:text="Amount"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:backgroundTint="#373737"
-            android:orientation="vertical"
-            android:textAlignment="center">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerHorizontal="true">
 
-            <TextView
-                android:id="@+id/seller_display"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="All Users"
+            <EditText
+                android:id="@+id/snf"
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rectangle_border"
+                android:hint="SNF"
+                android:inputType="numberDecimal"
                 android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="18sp"
-                android:layout_marginTop="15dp" />
+                />
+
+
+            <LinearLayout
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rectangle_border"
+                android:backgroundTint="#373737"
+                android:orientation="horizontal"
+                android:textAlignment="center">
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/cow_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginTop="2dp"
+                        android:text="Cow"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/buffalo_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginEnd="1dp"
+                        android:text="Buffalo"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                </RadioGroup>
+
+            </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:inputType="numberDecimal"
-            android:id="@+id/weight"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:hint="Weight"
-            android:textColor="#373737"
-            android:textColorHint="#373737"
-            android:textAlignment="center"
-            android:paddingStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"/>
-
-        <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"
-            android:backgroundTint="#373737"
-            android:orientation="vertical"
-            android:textAlignment="center">
-
-            <TextView
-                android:id="@+id/rate_display"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Rs/Ltr"
-                android:textColor="#ffffff"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_marginTop="15dp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:inputType="numberDecimal"
-            android:id="@+id/fat"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:hint="Fat"
-            android:textColor="#373737"
-            android:textColorHint="#373737"
-            android:textAlignment="center"
-            android:paddingStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"/>
-
-        <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"
-            android:backgroundTint="#373737"
-            android:orientation="vertical"
-            android:textAlignment="center">
-
-            <TextView
-                android:id="@+id/amount_display"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Amount"
-                android:textColor="#ffffff"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:layout_marginTop="15dp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:inputType="numberDecimal"
-            android:id="@+id/snf"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:hint="SNF"
-            android:textColor="#373737"
-            android:textColorHint="#373737"
-            android:textAlignment="center"
-            android:paddingStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"/>
-
-
-        <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangle_border"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"
-            android:backgroundTint="#373737"
-            android:orientation="vertical"
-            android:textAlignment="center">
-
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:text="Cow"
-                    android:textColor="@color/white"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginStart="5dp"/>
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:text="Buffalo"
-                    android:textColor="@color/white"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginStart="5dp"/>
-
-            </RadioGroup>
-
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 
     <Button
         android:id="@+id/save"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="40dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/rectangle_border"
         android:backgroundTint="@color/colorAccent"
         android:text="Save"
         android:textAllCaps="false"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout11" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="#30EC3D">
+        <RelativeLayout
+            android:id="@+id/linearLayout12"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="#30EC3D"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/save"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sr         Name       Weight       SNF       Rate       Amount"
-            android:textSize="16sp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
-            android:textColor="#ffffff"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/sr"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textAlignment="center"
+                    android:text="Sr"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:text="Name"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textAlignment="center"
+                    android:layout_marginTop="5dp"
+                    android:text="Weight"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:layout_marginTop="5dp"
+                    android:text="Fat/SNF"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/rate"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:text="Rate"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/amount"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Amount"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/options"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/linearLayout12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/linearLayout13"
+            android:layout_height="0dp"/>
 
 
-    </android.support.v7.widget.RecyclerView>
+        <RelativeLayout
+            android:id="@+id/linearLayout13"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="horizontal"
+            android:layout_below="@id/recyclerview">
 
-</LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Average Fat"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/fatAverage"
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Weight"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/weightTotal"
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Amount"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/amountTotal"
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+</android.support.constraint.ConstraintLayout>

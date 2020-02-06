@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     signingConfigs {
         release {
             storeFile file('C:\\Users\\HunchoMufasa\\Desktop\\new Apps\\DairyDaily\\dairydaily.jks')
@@ -13,7 +17,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.juicebox.dairydaily"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 2
@@ -33,6 +37,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //implementation 'com.android.support:multidex:1.0.1'
     implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.hanks:passcodeview:0.1.2'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.google.firebase:firebase-auth:16.0.5'

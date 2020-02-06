@@ -22,7 +22,12 @@ import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.Customers.AddCustomers;
 import com.juicebox.dairydaily.UI.Dashboard.Customers.CustomersActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,11 +43,16 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
     private List<CustomerModels> listFull;
     private DbHelper dbHelper;
     private static final String TAG = "CustomerAdapter";
+    private String shift, date;
+    private String from;
 
     private Context context;
 
-    public UsersListAdapter(List<CustomerModels> list, Context context){
+    public UsersListAdapter(List<CustomerModels> list, Context context, String from, String shift, String date){
         this.context = context;
+        this.shift = shift;
+        this.date = date;
+        this.from = from;
         this.list = list;
         listFull = new ArrayList<>(list);
         dbHelper = new DbHelper(context);
@@ -117,44 +127,46 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String date, am_pm;
-                    date = SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime());
 
-                    // Check time whether its morning or evening and check shift switches accordingly
-                    am_pm = "";
-                    Calendar dateTime = Calendar.getInstance();
-                    if(dateTime.get(Calendar.AM_PM) == Calendar.AM){
-                        am_pm = "AM";
-                    }
-                    else if(dateTime.get(Calendar.AM_PM) == Calendar.PM){
-                        am_pm = "PM";
-                    }
                     String name = list.get(getAdapterPosition()).getName();
                     String type = list.get(getAdapterPosition()).getStatus();
                     String phone_number = list.get(getAdapterPosition()).getPhone_number();
-                    Intent intent = new Intent(context, MilkBuyEntryActivity.class);
-                    Intent intent2 = new Intent(context, MilkSaleEntryActivity.class);
+                    Intent intent = new Intent(context, MilkSaleEntryActivity.class);
+                    Intent intent2 = new Intent(context, MilkBuyEntryActivity.class);
 
-                    int id2 = dbHelper.getBuyerId(name, phone_number);
+                    int id2 = dbHelper.getSellerId(name, phone_number);
                     intent2.putExtra("name", name);
                     intent2.putExtra("passed", true);
-                    intent2.putExtra("Shift", am_pm);
+                    intent2.putExtra("Shift", shift);
                     intent2.putExtra("Date", date);
                     intent2.putExtra("id", id2);
 
-                    int id = dbHelper.getSellerId(name, phone_number);
+                    int id = dbHelper.getBuyerId(name, phone_number);
                     intent.putExtra("name", name);
                     intent.putExtra("passed", true);
-                    intent.putExtra("Shift", am_pm);
+                    intent.putExtra("Shift", shift);
                     intent.putExtra("Date", date);
                     intent.putExtra("id", id);
 
-                    if(type.equals("Seller")){
+                    Log.d(TAG, "onMilkBuyClick: " + intent2.getStringExtra(from));
+                    Log.d(TAG, "onMilkBuyClick: " + id2);
+
+                    if(from.equals("MilkSaleEntryActivity")){
                         context.startActivity(intent);
                     }
-                    else if(type.equals("Buyer")){
+                    else if(from.equals("MilkBuyEntryActivity")){
                         context.startActivity(intent2);
                     }
+                    else if(from.equals("ReceiveCash"))
+                        context.startActivity(new Intent(context, ReceiveCashActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
+                    else if(from.equals("ViewReport"))
+                        context.startActivity(new Intent(context, ViewReportByDateActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
+                    else if(from.equals("CustomerReportActivity"))
+                        context.startActivity(new Intent(context, CustomerReportActivity.class).putExtra("id", dbHelper.getSellerId(name, phone_number)).putExtra("name", name));
+                    else if(from.equals("ProductSaleActivity"))
+                        context.startActivity(new Intent(context, ProductSaleActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
+                    else if(from.equals("ViewAllEntryActivity"))
+                        context.startActivity(new Intent(context, ViewAllEntryActivity.class).putExtra("id", dbHelper.getSellerId(name, phone_number)).putExtra("name", name));
                 }
             });
         }

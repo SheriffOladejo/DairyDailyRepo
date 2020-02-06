@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,8 @@ import com.juicebox.dairydaily.RateChart.RateChartOptions;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 
 
 public class CowSNF extends AppCompatActivity implements
@@ -51,8 +55,8 @@ public class CowSNF extends AppCompatActivity implements
 
     private DbHelper dbHelper;
     private static final String TAG = "CowSNF";
-    Button load_from_memory, update, cancel, back;
-    LinearLayout rate_values, directory_view;
+    Button load_from_memory, cancel, back;
+    ConstraintLayout rate_values, directory_view;
     ListView navigate_phone;
 
     private String[] filePathStrings;
@@ -69,6 +73,7 @@ public class CowSNF extends AppCompatActivity implements
     int count = 0;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,10 +163,14 @@ public class CowSNF extends AppCompatActivity implements
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CowSNF.this, CowSNF.class);
-                intent.putExtra("Name", nameOfSnf);
-                startActivity(intent);
-                finish();
+                rate_values.setVisibility(View.VISIBLE);
+                directory_view.setVisibility(View.GONE);
+                getSupportActionBar().setTitle(nameOfSnf + " Rate Chart");
+
+//                Intent intent = new Intent(CowSNF.this, CowSNF.class);
+//                intent.putExtra("Name", nameOfSnf);
+//                startActivity(intent);
+//                finish();
             }
         });
 
@@ -206,24 +215,6 @@ public class CowSNF extends AppCompatActivity implements
         });
 
         checkFilePermissions();
-        
-        update = findViewById(R.id.update);
-
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(nameOfSnf.equals("Buffalo")){
-                    dbHelper.clearBuffaloSNFTable();
-                    startActivity(new Intent(CowSNF.this, CowSNF.class).putExtra("Name", nameOfSnf));
-                    finish();
-                }
-                else if(nameOfSnf.equals("Cow")){
-                    dbHelper.clearSNFTable();
-                    startActivity(new Intent(CowSNF.this, CowSNF.class).putExtra("Name", nameOfSnf));
-                    finish();
-                }
-            }
-        });
 
         load_from_memory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -275,6 +266,7 @@ public class CowSNF extends AppCompatActivity implements
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkFilePermissions() {
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
             int permissionCheck = this.checkSelfPermission("Manifest.Permission.READ_EXTERNAL_STORAGE");

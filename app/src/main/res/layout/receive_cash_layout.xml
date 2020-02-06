@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_marginTop="10dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="100dp"
+            android:layout_marginStart="10dp"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginStart="10dp"
+            android:textColor="@android:color/black"
+            android:text="Title"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/debit"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Debit"
+            android:layout_marginStart="20dp"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/credit"
+            android:layout_width="60dp"
+            android:textAlignment="center"
+            android:layout_marginStart="20dp"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:text="Credit"
+            android:textSize="18sp"/>
+
+        <ImageView
+            android:id="@+id/options"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_more_vert"/>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:backgroundTint="#000000"
+        android:background="?android:attr/listDivider" />
+
+</LinearLayout>

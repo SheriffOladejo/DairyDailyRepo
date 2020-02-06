@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.juicebox.dairydaily.Others.BackupHandler;
+import com.juicebox.dairydaily.Others.DataRetrievalHandler;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
@@ -225,7 +227,18 @@ public class LoginActivity extends AppCompatActivity {
         work_offline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, BuyMilkActivity.class));
+                try{
+                    Log.d(TAG, "workOffline: " + Paper.book().read(Prevalent.has_account));
+                    if(Paper.book().read(Prevalent.has_account).equals("True")){
+                        startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
+                    }
+                    else{
+                        useSnackBar("Please login.", frameLayout);
+                    }
+                }
+                catch(Exception e){
+
+                }
             }
         });
 
@@ -254,14 +267,16 @@ public class LoginActivity extends AppCompatActivity {
         Paper.init(this);
 
         String remember = Paper.book().read(Prevalent.remember_me);
+        Log.d(TAG,"remember: " + remember);
+        Log.d(TAG,"name: " + Paper.book().read(Prevalent.name));
         if(remember != null){
             if(remember.equals("True")){
-                startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
                 finish();
             }
         }
 
-        hideKeyboard(LoginActivity.this);
+        hideKeyboard(this);
 
         mAuth = FirebaseAuth.getInstance();
     }
@@ -297,8 +312,31 @@ public class LoginActivity extends AppCompatActivity {
                             if(remember_me){
                                 Paper.book().write(Prevalent.remember_me, "True");
                             }
+                            String firstname = dataSnapshot.child("Firstname").getValue().toString();
+                            String lastname = dataSnapshot.child("Lastname").getValue().toString();
+                            String phone_number = dataSnapshot.child("Phone Number").getValue().toString();
+                            String email = dataSnapshot.child("Email").getValue().toString();
+                            String city = dataSnapshot.child("City").getValue().toString();
+                            String address = dataSnapshot.child("Address").getValue().toString();
+                            String state = dataSnapshot.child("State").getValue().toString();
+                            String default_device = dataSnapshot.child("Default Printer").getValue().toString();
+                            String last_backup = dataSnapshot.child("Last backup").getValue().toString();
+                            String offline_password = dataSnapshot.child("Offline Password").getValue().toString();
+                            Log.d(TAG, "verifyLogin: " + offline_password);
+                            Paper.book().write(Prevalent.offline_password, offline_password);
+                            Paper.book().write(Prevalent.name, firstname + " " + lastname);
+                            Paper.book().write(Prevalent.has_account, "True");
+                            Paper.book().write(Prevalent.phone_number, phone_number);
+                            Paper.book().write(Prevalent.city, city);
+                            Paper.book().write(Prevalent.email, email);
+                            Paper.book().write(Prevalent.address, address);
+                            Paper.book().write(Prevalent.selected_device, default_device);
+                            Paper.book().write(Prevalent.last_update, last_backup);
+                            Paper.book().write(Prevalent.state,state);
+                            new DataRetrievalHandler(LoginActivity.this);
+                            Log.d(TAG, "verifyLogin: " + Paper.book().read(Prevalent.phone_number));
                             progressDialog.dismiss();
-                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                            startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
                             finish();
                         }
                         else{
@@ -372,6 +410,13 @@ public class LoginActivity extends AppCompatActivity {
 
             else if(street_address.isEmpty())
                 address.setError("Required");
+            else if(offline_password.length() > 4 || offline_password.length() < 4){
+                offline_password.setError("Offline Password length should be 4");
+            }
+            else if(city.isEmpty())
+                actCity.setError("Required");
+            else if(state.isEmpty())
+                actState.setError("Required");
                 // Remember to add else if for state and city
             else {
                 if(sign_up_password.equals(confirm_password)){
@@ -380,61 +425,86 @@ public class LoginActivity extends AppCompatActivity {
                     progressDialog.setCancelable(false);
                     progressDialog.show();
 
-                    mAuth.createUserWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(sign_up_phone_number);
+                    ref.addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
-                                            progressDialog.dismiss();
-                                            Log.d(TAG, "createUserEmail: verification sent");
-                                            useSnackBar("Check your mail for verification", frameLayout);
-                                        }
-                                        else{
-                                            progressDialog.dismiss();
-                                            useSnackBar("Unable to verify email", frameLayout);
-                                        }
-                                    }
-                                });
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                useSnackBar("A user with these credentials already exists.", frameLayout);
+                                progressDialog.dismiss();
                             }
                             else{
-                                mAuth.signInWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                mAuth.createUserWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if(task.isSuccessful()){
-                                            if(mAuth.getCurrentUser().isEmailVerified()){
-                                                Log.d(TAG,  "Email: " + mAuth.getCurrentUser().getEmail());
-                                                Intent intent = new Intent(LoginActivity.this, SendOtpActivity.class);
-                                                intent.putExtra("phoneNumber", sign_up_phone_number);
-                                                intent.putExtra("Firstname", firstname_string);
-                                                intent.putExtra("Lastname", lastname_string);
-                                                intent.putExtra("Password", sign_up_password);
-                                                intent.putExtra("Address", street_address);
-                                                intent.putExtra("Country Code", country_code_sign_up);
-                                                intent.putExtra("Offline Password", offlinePassword);
-                                                intent.putExtra("Email", email);
-                                                intent.putExtra("City", city);
-                                                intent.putExtra("State", state);
-                                                startActivity(intent);
-                                                finish();
-                                                // Remember to add state and city values too
-                                            }
-                                            else{
-                                                progressDialog.dismiss();
-                                                useSnackBar("Please verify your email", frameLayout);
-                                            }
+                                            mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        progressDialog.dismiss();
+                                                        Log.d(TAG, "createUserEmail: verification sent");
+                                                        useSnackBar("A verification link has been sent to your email.", frameLayout);
+                                                    }
+                                                    else{
+                                                        progressDialog.dismiss();
+                                                        useSnackBar("Unable to verify email", frameLayout);
+                                                    }
+                                                }
+                                            });
                                         }
                                         else{
-                                            progressDialog.dismiss();
-                                            useSnackBar(task.getException().getMessage(), frameLayout);
+                                            mAuth.signInWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                                    if(task.isSuccessful()){
+                                                        if(mAuth.getCurrentUser().isEmailVerified()){
+                                                            Log.d(TAG,  "Email: " + mAuth.getCurrentUser().getEmail());
+                                                            if(Paper.book().read(Prevalent.has_account).equals("True")){
+                                                                new DataRetrievalHandler(LoginActivity.this);
+                                                                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
+                                                                finish();
+                                                            }
+                                                            else{
+                                                                Intent intent = new Intent(LoginActivity.this, SendOtpActivity.class);
+                                                                intent.putExtra("phoneNumber", sign_up_phone_number);
+                                                                intent.putExtra("Firstname", firstname_string);
+                                                                intent.putExtra("Lastname", lastname_string);
+                                                                intent.putExtra("Password", sign_up_password);
+                                                                intent.putExtra("Address", street_address);
+                                                                intent.putExtra("Country Code", country_code_sign_up);
+                                                                intent.putExtra("Offline Password", offlinePassword);
+                                                                intent.putExtra("Email", email);
+                                                                intent.putExtra("City", city);
+                                                                intent.putExtra("State", state);
+                                                                startActivity(intent);
+                                                                finish();
+                                                                // Remember to add state and city values too
+                                                            }
+                                                        }
+                                                        else{
+                                                            progressDialog.dismiss();
+                                                            useSnackBar("Please verify your email", frameLayout);
+                                                        }
+                                                    }
+                                                    else{
+                                                        progressDialog.dismiss();
+                                                        useSnackBar(task.getException().getMessage(), frameLayout);
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 });
                             }
                         }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
                     });
+
                 }
                 else{
                     progressDialog.dismiss();
@@ -622,6 +692,12 @@ public class LoginActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sign_up_text, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        System.exit(0);
     }
 
     @Override

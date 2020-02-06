@@ -64,6 +64,8 @@ public class CustomersActivity extends AppCompatActivity {
 
         buyers_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         sellers_recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        buyers_recyclerview.requestFocus();
+        sellers_recyclerview.requestFocus();
 
         // Initially hide the seller layout
         buyer_layout.setVisibility(View.GONE);
@@ -110,14 +112,14 @@ public class CustomersActivity extends AppCompatActivity {
             }
         });
 
-        hideKeyboard(CustomersActivity.this);
+        hideKeyboard(this);
     }
 
     private void populateSellerView() {
         Cursor sellers = dbHelper.getAllSellers();
 
         if(sellers.getCount() == 0){
-            Toast.makeText(CustomersActivity.this, "Seller database is empty", Toast.LENGTH_SHORT).show();
+
         }
         else{
             while(sellers.moveToNext()){
@@ -156,7 +158,7 @@ public class CustomersActivity extends AppCompatActivity {
         Cursor buyers = dbHelper.getAllBuyers();
 
         if(buyers.getCount() == 0){
-            Toast.makeText(CustomersActivity.this, "Buyer database is empty", Toast.LENGTH_SHORT).show();
+
         }
         else{
             while(buyers.moveToNext()){

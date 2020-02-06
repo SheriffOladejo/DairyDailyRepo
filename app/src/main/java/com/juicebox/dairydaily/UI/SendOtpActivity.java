@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.juicebox.dairydaily.Others.DbHelper;
+import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+
+import io.paperdb.Paper;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
@@ -56,6 +60,8 @@ public class SendOtpActivity extends AppCompatActivity {
     String city;
     String state;
 
+    DbHelper helper;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +80,8 @@ public class SendOtpActivity extends AppCompatActivity {
         state = getIntent().getStringExtra("State");
         country_code += phoneNumber;
         phoneNumber = country_code;
+
+        helper = new DbHelper(this);
 
         Log.d(TAG, "Phone Number" + phoneNumber);
         countDownTimer = findViewById(R.id.count_down_text);
@@ -172,7 +180,7 @@ public class SendOtpActivity extends AppCompatActivity {
                 otpCode = otp.getText().toString();
                 if(otpCode.isEmpty())
                     otp.setError("OTP is required");
-
+                progressDialog.show();
                 sendVerificationCode(otpCode);
             }
         });
@@ -209,6 +217,7 @@ public class SendOtpActivity extends AppCompatActivity {
     }
 
     private void uploadDetailsToCloud(){
+        Paper.init(SendOtpActivity.this);
         HashMap<String, Object> details = new HashMap<>();
         details.put("Firstname", firstname);
         details.put("Lastname", lastname);
@@ -218,18 +227,32 @@ public class SendOtpActivity extends AppCompatActivity {
         details.put("Email", email);
         details.put("City", city);
         details.put("State", state);
+        details.put("Address", address);
+
+        Paper.book().write(Prevalent.offline_password, offline_password);
+        Paper.book().write(Prevalent.has_account, "True");
+        Paper.book().write(Prevalent.name, firstname + " " + lastname);
+        Paper.book().write(Prevalent.phone_number, phoneNumber);
+        Paper.book().write(Prevalent.city, city);
+        Paper.book().write(Prevalent.email, email);
+        Paper.book().write(Prevalent.state,state);
+        Paper.book().write(Prevalent.address, address);
+        Paper.book().write(Prevalent.offline_password, offline_password);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(phoneNumber);
         ref.updateChildren(details).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
+                    progressDialog.dismiss();
+                    helper.createSNFTable("");
                     startActivity(new Intent(SendOtpActivity.this, DashboardActivity.class));
                     finish();
                 }
                 else{
+                    progressDialog.dismiss();
                     useSnackBar("Sign up failed", linearLayout);
-                    startActivity(new Intent(SendOtpActivity.this, SignUpActivity.class));
+                    startActivity(new Intent(SendOtpActivity.this, LoginActivity.class));
                     finish();
                 }
             }

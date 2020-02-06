@@ -11,26 +11,30 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.juicebox.dairydaily.MyAdapters.SpinnerAdapter;
 import com.juicebox.dairydaily.R;
+import com.juicebox.dairydaily.UI.BluetoothConnectionService;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 
 
-import io.paperdb.Paper;
+import java.util.ArrayList;
 
-import static com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity.deviceList;
+import io.paperdb.Paper;
 
 public class SelectPrinterDialog2  extends Dialog implements View.OnClickListener {
     private Context context;
     private Button connect;
     private ImageView close;
     private SpinnerAdapter adapter;
+    ArrayList<SpinnerItem> deviceList;
     String clickedDeviceName;
     SpinnerItem clickedItem;
     BluetoothConnectionService bluetoothConnectionService;
 
-    public SelectPrinterDialog2(Context context) {
+    public SelectPrinterDialog2(Context context, ArrayList<SpinnerItem> deviceList) {
         super(context);
         this.context = context;
+        this.deviceList = deviceList;
     }
 
     @Override

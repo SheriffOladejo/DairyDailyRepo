@@ -10,6 +10,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+
+
         <Button
             android:id="@+id/sellers_button"
             android:layout_width="150dp"
@@ -78,13 +80,43 @@
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="20dp"
                     android:layout_height="wrap_content"
-                    android:text="ID         Name             Phone Number                Status"
+                    android:textAlignment="center"
+                    android:text="ID"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp"
+                    android:layout_marginStart="5dp"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:layout_marginStart="15dp"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="140dp"
                     android:layout_marginStart="10dp"
-                    android:layout_gravity="center"/>
+                    android:layout_height="wrap_content"
+                    android:text="Phone Number"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="70dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:text="Status"
+                    android:textSize="16sp"/>
 
             </LinearLayout>
 
@@ -105,18 +137,48 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="50dp"
                 android:background="@color/colorPrimary"
                 android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ID         Name             Phone Number                Status"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:layout_marginStart="10dp"
-                    android:layout_gravity="center"/>
+                    <TextView
+                        android:layout_marginTop="15dp"
+                        android:layout_width="20dp"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:text="ID"
+                        android:textColor="@android:color/white"
+                        android:layout_marginStart="5dp"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:layout_marginTop="15dp"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Name"
+                        android:layout_marginStart="15dp"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:layout_marginTop="15dp"
+                        android:layout_width="140dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_height="wrap_content"
+                        android:text="Phone Number"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:layout_marginTop="15dp"
+                        android:layout_width="70dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:text="Status"
+                        android:textSize="16sp"/>
 
             </LinearLayout>
 

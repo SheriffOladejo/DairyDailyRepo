@@ -1,60 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
-    android:layout_height="match_parent"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/relative_layout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:layout_width="100dp"
-                android:layout_height="50dp"
-                android:background="@drawable/rectangle_border"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerInParent="true">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="ID"
-                    android:textSize="18sp"
-                    android:textColor="#373737"
-                    android:textAlignment="center"
-                    android:layout_marginTop="10dp"/>
+                <FrameLayout
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="20dp">
+
+                    <EditText
+                        android:id="@+id/id"
+                        android:layout_width="match_parent"
+                        android:hint="ID"
+                        android:inputType="number"
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rectangle_border"/>
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_account_box_black_24dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginStart="120dp"/>
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/rectangle_border"
+                    android:backgroundTint="#373737"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp">
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="Name"
+                        android:textSize="18sp"
+                        android:textColor="@android:color/white"
+                        android:textAlignment="center"
+                        android:layout_marginTop="10dp"/>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="150dp"
-                android:layout_height="50dp"
-                android:background="@drawable/rectangle_border"
-                android:backgroundTint="#373737"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="105dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Name"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/white"
-                    android:textAlignment="center"
-                    android:layout_marginTop="10dp"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </RelativeLayout>
 
         <View
+            android:id="@+id/view"
+            app:layout_constraintTop_toBottomOf="@id/relative_layout1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
@@ -63,75 +87,101 @@
             android:background="?android:attr/listDivider" />
 
 
-        <LinearLayout
+        <RelativeLayout
+            app:layout_constraintTop_toBottomOf="@id/view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Start Date"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"/>
+                android:orientation="horizontal"
+                android:layout_centerInParent="true">
 
-            <ImageView
-                android:id="@+id/start_date_image"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="10dp"
-                android:src="@drawable/ic_calendar"
-                android:layout_marginStart="10dp"/>
+                <RelativeLayout
+                    android:id="@+id/relative_layout"
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/rectangle_border">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="End Date"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginStart="105dp"
-                android:layout_marginTop="10dp"/>
 
-            <ImageView
-                android:id="@+id/end_date_image_view"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="10dp"
-                android:src="@drawable/ic_calendar"
-                android:layout_marginStart="10dp"/>
+                    <TextView
+                        android:id="@+id/start_date_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:paddingTop="5dp"
+                        android:text="Dec 12,2019"
+                        android:textAlignment="center"
+                        android:layout_marginTop="3dp"
+                        android:textSize="20sp"
+                        android:textStyle="normal" />
 
-        </LinearLayout>
+                    <ImageView
+                        android:id="@+id/start_date_image"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginEnd="5dp"
+                        android:layout_gravity="left|center_vertical"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_toRightOf="@id/start_date_text_view"
+                        android:src="@drawable/ic_calendar" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                </RelativeLayout>
 
-            <TextView
-                android:id="@+id/start_date_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dec 12,2019"
-                android:textSize="20sp"
-                android:textStyle="normal"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"/>
+                <RelativeLayout
+                    android:layout_width="160dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@id/relative_layout"
+                    android:background="@drawable/rectangle_border">
 
-            <TextView
-                android:id="@+id/end_date_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dec 20, 2019"
-                android:textSize="20sp"
-                android:textStyle="normal"
-                android:layout_marginStart="120dp"
-                android:layout_marginTop="10dp"/>
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/end_date_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="3dp"
+                        android:paddingTop="5dp"
+                        android:text="Dec 12,2019"
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/end_date_image_view"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="left|center_vertical"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toRightOf="@id/end_date_text_view"
+                        android:src="@drawable/ic_calendar" />
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+        </RelativeLayout>
+
 
         <View
+            android:id="@+id/view2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
@@ -140,138 +190,234 @@
             android:background="?android:attr/listDivider" />
 
         <Button
+            android:id="@+id/go"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:backgroundTint="@color/colorAccent"
-            android:text="GO"
+            android:text="Submit"
             android:textSize="18sp"
             android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/view2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="80dp"
             android:layout_marginEnd="80dp"
             android:background="@drawable/rectangle_border"
             android:layout_marginTop="10dp"/>
 
         <LinearLayout
+            android:id="@+id/linearLayout"
+            app:layout_constraintTop_toBottomOf="@id/go"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="50dp"
             android:background="@color/colorPrimary"
+            android:orientation="horizontal"
             android:layout_marginTop="10dp">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="    Date                 Title              Credit               Debit"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:layout_marginTop="15dp"
+                android:layout_width="100dp"
                 android:layout_marginStart="10dp"
-                android:layout_gravity="center"/>
-
-        </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="331dp">
-
-        </android.support.v7.widget.RecyclerView>
-
-        <LinearLayout
-            android:layout_marginTop="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:orientation="horizontal"
-            android:background="@color/colorPrimary">
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="    Total: "
+                android:text="Date"
+                android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"/>
 
-            <LinearLayout
-                android:layout_marginStart="30dp"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:textAlignment="center"
+                android:layout_marginStart="10dp"
+                android:textColor="@android:color/white"
+                android:text="Title"
+                android:textSize="16sp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Credit"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
-                    android:text="  30.2"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_marginStart="50dp"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:textAlignment="center"
+                android:text="Debit"
+                android:layout_marginStart="20dp"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Debit"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
-                    android:text=" 30.2"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_marginStart="50dp"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="60dp"
+                android:textAlignment="center"
+                android:layout_marginStart="20dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:textColor="@android:color/white"
+                android:text="Credit"
+                android:textSize="16sp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Remaining Rs"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:text="30.2"/>
-
-            </LinearLayout>
 
         </LinearLayout>
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Receive  Cash"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:background="@drawable/rectangle_border"
-            android:backgroundTint="@color/colorAccent"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp"
-            android:textSize="18sp"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/li"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/li"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="100dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:text="Total Credit"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/totalCredit"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="90dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:text="Total Debit"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/totalDebit"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Remaining"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/remaining"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</ScrollView>
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="358dp"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="5dp">
+
+        <Button
+            android:id="@+id/receive_cash"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/rectangle_border"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:text="Receive Cash"
+            android:textAllCaps="false"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/pdf"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/receive_cash"
+            android:layout_toEndOf="@+id/send_msg"
+            android:background="@drawable/rectangle_border"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:text="PDF"
+            android:textAllCaps="false"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/send_msg"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/rectangle_border"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:text="Send MSG"
+            android:textSize="18sp"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+
+    </RelativeLayout>
+
+    </android.support.constraint.ConstraintLayout>

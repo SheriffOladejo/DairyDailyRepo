@@ -107,22 +107,25 @@
     </LinearLayout>
 
     <EditText
+        android:id="@+id/id"
         android:layout_width="120dp"
         android:layout_height="50dp"
         android:hint="ID"
+        android:inputType="number"
         android:textAlignment="center"
         android:background="@drawable/rectangle_border"
         android:layout_marginStart="120dp"
         android:layout_marginTop="20dp"/>
 
     <Button
+        android:id="@+id/print"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:textAlignment="center"
         android:text="Print"
         android:textAllCaps="false"
         android:backgroundTint="@color/colorAccent"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textColor="@android:color/white"
         android:background="@drawable/rectangle_border"
         android:layout_marginStart="30dp"

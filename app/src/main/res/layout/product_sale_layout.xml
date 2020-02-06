@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_marginTop="10dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/sr"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Sr"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="80dp"
+            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/product_name"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:text="Product"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/units"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Units"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/amount"
+            android:layout_width="65dp"
+            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:text="Amount"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_toEndOf="@id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:backgroundTint="#000000"
+        android:background="?android:attr/listDivider" />
+
+</RelativeLayout>

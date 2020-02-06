@@ -10,11 +10,12 @@ public class DailySalesObject {
     private String date;
     private double debit;
     private double credit;
+    private int unique_id;
 
     public DailySalesObject() {
     }
 
-    public DailySalesObject(int id, String buyerName, double weight, double amount, double rate, String shift, String date, double debit, double credit) {
+    public DailySalesObject(int id, String buyerName, double weight, double amount, double rate, String shift, String date, double debit, double credit, int unique_id) {
         this.id = id;
         this.buyerName = buyerName;
         this.weight = weight;
@@ -24,6 +25,7 @@ public class DailySalesObject {
         this.date = date;
         this.debit = debit;
         this.credit = credit;
+        this.unique_id = unique_id;
     }
 
     public int getId() {
@@ -96,5 +98,13 @@ public class DailySalesObject {
 
     public void setCredit(double credit) {
         this.credit = credit;
+    }
+
+    public int getUnique_id() {
+        return unique_id;
+    }
+
+    public void setUnique_id(int unique_id) {
+        this.unique_id = unique_id;
     }
 }

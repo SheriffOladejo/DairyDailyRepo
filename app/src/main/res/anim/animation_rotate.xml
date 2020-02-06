@@ -10,5 +10,5 @@
         android:pivotY="55%"
         android:repeatCount="3"
         android:repeatMode="restart"
-        android:startOffset="3700" />
+        android:startOffset="3000" />
 </set>

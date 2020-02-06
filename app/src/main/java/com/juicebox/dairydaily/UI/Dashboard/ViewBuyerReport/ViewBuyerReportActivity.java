@@ -10,6 +10,8 @@ import android.view.View;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
+import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
+
 public class ViewBuyerReportActivity extends AppCompatActivity {
 
     private CardView invoice, buyer_register, receive_cash, view_report_by_date, set_milk_rate;
@@ -22,6 +24,7 @@ public class ViewBuyerReportActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("View Buyer Report");
         getSupportActionBar().setHomeButtonEnabled(true);
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+        hideKeyboard(this);
 
         invoice = findViewById(R.id.invoice);
         buyer_register = findViewById(R.id.buyer_register);

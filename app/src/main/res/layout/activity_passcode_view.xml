@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/relative_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.PasscodeViewClass">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.hanks.passcodeview.PasscodeView
+            android:id="@+id/passcodeview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_bright"
+            app:correctStateColor="@android:color/holo_green_light"
+            app:wrongStateColor="@android:color/holo_red_light"
+            app:numberTextColor="@android:color/black"/>
+
+        <Button
+            android:id="@+id/change_passcode"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/rectangle_border"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:text="Change Passcode"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:layout_marginTop="250dp"
+            android:layout_marginStart="70dp"
+            android:layout_marginEnd="70dp"/>
+
+    </FrameLayout>
+
+
+
+</RelativeLayout>

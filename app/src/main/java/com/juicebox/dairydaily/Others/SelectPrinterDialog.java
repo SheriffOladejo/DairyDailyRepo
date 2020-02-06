@@ -2,9 +2,13 @@ package com.juicebox.dairydaily.Others;
 
 // Dialog that pops up for user to select slip printer
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -13,26 +17,41 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.juicebox.dairydaily.MyAdapters.SpinnerAdapter;
 import com.juicebox.dairydaily.R;
+import com.juicebox.dairydaily.UI.BluetoothConnectionService;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
+import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
+import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity;
+
+import java.util.ArrayList;
 
 import io.paperdb.Paper;
-
-import static com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity.deviceList;
 
 public class SelectPrinterDialog extends Dialog implements View.OnClickListener {
 
     private Context context;
+    private Activity activity;
     private Button connect;
     private ImageView close;
     private SpinnerAdapter adapter;
+    ArrayList<SpinnerItem> deviceList;
     String clickedDeviceName;
     SpinnerItem clickedItem;
     BluetoothConnectionService bluetoothConnectionService;
 
-    public SelectPrinterDialog(Context context) {
+    public SelectPrinterDialog(Context context, ArrayList<SpinnerItem> deviceList, Activity activity) {
         super(context);
+        this.activity = activity;
         this.context = context;
+        this.deviceList = deviceList;
     }
 
     @Override
@@ -51,6 +70,8 @@ public class SelectPrinterDialog extends Dialog implements View.OnClickListener 
         Spinner spinner = findViewById(R.id.spinner);
 
         final TextView textView = findViewById(R.id.device_text);
+
+        Log.d("SelectPrinterdialog", "Class: "+ context.getClass().toString());
 
         adapter = new SpinnerAdapter(context, deviceList);
         spinner.setAdapter(adapter);
@@ -71,12 +92,13 @@ public class SelectPrinterDialog extends Dialog implements View.OnClickListener 
         });
      }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.connect:
-                // Connect Device here
-                BuyMilkActivity.connect(clickedDeviceName);
+                DashboardActivity.bluetoothConnectionService = new BluetoothConnectionService(context, activity);
+                DashboardActivity.connect(clickedDeviceName);
                 dismiss();
                 break;
             case R.id.close:

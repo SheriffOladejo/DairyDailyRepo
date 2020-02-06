@@ -12,6 +12,8 @@ import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
+import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
+
 public class SetMilkRateActivity extends AppCompatActivity{
 
     private Button save;
@@ -29,6 +31,7 @@ public class SetMilkRateActivity extends AppCompatActivity{
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Set Milk Rate");
+        hideKeyboard(this);
 
         rate = findViewById(R.id.milk_rate);
         save = findViewById(R.id.save);
@@ -47,7 +50,7 @@ public class SetMilkRateActivity extends AppCompatActivity{
                     finish();
                 }
                 else{
-                    dbHelper.setRate(Integer.valueOf(rate.getText().toString()));
+                    dbHelper.setRate(Double.valueOf(rate.getText().toString()));
                     startActivity(new Intent(SetMilkRateActivity.this, DashboardActivity.class));
                     finish();
                 }

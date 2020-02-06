@@ -20,12 +20,17 @@ import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
+import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 
 public class UsersListActivity extends AppCompatActivity {
     LinearLayout seller_layout;
@@ -61,10 +66,20 @@ public class UsersListActivity extends AppCompatActivity {
         date = getIntent().getStringExtra("Date");
         shift = getIntent().getStringExtra("Shift");
 
-        if(from.equals("Buy"))
+        if(from.equals("MilkBuyEntryActivity"))
             populateSellerView();
-        else if(from.equals("Sell"))
+        else if(from.equals("MilkSaleEntryActivity"))
             populateBuyerView();
+        else if(from.equals("ViewReport"))
+            populateBuyerView();
+        else if(from.equals("CustomerReportActivity"))
+            populateSellerView();
+        else if(from.equals("ReceiveCash"))
+            populateBuyerView();
+        else if(from.equals("ProductSaleActivity"))
+            populateBuyerView();
+        else if(from.equals("ViewAllEntryActivity"))
+            populateSellerView();
 
         hideKeyboard(UsersListActivity.this);
     }
@@ -73,7 +88,7 @@ public class UsersListActivity extends AppCompatActivity {
         Cursor sellers = dbHelper.getAllSellers();
 
         if(sellers.getCount() == 0){
-            Toast.makeText(UsersListActivity.this, "Seller database is empty", Toast.LENGTH_SHORT).show();
+
         }
         else{
             while(sellers.moveToNext()){
@@ -87,7 +102,7 @@ public class UsersListActivity extends AppCompatActivity {
                 list.add(model);
                 Log.d(TAG, "populateSellerView: " + status);
             }
-            adapter = new UsersListAdapter(list, this);
+            adapter = new UsersListAdapter(list, this, from, shift, date);
             recyclerView.setAdapter(adapter);
             search.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -112,7 +127,7 @@ public class UsersListActivity extends AppCompatActivity {
         Cursor buyers = dbHelper.getAllBuyers();
 
         if(buyers.getCount() == 0){
-            Toast.makeText(UsersListActivity.this, "Buyer database is empty", Toast.LENGTH_SHORT).show();
+
         }
         else{
             while(buyers.moveToNext()){
@@ -126,7 +141,7 @@ public class UsersListActivity extends AppCompatActivity {
                 list.add(model);
                 Log.d(TAG, "populateSellerView: " + status);
             }
-            adapter = new UsersListAdapter(list, this);
+            adapter = new UsersListAdapter(list, this, from, shift, date);
             recyclerView.setAdapter(adapter);
             search.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -149,14 +164,38 @@ public class UsersListActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(from.equals("Buy")){
+        if(from.equals("MilkBuyEntryActivity")){
             Intent intent = new Intent(UsersListActivity.this, MilkBuyEntryActivity.class);
             intent.putExtra("Shift", shift);
             intent.putExtra("Date", date);
             startActivity(intent);
         }
-        else if(from.equals("Sell")){
+        else if(from.equals("MilkSaleEntryActivity")){
             Intent intent = new Intent(UsersListActivity.this, MilkSaleEntryActivity.class);
+            intent.putExtra("Shift", shift);
+            intent.putExtra("Date", date);
+            startActivity(intent);
+        }
+        else if(from.equals("ViewReport")){
+            Intent intent = new Intent(UsersListActivity.this, ViewReportByDateActivity.class);
+            intent.putExtra("Shift", shift);
+            intent.putExtra("Date", date);
+            startActivity(intent);
+        }
+        else if(from.equals("CustomerReportActivity")){
+            Intent intent = new Intent(UsersListActivity.this, CustomerReportActivity.class);
+            intent.putExtra("Shift", shift);
+            intent.putExtra("Date", date);
+            startActivity(intent);
+        }
+        else if(from.equals("ReceiveCash")){
+            Intent intent = new Intent(UsersListActivity.this, ReceiveCashActivity.class);
+            intent.putExtra("Shift", shift);
+            intent.putExtra("Date", date);
+            startActivity(intent);
+        }
+        else if(from.equals("ProductSaleActivity")){
+            Intent intent = new Intent(UsersListActivity.this, ProductSaleActivity.class);
             intent.putExtra("Shift", shift);
             intent.putExtra("Date", date);
             startActivity(intent);

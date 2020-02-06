@@ -17,6 +17,7 @@ import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.convertFirstLetter;
+import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class AddCustomers extends AppCompatActivity {
@@ -49,6 +50,8 @@ public class AddCustomers extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
         dbHelper = new DbHelper(this);
+
+        hideKeyboard(this);
 
         firstnameEdittext = findViewById(R.id.first_name);
         lastnameEdittext = findViewById(R.id.lastname);
@@ -91,7 +94,9 @@ public class AddCustomers extends AppCompatActivity {
         lastnameEdittext.setText(lastname);
         addressEdittext.setText(address);
         phone_numberEdittext.setText(phone_number);
-        idEditText.setText(String.valueOf(passId));
+        if(passId != 0){
+            idEditText.setText(String.valueOf(passId));
+        }
     }
 
     private void saveEntry(){

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/linearlayout"
+    tools:context=".UI.ChangePasscodeActivity">
+
+    <EditText
+        android:id="@+id/current_passcode"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/rectangle_border"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="15dp"
+        android:inputType="numberPassword"
+        android:hint="Current Passcode"
+        android:paddingStart="15dp"/>
+
+    <EditText
+        android:id="@+id/passcode"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/rectangle_border"
+        android:layout_marginStart="30dp"
+        android:inputType="numberPassword"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="15dp"
+        android:hint="New Passcode"
+        android:paddingStart="15dp"/>
+
+    <EditText
+        android:id="@+id/confirm_passcode"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:inputType="numberPassword"
+        android:background="@drawable/rectangle_border"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="15dp"
+        android:hint="Confirm Passcode"
+        android:paddingStart="15dp"/>
+
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
+        android:text="Save"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:background="@drawable/rectangle_border"
+        android:backgroundTint="#373737"/>
+
+
+</LinearLayout>

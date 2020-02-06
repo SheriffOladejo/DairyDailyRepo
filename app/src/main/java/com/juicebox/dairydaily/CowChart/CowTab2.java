@@ -58,7 +58,7 @@ public class CowTab2 extends Fragment {
                     //Log.d(TAG, "CowTab1: " + data.getString(0) + " " + data.getString(1));
                 }
             }else{
-                Toast.makeText(getContext(), "Data count is 0", Toast.LENGTH_SHORT).show();
+
             }
             RateChartAdapter adapter = new RateChartAdapter(list);
             recyclerView.setAdapter(adapter);
@@ -72,7 +72,7 @@ public class CowTab2 extends Fragment {
                     //Log.d(TAG, "CowTab1: " + data.getString(0) + " " + data.getString(1));
                 }
             } else {
-                Toast.makeText(getContext(), "Data count is 0", Toast.LENGTH_SHORT).show();
+
             }
             RateChartAdapter adapter = new RateChartAdapter(list);
             recyclerView.setAdapter(adapter);

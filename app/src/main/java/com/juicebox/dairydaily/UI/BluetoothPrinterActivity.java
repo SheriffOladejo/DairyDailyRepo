@@ -18,7 +18,7 @@ import android.bluetooth.BluetoothSocket;
 import android.widget.Toast;
 
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.Others.SpinnerAdapter;
+import com.juicebox.dairydaily.MyAdapters.SpinnerAdapter;
 import com.juicebox.dairydaily.Others.SpinnerItem;
 
 import java.io.IOException;

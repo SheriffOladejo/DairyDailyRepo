@@ -16,6 +16,7 @@ public class ViewReportActivity extends AppCompatActivity {
     LinearLayout customer_report;
     LinearLayout shift_report;
     LinearLayout duplicate_slip;
+    LinearLayout add_bonus;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,7 +32,14 @@ public class ViewReportActivity extends AppCompatActivity {
         customer_report = findViewById(R.id.customer_report);
         shift_report = findViewById(R.id.shift_report);
         duplicate_slip = findViewById(R.id.duplicate_slip);
+        add_bonus = findViewById(R.id.add_bonus);
 
+        add_bonus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewReportActivity.this, Experiment.class));
+            }
+        });
         shift_report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
