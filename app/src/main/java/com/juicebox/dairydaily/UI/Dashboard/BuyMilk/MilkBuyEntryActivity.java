@@ -20,8 +20,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +37,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +46,9 @@ import android.widget.Toast;
 import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.MyAdapters.MilkBuyAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
+import com.juicebox.dairydaily.Others.Logout;
+import com.juicebox.dairydaily.Others.Prevalent;
+import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.UI.BluetoothConnectionService;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.SelectPrinterDialog;
@@ -48,9 +56,14 @@ import com.juicebox.dairydaily.Others.SpinnerItem;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
 import com.juicebox.dairydaily.UI.MainActivity;
 import com.juicebox.dairydaily.UI.UsersListActivity;
 
@@ -59,10 +72,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
+
+import io.paperdb.Paper;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
@@ -79,6 +96,10 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
     boolean wantToUpdate = false;
 
     private static final String TAG = "MilkBuyEntryActivity";
+
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle toggle;
+    NavigationView navigationView;
 
     String shift, date;
     String fatString;
@@ -122,6 +143,14 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Buy Milk Entry");
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        drawerLayout = findViewById(R.id.drawerlayout);
+        navigationView = findViewById(R.id.nav_view);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        initDashboard();
 
         id = findViewById(R.id.id);
         linearLayout = findViewById(R.id.constraintlayout);
@@ -423,7 +452,6 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
     private void saveEntry(){
         int idInt = -1;
         try {
-
             idInt = Integer.valueOf(id.getText().toString());
             String nameString = seller_display.getText().toString();
             String amountDouble = truncate(Double.valueOf(amount_display.getText().toString()));
@@ -444,8 +472,8 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
                     }
                     else{
                         String toPrint = date + "\n" + "ID " + idInt + "    " + nameString + "\n" +
-                                "SHIFT  | " + shift + "\n" + "TYPE   | " + type + "\nFAT %  | " + fatString + "\nSNF/CLR| " + snfValue +
-                                "\nWEIGHT | " + weightString + " Ltr\nRATE   | " + rateDouble + "Rs/Ltr" + "\nAmount | " + amountDouble + "Rs";
+                                "SHIFT  :   " + shift + "\n" + "TYPE   :   " + type + "\nFAT %  :   " + fatString + "\nSNF/CLR:   " + snfValue +
+                                "\nWEIGHT :   " + weightString + " Ltr\nRATE   :   " + rateDouble + "Rs/Ltr" + "\nAmount :   " + amountDouble + "Rs";
                         ArrayList<DailyBuyObject> list = dbHelper.getDailyBuyData(date, shift);
                         Log.d(TAG, "list size: " + list.size());
                         MilkBuyAdapter adapter = new MilkBuyAdapter(this, list);
@@ -489,7 +517,9 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
                         fat.setText("");
                         snf.setText("");
                         seller_display.setText("All Sellers");
-                        new BackupHandler(MilkBuyEntryActivity.this);
+                        if(BuyMilkActivity.online){
+                            new BackupHandler(MilkBuyEntryActivity.this);
+                        }
                     }
                 }
             }
@@ -513,6 +543,130 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
             if(isWifi)
                 isInternetConnected = true;
         }
+    }
+
+    void initDashboard(){
+        findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkBuyEntryActivity.this, ProfileActivity.class));
+            }
+        });
+        findViewById(R.id.dashboard).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkBuyEntryActivity.this, DashboardActivity.class));
+                finish();
+            }
+        });
+        findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkBuyEntryActivity.this, ViewAllEntryActivity.class));
+            }
+        });
+        findViewById(R.id.milk_history).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkBuyEntryActivity.this, MilkHistoryActivity.class));
+            }
+        });
+        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Logout(MilkBuyEntryActivity.this);
+            }
+        });
+        findViewById(R.id.recover_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new WarningDialog(MilkBuyEntryActivity.this).show();
+            }
+        });
+        findViewById(R.id.backup_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActivityCompat.requestPermissions(MilkBuyEntryActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                // Send user's phone number for verification
+                Date dateIntermediate = new Date();
+                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+                Paper.book().write(Prevalent.last_update, date);
+                new BackupHandler(MilkBuyEntryActivity.this);
+            }
+        });
+
+        LinearLayout backup, recover, update_rate_charts, erase_milk_history;
+        ImageView arrow = findViewById(R.id.arrow);
+        final boolean[] arrowClicked = {false};
+        backup = findViewById(R.id.backup_data);
+        erase_milk_history = findViewById(R.id.erase_milk_history);
+        update_rate_charts = findViewById(R.id.update_rate_charts);
+        recover = findViewById(R.id.recover_data);
+        update_rate_charts.setVisibility(View.GONE);
+        erase_milk_history.setVisibility(View.GONE);
+        backup.setVisibility(View.GONE);
+        recover.setVisibility(View.GONE);
+        findViewById(R.id.erase_milk_history).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkBuyEntryActivity.this, DeleteHistory.class));
+            }
+        });
+        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(arrowClicked[0]){
+                    backup.setVisibility(View.GONE);
+                    recover.setVisibility(View.GONE);
+                    erase_milk_history.setVisibility(View.GONE);
+                    update_rate_charts.setVisibility(View.GONE);
+                    arrowClicked[0] = false;
+                    arrow.setImageResource(R.drawable.ic_drop_down);
+                }
+                else{
+                    arrow.setImageResource(R.drawable.drop_down);
+                    backup.setVisibility(View.VISIBLE);
+                    erase_milk_history.setVisibility(View.VISIBLE);
+                    update_rate_charts.setVisibility(View.VISIBLE);
+                    recover.setVisibility(View.VISIBLE);
+                    arrowClicked[0] = true;
+                }
+            }
+        });
+        arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(arrowClicked[0]){
+                    backup.setVisibility(View.GONE);
+                    recover.setVisibility(View.GONE);
+                    erase_milk_history.setVisibility(View.GONE);
+                    update_rate_charts.setVisibility(View.GONE);
+                    arrowClicked[0] = false;
+                    arrow.setImageResource(R.drawable.ic_drop_down);
+                }
+                else{
+                    arrow.setImageResource(R.drawable.drop_down);
+                    backup.setVisibility(View.VISIBLE);
+                    erase_milk_history.setVisibility(View.VISIBLE);
+                    update_rate_charts.setVisibility(View.VISIBLE);
+                    recover.setVisibility(View.VISIBLE);
+                    arrowClicked[0] = true;
+                }
+            }
+        });
+        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkBuyEntryActivity.this, UpgradeToPremium.class));
+            }
+        });
+        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     @Override
@@ -539,6 +693,8 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if(toggle.onOptionsItemSelected(item))
+            return true;
         String line = "--------------------------------";
         String toPrint = "\nDATE  |" + date + "\nSHIFT |" + shift + "\n"+line +  "\nID| " + "FAT/SNF |" + "RATE |" + "WEIGHT|" + "AMOUNT\n";
         if (id == R.id.printer) {
@@ -587,8 +743,6 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        bluetoothConnectionService = null;
-        startActivity(new Intent(MilkBuyEntryActivity.this, BuyMilkActivity.class));
         finish();
     }
 }

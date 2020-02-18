@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DataRetrievalHandler;
+import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
@@ -47,13 +49,17 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import io.paperdb.Paper;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
+import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class LoginActivity extends AppCompatActivity {
@@ -75,6 +81,8 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     private FrameLayout frameLayout;
+
+    DbHelper helper;
 
     private ProgressDialog progressDialog;
 
@@ -133,6 +141,7 @@ public class LoginActivity extends AppCompatActivity {
         sign_up_view = findViewById(R.id.sign_up_view);
 
         frameLayout = findViewById(R.id.framelayout);
+        helper = new DbHelper(this);
 
         progressDialog = new ProgressDialog(this);
 
@@ -173,6 +182,7 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if(!forgot && control){
                     verifyLoginInput();
                 }
@@ -302,16 +312,20 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog.show();
 
             // We first want to check if the phone number exists and if the password matches.
+            Log.d(TAG, "verifyLogin: before");
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
+            Log.d(TAG, "verifyLogin: after");
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
                         String password = dataSnapshot.child("Password").getValue().toString();
                         if(password.equals(login_password)){
+                            Log.d(TAG, "verifyLogin: password equal");
                             if(remember_me){
                                 Paper.book().write(Prevalent.remember_me, "True");
                             }
+                            Log.d(TAG, "verifyLogin: started");
                             String firstname = dataSnapshot.child("Firstname").getValue().toString();
                             String lastname = dataSnapshot.child("Lastname").getValue().toString();
                             String phone_number = dataSnapshot.child("Phone Number").getValue().toString();
@@ -319,9 +333,19 @@ public class LoginActivity extends AppCompatActivity {
                             String city = dataSnapshot.child("City").getValue().toString();
                             String address = dataSnapshot.child("Address").getValue().toString();
                             String state = dataSnapshot.child("State").getValue().toString();
-                            String default_device = dataSnapshot.child("Default Printer").getValue().toString();
-                            String last_backup = dataSnapshot.child("Last backup").getValue().toString();
                             String offline_password = dataSnapshot.child("Offline Password").getValue().toString();
+                            String expiry_date = dataSnapshot.child("Expiry Date").getValue().toString();
+                            Log.d(TAG, "expiry" + expiry_date);
+                            String last_backup;
+                            String default_device;
+                            try{
+                                last_backup = dataSnapshot.child("Last backup").getValue().toString();
+                                default_device = dataSnapshot.child("Default Printer").getValue().toString();
+                            }
+                            catch(Exception e){
+                                last_backup = "";
+                                default_device = "";
+                            }
                             Log.d(TAG, "verifyLogin: " + offline_password);
                             Paper.book().write(Prevalent.offline_password, offline_password);
                             Paper.book().write(Prevalent.name, firstname + " " + lastname);
@@ -331,6 +355,7 @@ public class LoginActivity extends AppCompatActivity {
                             Paper.book().write(Prevalent.email, email);
                             Paper.book().write(Prevalent.address, address);
                             Paper.book().write(Prevalent.selected_device, default_device);
+                            helper.setExpiryDate(expiry_date);
                             Paper.book().write(Prevalent.last_update, last_backup);
                             Paper.book().write(Prevalent.state,state);
                             new DataRetrievalHandler(LoginActivity.this);
@@ -460,7 +485,8 @@ public class LoginActivity extends AppCompatActivity {
                                                     if(task.isSuccessful()){
                                                         if(mAuth.getCurrentUser().isEmailVerified()){
                                                             Log.d(TAG,  "Email: " + mAuth.getCurrentUser().getEmail());
-                                                            if(Paper.book().read(Prevalent.has_account).equals("True")){
+                                                            //Log.d(TAG, "Has account", Paper.book().read(Prevalent.has_account));
+                                                            if(Paper.book().read(Prevalent.has_account)!= null && Paper.book().read(Prevalent.has_account).equals("True")){
                                                                 new DataRetrievalHandler(LoginActivity.this);
                                                                 startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
                                                                 finish();

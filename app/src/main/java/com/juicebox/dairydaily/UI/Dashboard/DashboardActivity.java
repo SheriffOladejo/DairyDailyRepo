@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -53,6 +55,7 @@ import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity;
@@ -60,11 +63,14 @@ import com.juicebox.dairydaily.UI.Dashboard.Customers.CustomersActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity;
 import com.juicebox.dairydaily.UI.LoginActivity;
+import com.juicebox.dairydaily.UI.MainActivity;
 import com.juicebox.dairydaily.UI.SendOtpActivity;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,28 +88,28 @@ public class DashboardActivity extends AppCompatActivity {
 
     // Bluetooth variables
     public static BluetoothAdapter bluetoothAdapter;
-    public static BluetoothSocket bluetoothSocket;
     public static BluetoothDevice bluetoothDevice;
     public static BluetoothConnectionService bluetoothConnectionService;
-    private final int REQUEST_READ_PHONE_STATE = 1;
-    static OutputStream outputStream;
-    static InputStream inputStream;
     public static ArrayList<SpinnerItem> deviceList;
     public static Set<BluetoothDevice> pairedDevice;
     public static SelectPrinterDialog dialog;
-    static volatile boolean stopWorker;
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
 
-    DbHelper helper;
+    boolean isExpired = false;
 
     CardView view_report, buyer_report, add_product, rate_chart;
     CardView buy_milk, sell_milk, customers, product_sale;
     LinearLayout linearLayout;
     private static final String TAG = "DashboardActivity";
+
+    public static String expiryDate, hasPaid, hasExpired;
+    String date;
+
+    DbHelper helper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -113,11 +119,68 @@ public class DashboardActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Dashboard");
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
+        helper = new DbHelper(this);
+//
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(new Date());
+//        c.add(Calendar.DATE, 31);
+//        helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
+
+        Date dateIntermediate = new Date();
+        date = new SimpleDateFormat("dd-MM-YYYY").format(dateIntermediate);
+        Log.d(TAG, "Date: "+ date);
+
         Paper.init(this);
+
+        Cursor data = helper.getExpiryDate();
+        if(data.getCount() != 0){
+            while(data.moveToNext()){
+                expiryDate = data.getString(data.getColumnIndex("Date"));
+                toast(DashboardActivity.this, expiryDate);
+                Log.d(TAG, "Expiry date from cursor: " + expiryDate + "  " + hasExpired);
+            }
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        if(Long.valueOf(expiryDate)<cal.getTime().getTime()){
+            isExpired = true;
+        }
+        else if(Long.valueOf(expiryDate)>cal.getTime().getTime()){
+            isExpired = false;
+        }
+
+//        if(date.equals(expiryDate))
+//            helper.setExpiryDate(expiryDate);
+//
+//        Date todayDate = null, myExpiryDate = null;
+//
+//        try {
+//            todayDate = new SimpleDateFormat("dd-MM-YYYY").parse(date);
+//            myExpiryDate = new SimpleDateFormat("dd-MM-YYYY").parse(expiryDate);
+//            Log.d(TAG, "Today Date: " + todayDate + "   MyExpiryDate: " + myExpiryDate);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if(myExpiryDate != null && todayDate != null){
+//            if(myExpiryDate.compareTo(todayDate) >0 ){
+//                helper.setExpiryDate(expiryDate);
+//                isExpired = false;
+//                Log.d(TAG, "Expirty date greater: " + expiryDate + "  " + isExpired);
+//                Log.d(TAG, "Expirty date is after now");
+//            }
+//            else if(myExpiryDate.compareTo(todayDate)<0){
+//                helper.setExpiryDate(expiryDate);
+//                isExpired = true;
+//                Log.d(TAG, "Expirty date less: " + expiryDate + "  " + isExpired);
+//                Log.d(TAG, "Expirty date is before now");
+//            }
+//        }
+//        Log.d(TAG, "Expiry date" + myExpiryDate + "   " + todayDate + "    " + expiryDate);
 
         view_report = findViewById(R.id.view_report);
         buy_milk = findViewById(R.id.buy_milk_image);
-        navigationView = findViewById(R.id.nav_view);
         sell_milk = findViewById(R.id.sell_milk_image);
         customers = findViewById(R.id.customers);
         buyer_report = findViewById(R.id.buyer_report);
@@ -127,12 +190,11 @@ public class DashboardActivity extends AppCompatActivity {
         linearLayout = findViewById(R.id.ll);
 
         drawerLayout = findViewById(R.id.drawerlayout);
+        navigationView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothAdapter.enable();
@@ -157,20 +219,37 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(DashboardActivity.this, RateChartOptions.class));
-                finish();
             }
         });
+
+        if(ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
+        ){
+            ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS}, 1);
+        }
 
         product_sale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
+               // startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
+                if(!isExpired){
+                    startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
+                }
+                else{
+                    startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                }
             }
         });
         add_product.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
+                //startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
+                if(!isExpired){
+                    startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
+                }
+                else{
+                    startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                }
             }
         });
         customers.setOnClickListener(new View.OnClickListener() {
@@ -188,13 +267,24 @@ public class DashboardActivity extends AppCompatActivity {
         buy_milk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, BuyMilkActivity.class));
+                if(!isExpired){
+                    startActivity(new Intent(DashboardActivity.this, BuyMilkActivity.class));
+                }
+                else{
+                    startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                }
             }
         });
         sell_milk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
+                //startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
+                if(!isExpired){
+                    startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
+                }
+                else{
+                    startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                }
             }
         });
         view_report.setOnClickListener(new View.OnClickListener() {
@@ -206,7 +296,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         //Broadcasts when bond state changes(i.e pairing)
         IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(mBroadcastReceiver4, intentFilter);
+//        registerReceiver(mBroadcastReceiver4, intentFilter);
     }
 
     void initDashboard(){
@@ -214,6 +304,12 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
+            }
+        });
+        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
             }
         });
         findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
@@ -226,6 +322,12 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(DashboardActivity.this, MilkHistoryActivity.class));
+            }
+        });
+        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
             }
         });
         findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
@@ -504,7 +606,6 @@ public class DashboardActivity extends AppCompatActivity {
         inflater.inflate( R.menu.sign_up_text, menu );
         inflater.inflate(R.menu.printer, menu);
         MenuItem dateItem = menu.findItem(R.id.sign_up);
-        String date = SimpleDateFormat.getDateInstance().format(Calendar.getInstance().getTime());
         dateItem.setTitle(date);
         return super.onCreateOptionsMenu(menu);
     }

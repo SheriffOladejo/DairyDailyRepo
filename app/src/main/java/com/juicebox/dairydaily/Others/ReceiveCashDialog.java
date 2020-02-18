@@ -4,11 +4,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.juicebox.dairydaily.MyAdapters.ReceiveCashAdapter;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
 
@@ -25,6 +27,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
     Button save;
     DbHelper dbHelper;
     int id;
+    int unique_id;
 
     String date, titleString, debit, credit;
     boolean wantToUpdate = false;
@@ -37,10 +40,11 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
         this.id = id;
     }
 
-    public ReceiveCashDialog(Context context, int id, String date, String title, String debit, String credit){
+    public ReceiveCashDialog(Context context,int unique_id, int id, String date, String title, String debit, String credit){
         super(context);
-        dbHelper = new DbHelper(context);
+        this.unique_id = unique_id;
         this.context = context;
+        dbHelper = new DbHelper(this.context);
         this.id = id;
         this.date = date;
         this.titleString = title;
@@ -70,20 +74,33 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                 Date dateIntermediate = new Date();
                 String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
 
-                if(wantToUpdate){
-                    dbHelper.updateReceiveCash(id, date, titleString, debit, amountString);
-                }
-
                 if(titleString.isEmpty() || amountString.isEmpty()){
                     toast(context, "Fields should be filled");
                 }
                 else{
-                    if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString)){
-                        toast(context, "Operation failed");
+                    if(wantToUpdate){
+                        Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
+                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString);
+                        new BackupHandler(context);
+                        ReceiveCashActivity.list = dbHelper.getReceiveCash(id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
+                        ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                        ReceiveCashActivity.recyclerView.setAdapter(adapter);
                         dismiss();
                     }
                     else{
-                        context.startActivity(new Intent(context, ReceiveCashActivity.class));
+                        Log.d("ReceiveCashDialog", "Trying to add new");
+                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString)){
+                            toast(context, "Operation failed");
+                            dismiss();
+                        }
+                        else{
+                            new BackupHandler(context);
+                            ReceiveCashActivity.list = dbHelper.getReceiveCash(id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
+                            ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                            ReceiveCashActivity.recyclerView.setAdapter(adapter);
+                            dismiss();
+                            //context.startActivity(new Intent(context, ReceiveCashActivity.class));
+                        }
                     }
                 }
             }

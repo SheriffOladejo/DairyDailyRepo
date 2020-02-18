@@ -31,7 +31,7 @@ public class PaymentRegisterAdapter extends RecyclerView.Adapter<PaymentRegister
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.payment_register_layout, viewGroup, false);
-        return new PaymentRegisterAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override

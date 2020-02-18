@@ -53,11 +53,17 @@ public class DbHelper extends SQLiteOpenHelper {
 
     // Receive cash table columns
     private static final String receive_cash_table = "Receive_Cash";
+    private static final String Rec_COL6 = "Unique_ID";
     private static final String Rec_COL5 = "ID";
     private static final String Rec_COL1 = "Date";
     private static final String Rec_COL2 = "Credit";
     private static final String Rec_COL3 = "Debit";
     private static final String Rec_COL4 = "Title";
+
+    // Expiry date
+    private static final String expiry_date_table = "Expiry_Date";
+    private static final String EXCol1 = "Date";
+    private static final String EXCol2 = "HasExpired";
 
     // Product Sale table columns
     private static final String product_sale_table = "Product_Sale";
@@ -99,7 +105,6 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String Sale_COL7 = "Date";
     private static final String Sale_COL8 = "Debit";
     private static final String Sale_COL9 = "Credit";
-    private static final String Recognized_Date = "Recog_Date";
 
     // Product Table
     private static final String product_table = "ProductTable";
@@ -133,6 +138,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public DbHelper(Context context){
         super(context, DATABASE_NAME, null, 1);
         this.context = context;
+        //context.deleteDatabase(DATABASE_NAME);
     }
 
     @Override
@@ -140,6 +146,7 @@ public class DbHelper extends SQLiteOpenHelper {
         String createProductSaleTable = "CREATE TABLE " + product_sale_table + " (ID INTEGER, Name TEXT, Units TEXT, ProductName TEXT, Amount TEXT)";
         String createBuyerTable = "CREATE TABLE " + buyers_table + " (ID INTEGER, " +
                 "Name TEXT, PhoneNumber TEXT, Address TEXT, Status TEXT)";
+        String createExpiryTable = "CREATE TABLE " + expiry_date_table + " (Date TEXT, HasExpired TEXT)";
         String createSellerTable = "CREATE TABLE " + sellers_table + " (ID INTEGER, " +
                 "Name TEXT, PhoneNumber TEXT, Address TEXT, Status TEXT)";
         String createRateTable = "CREATE TABLE " + rate_table + "(Rate TEXT)";
@@ -155,10 +162,11 @@ public class DbHelper extends SQLiteOpenHelper {
                 "BuyerName TEXT, Weight String, Amount String, Rate String, Shift TEXT, Date TEXT, Credit String, Debit String, Recog_Date TEXT)";
         String createBuyTable = "CREATE TABLE " + milk_buy_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, " +
                 "SellerName TEXT,  Weight TEXT, Fat TEXT, SNF TEXT, Amount TEXT, Date TEXT, Shift TEXT, Rate TEXT, Type TEXT)";
-        String createReceiveCashTable = "CREATE TABLE " + receive_cash_table + " (ID INTEGER, Date TEXT, Credit TEXT, Debit TEXT, Title TEXT)";
+        String createReceiveCashTable = "CREATE TABLE " + receive_cash_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, Date TEXT, Credit TEXT, Debit TEXT, Title TEXT)";
         String createProductTable = "CREATE TABLE " + product_table + " (Product_Name TEXT, Price_Per_Unit TEXT)";
 
         db.execSQL(createProductSaleTable);
+        db.execSQL(createExpiryTable);
         db.execSQL(createProductTable);
         db.execSQL(createBuyTable);
         db.execSQL(createSNFTable);
@@ -168,7 +176,6 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL(createSellerTable);
         db.execSQL(createBuffaloSNFTable);
         db.execSQL(createSalesTable);
-        //context.deleteDatabase(DATABASE_NAME);
     }
 
     @Override
@@ -176,6 +183,7 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + buyers_table);
         db.execSQL("DROP TABLE IF EXISTS " + sellers_table);
         db.execSQL("DROP TABLE IF EXISTS " + rate_table);
+        db.execSQL("DROP TABLE IF EXISTS " + expiry_date_table);
         db.execSQL("DROP TABLE IF EXISTS " + SNF_table);
         db.execSQL("DROP TABLE IF EXISTS " + Buffalo_SNF);
         db.execSQL("DROP TABLE IF EXISTS " + milk_sale_table);
@@ -183,6 +191,23 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + receive_cash_table);
         db.execSQL("DROP TABLE IF EXISTS " + product_table);
         db.execSQL("DROP TABLE IF EXISTS " + product_sale_table);
+    }
+
+    // Set expiry date
+    public void setExpiryDate(String date){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        String query = "DELETE FROM " + expiry_date_table;
+        db.execSQL(query);
+        contentValues.put(EXCol1, date);
+        db.insert(expiry_date_table, null, contentValues);
+    }
+
+    public Cursor getExpiryDate(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + expiry_date_table;
+        Cursor data = db.rawQuery(query, null);
+        return data;
     }
 
     // Add buy data to buy table
@@ -372,16 +397,19 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateReceiveCash(int id, String date, String title, String debit, String credit){
-        String query = "UPDATE " + receive_cash_table + " SET " + Rec_COL1 + " ='" + date + "' AND " + Rec_COL2 + " ='" + credit + "' AND "
-                + Rec_COL3 + " ='" + debit + "' AND " + Rec_COL5 + " ='" + id + "' AND " + Rec_COL4 + " ='" + title + "' WHERE " + Rec_COL5 + " ='" + id + "' AND " + Rec_COL1 + " ='" + date + "'";
+    public void updateReceiveCash(int unique_id, int id, String date, String title, String debit, String credit){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL(query);
+        String query2 = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL6 + " ='" + unique_id + "'";
+        db.execSQL(query2);
+        addReceiveCash(id, date, credit, debit, title);
+        String query = "UPDATE " + receive_cash_table + " SET " + Rec_COL1 + " ='" + date + "' AND " + Rec_COL2 + " ='" + credit + "' AND "
+                + Rec_COL3 + " ='" + debit + "' AND " + Rec_COL5 + " ='" + id + "' AND " + Rec_COL4 + " ='" + title + "' WHERE " + Rec_COL6 + " ='" + unique_id + "'";
+        Log.d(TAG, "Query: " + query);
+
     }
 
-    public void deleteReceiveCash(int id, String date, String title, String debit, String credit){
-        String query = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL5 + " ='" + id + "' AND " + Rec_COL1 + " ='" +date + "' AND " +
-                Rec_COL4 + " ='" + title + "' AND " + Rec_COL2 + " ='" + credit + "' AND " + Rec_COL3 + " ='" + debit + "'";
+    public void deleteReceiveCash(int id){
+        String query = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL6 + " ='" + id + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
     }
@@ -488,11 +516,17 @@ public class DbHelper extends SQLiteOpenHelper {
         if(data2.getCount() != 0){
             while(data2.moveToNext()){
                 String title = data2.getString(data2.getColumnIndex(Rec_COL4));
-                String date = data2.getString(data2.getColumnIndex(Rec_COL1));
+                String date = data2.getString(data2.getColumnIndex("Date"));
                 String credit = data2.getString(data2.getColumnIndex(Rec_COL2));
                 String debit = data2.getString(data2.getColumnIndex(Rec_COL3));
+                int unique_id = data2.getInt(data2.getColumnIndex(Rec_COL6));
+                Log.d(TAG, "getReceiveCash: " + unique_id);
                 Log.d(TAG, "getReceiveCash: " + title);
-                ReceiveCashModel model = new ReceiveCashModel(date, title, credit, debit, id);
+                Log.d(TAG, "getReceiveCash: " + date);
+                Log.d(TAG, "getReceiveCash: " + credit);
+                Log.d(TAG, "getReceiveCash: " + debit);
+                //Log.d(TAG, "getReceiveCash: " + unique_id);
+                ReceiveCashModel model = new ReceiveCashModel(date, title, credit, debit, id, unique_id);
                 list.add(model);
             }
         }
@@ -1378,6 +1412,40 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String name = "";
         String query = "SELECT " + BTCOL2 + " FROM " + buyers_table + " WHERE " + BTCOL1 + " ='" + id + "'";
+        Cursor data = db.rawQuery(query, null);
+        if(data.getCount() != 0){
+            while(data.moveToNext()){
+                name = data.getString(0);
+            }
+        }
+        else{
+            return "";
+        }
+        return name;
+    }
+
+    // Returns the name of a buyer with id passed
+    public String getBuyerPhone(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String name = "";
+        String query = "SELECT " + BTCOL3 + " FROM " + buyers_table + " WHERE " + BTCOL1 + " ='" + id + "'";
+        Cursor data = db.rawQuery(query, null);
+        if(data.getCount() != 0){
+            while(data.moveToNext()){
+                name = data.getString(0);
+            }
+        }
+        else{
+            return "";
+        }
+        return name;
+    }
+
+    // Returns the name of a buyer with id passed
+    public String getSellerPhone(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String name = "";
+        String query = "SELECT " + STCOL3 + " FROM " + sellers_table + " WHERE " + STCOL1 + " ='" + id + "'";
         Cursor data = db.rawQuery(query, null);
         if(data.getCount() != 0){
             while(data.moveToNext()){

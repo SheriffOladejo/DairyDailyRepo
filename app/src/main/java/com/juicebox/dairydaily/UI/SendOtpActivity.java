@@ -30,6 +30,9 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -217,17 +220,26 @@ public class SendOtpActivity extends AppCompatActivity {
     }
 
     private void uploadDetailsToCloud(){
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        c.add(Calendar.DATE, 31);
+        helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
+
         Paper.init(SendOtpActivity.this);
         HashMap<String, Object> details = new HashMap<>();
         details.put("Firstname", firstname);
         details.put("Lastname", lastname);
         details.put("Phone Number", phoneNumber);
         details.put("Password", password);
+        details.put("Last Backup", "");
+        details.put("Default Printer", "");
         details.put("Offline Password", offline_password);
         details.put("Email", email);
         details.put("City", city);
         details.put("State", state);
         details.put("Address", address);
+        details.put("Expiry Date", String.valueOf(c.getTime().getTime()));
 
         Paper.book().write(Prevalent.offline_password, offline_password);
         Paper.book().write(Prevalent.has_account, "True");
@@ -246,6 +258,12 @@ public class SendOtpActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     progressDialog.dismiss();
                     helper.createSNFTable("");
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(new Date());
+                    c.add(Calendar.DATE, 31);
+                    helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
+
                     startActivity(new Intent(SendOtpActivity.this, DashboardActivity.class));
                     finish();
                 }

@@ -4,15 +4,19 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +39,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.juicebox.dairydaily.Models.CustomerReportModel;
 import com.juicebox.dairydaily.Models.ViewAllEntryModel;
 import com.juicebox.dairydaily.MyAdapters.CustomerReportAdapter;
@@ -50,11 +64,16 @@ import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
 import com.juicebox.dairydaily.UI.LoginActivity;
 import com.juicebox.dairydaily.UI.UsersListActivity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import io.paperdb.Paper;
 
@@ -66,6 +85,8 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class ViewAllEntryActivity extends AppCompatActivity {
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
+    File pdfFile;
     ImageView start_date_image;
     ImageView end_date_image;
     TextView start_date_text_view, end_date_text_view;
@@ -183,6 +204,12 @@ public class ViewAllEntryActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createPdfWrapper();
+            }
+        });
 
         final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
 
@@ -335,6 +362,116 @@ public class ViewAllEntryActivity extends AppCompatActivity {
 
     }
 
+    private void createPdfWrapper() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+        try {
+            createPdf();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createPdf() throws IOException, DocumentException {
+        File docFolder = new File(Environment.getExternalStorageDirectory() + "/DairyDaily/AllEntries");
+        if((!docFolder.exists())){
+            docFolder.mkdirs();
+            Log.i(TAG, "Created a new directory for buyerregister");
+        }
+        String date = new SimpleDateFormat("dd-MM-YYYY").format(new Date());
+        String pdfName = date + ".pdf";
+        pdfFile = new File(docFolder.getAbsolutePath(), pdfName);
+
+        Paper.init(this);
+
+        OutputStream outputStream = new FileOutputStream(pdfFile);
+        Document document = new Document(PageSize.A4);
+        PdfPTable table = new PdfPTable(new float[]{2,2,2,2,2,2,2,2});
+        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.getDefaultCell().setFixedHeight(20);
+        table.setTotalWidth(PageSize.A4.getWidth());
+
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell("Date");
+        table.addCell("Session");
+        table.addCell("Fat(%)");
+        table.addCell("SNF");
+        table.addCell("Rate(Rs/Ltr)");
+        table.addCell("Weight(Ltr)");
+        table.addCell("Amount(Rs)");
+        table.addCell("Bonus(Rs)");
+
+        table.setHeaderRows(1);
+        PdfPCell[] cells = table.getRow(0).getCells();
+
+        for(int i = 0; i<cells.length; i++){
+            cells[i].setBackgroundColor(BaseColor.WHITE);
+        }
+        for(int j = 0; j <list.size(); j++){
+            table.addCell(String.valueOf(list.get(j).getDate()));
+            table.addCell(list.get(j).getSession());
+            table.addCell(list.get(j).getFat());
+            table.addCell(list.get(j).getSnf());
+            table.addCell(list.get(j).getRate());
+            table.addCell(list.get(j).getWeight());
+            table.addCell(list.get(j).getAmount());
+            table.addCell("-");
+        }
+
+        PdfWriter.getInstance(document, outputStream);
+        document.open();
+        Font f  = new Font(Font.FontFamily.HELVETICA, 17.0f, Font.BOLD, BaseColor.BLACK);
+        Font f1 = new Font(Font.FontFamily.HELVETICA, 17.0f, Font.BOLDITALIC, BaseColor.BLACK);
+        document.add(new Paragraph("DAIRYDAILY APP\n\n",f));
+        Paragraph header = new Paragraph("All Entries",f1);
+        header.setAlignment(Element.ALIGN_CENTER);
+        document.add(header);
+        Paragraph p1 = new Paragraph("Username: " + Paper.book().read(Prevalent.name) + "\nPhone Number: " + Paper.book().read(Prevalent.phone_number),f);
+        p1.setAlignment(Element.ALIGN_CENTER);
+        document.add(p1);
+        document.add(new Paragraph("ID: " + idInt,f));
+        document.add(new Paragraph("Name: " + all_sellers.getText().toString(),f));
+        document.add(new Paragraph("Date: "+date,f));
+        document.add(new Paragraph("Phone Number: " + dbHelper.getSellerPhone_Number(idInt),f));
+        Paragraph range = new Paragraph(startDate + " - " + endDate + "\n\n",f);
+        range.setAlignment(Element.ALIGN_CENTER);
+        document.add(range);
+        document.add(table);
+
+        PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2,2,2});
+        table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table1.getDefaultCell().setFixedHeight(20);
+        table1.setTotalWidth(PageSize.A4.getWidth());
+
+        table1.setWidthPercentage(100);
+        table1.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table1.addCell("Total Weight: " + weightTotal.getText().toString());
+        table1.addCell("Total Amount: " + amountTotal.getText().toString());
+        document.add(table1);
+
+        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
+        document.close();
+        previewPdf();
+    }
+
+    private void previewPdf() {
+        PackageManager manager = getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setType("application/pdf");
+        List list = manager.queryIntentActivities(intent, manager.MATCH_DEFAULT_ONLY);
+
+        if(list.size()>0){
+            Intent newIntent = new Intent();
+            newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            newIntent.setAction(Intent.ACTION_VIEW);
+            Uri uri = FileProvider.getUriForFile(ViewAllEntryActivity.this, getApplicationContext().getPackageName() + ".provider", pdfFile);
+            newIntent.setDataAndType(uri, "application/pdf");
+            startActivity(newIntent);
+        }
+    }
+
     void initDashboard(){
         DbHelper helper = new DbHelper(ViewAllEntryActivity.this);
         findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
@@ -437,6 +574,18 @@ public class ViewAllEntryActivity extends AppCompatActivity {
                     recover.setVisibility(View.VISIBLE);
                     arrowClicked[0] = true;
                 }
+            }
+        });
+        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewAllEntryActivity.this, UpgradeToPremium.class));
+            }
+        });
+        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

@@ -165,40 +165,46 @@ public class UsersListActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(from.equals("MilkBuyEntryActivity")){
-            Intent intent = new Intent(UsersListActivity.this, MilkBuyEntryActivity.class);
-            intent.putExtra("Shift", shift);
-            intent.putExtra("Date", date);
-            startActivity(intent);
+//            Intent intent = new Intent(UsersListActivity.this, MilkBuyEntryActivity.class);
+//            intent.putExtra("Shift", shift);
+//            intent.putExtra("Date", date);
+//            startActivity(intent);
+            finish();
         }
         else if(from.equals("MilkSaleEntryActivity")){
-            Intent intent = new Intent(UsersListActivity.this, MilkSaleEntryActivity.class);
-            intent.putExtra("Shift", shift);
-            intent.putExtra("Date", date);
-            startActivity(intent);
+//            Intent intent = new Intent(UsersListActivity.this, MilkSaleEntryActivity.class);
+//            intent.putExtra("Shift", shift);
+//            intent.putExtra("Date", date);
+//            startActivity(intent);
+            finish();
         }
         else if(from.equals("ViewReport")){
-            Intent intent = new Intent(UsersListActivity.this, ViewReportByDateActivity.class);
-            intent.putExtra("Shift", shift);
-            intent.putExtra("Date", date);
-            startActivity(intent);
+//            Intent intent = new Intent(UsersListActivity.this, ViewReportByDateActivity.class);
+//            intent.putExtra("Shift", shift);
+//            intent.putExtra("Date", date);
+//            startActivity(intent);
+            finish();
         }
         else if(from.equals("CustomerReportActivity")){
-            Intent intent = new Intent(UsersListActivity.this, CustomerReportActivity.class);
-            intent.putExtra("Shift", shift);
-            intent.putExtra("Date", date);
-            startActivity(intent);
+//            Intent intent = new Intent(UsersListActivity.this, CustomerReportActivity.class);
+//            intent.putExtra("Shift", shift);
+//            intent.putExtra("Date", date);
+//            startActivity(intent);
+            finish();
         }
         else if(from.equals("ReceiveCash")){
-            Intent intent = new Intent(UsersListActivity.this, ReceiveCashActivity.class);
-            intent.putExtra("Shift", shift);
-            intent.putExtra("Date", date);
-            startActivity(intent);
+//            Intent intent = new Intent(UsersListActivity.this, ReceiveCashActivity.class);
+//            intent.putExtra("Shift", shift);
+//            intent.putExtra("Date", date);
+//            startActivity(intent);
+            finish();
         }
         else if(from.equals("ProductSaleActivity")){
-            Intent intent = new Intent(UsersListActivity.this, ProductSaleActivity.class);
-            intent.putExtra("Shift", shift);
-            intent.putExtra("Date", date);
-            startActivity(intent);
+//            Intent intent = new Intent(UsersListActivity.this, ProductSaleActivity.class);
+//            intent.putExtra("Shift", shift);
+//            intent.putExtra("Date", date);
+//            startActivity(intent);
+            finish();
         }
     }
 }

@@ -65,6 +65,7 @@ public class Logout extends AppCompatActivity {
                 HashMap<String, Object> details = new HashMap<>();
                 details.put("Last backup", lastUpdated);
                 details.put("Default Printer", defaultPrinter);
+                details.put("Expiry Date", DashboardActivity.expiryDate);
                 //Paper.book().destroy();
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
 

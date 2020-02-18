@@ -68,7 +68,7 @@ public class ViewReportActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ViewReportActivity.this, DashboardActivity.class));
+        //startActivity(new Intent(ViewReportActivity.this, DashboardActivity.class));
         finish();
     }
 }

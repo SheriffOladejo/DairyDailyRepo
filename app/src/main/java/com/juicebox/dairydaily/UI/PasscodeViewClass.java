@@ -18,9 +18,12 @@ import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import io.paperdb.Paper;
 
+import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 
@@ -36,6 +39,11 @@ public class PasscodeViewClass extends AppCompatActivity {
         setContentView(R.layout.activity_passcode_view);
 
         Paper.init(this);
+
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(new Date());
+//        c.add(Calendar.DATE, 0);
+//        toast(this, String.valueOf(c.getTime().getTime()));
 
         String success = "";
         try{

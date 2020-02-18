@@ -1,5 +1,6 @@
 package com.juicebox.dairydaily.MyAdapters;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +29,7 @@ import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
+import com.juicebox.dairydaily.UI.MainActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -153,20 +155,32 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
 
                     if(from.equals("MilkSaleEntryActivity")){
                         context.startActivity(intent);
+                        ((Activity)context).finish();
                     }
                     else if(from.equals("MilkBuyEntryActivity")){
                         context.startActivity(intent2);
+                        ((Activity)context).finish();
                     }
-                    else if(from.equals("ReceiveCash"))
+                    else if(from.equals("ReceiveCash")){
                         context.startActivity(new Intent(context, ReceiveCashActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
-                    else if(from.equals("ViewReport"))
+                        ((Activity)context).finish();
+                    }
+                    else if(from.equals("ViewReport")){
                         context.startActivity(new Intent(context, ViewReportByDateActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
-                    else if(from.equals("CustomerReportActivity"))
+                        ((Activity)context).finish();
+                    }
+                    else if(from.equals("CustomerReportActivity")) {
                         context.startActivity(new Intent(context, CustomerReportActivity.class).putExtra("id", dbHelper.getSellerId(name, phone_number)).putExtra("name", name));
-                    else if(from.equals("ProductSaleActivity"))
+                        ((Activity)context).finish();
+                    }
+                    else if(from.equals("ProductSaleActivity")) {
                         context.startActivity(new Intent(context, ProductSaleActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
-                    else if(from.equals("ViewAllEntryActivity"))
+                        ((Activity) context).finish();
+                    }
+                    else if(from.equals("ViewAllEntryActivity")) {
                         context.startActivity(new Intent(context, ViewAllEntryActivity.class).putExtra("id", dbHelper.getSellerId(name, phone_number)).putExtra("name", name));
+                        ((Activity) context).finish();
+                    }
                 }
             });
         }
@@ -236,5 +250,6 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
             phoneNumberView.setText(phone_number);
             idView.setText(String.valueOf(id));
         }
+
     }
 }

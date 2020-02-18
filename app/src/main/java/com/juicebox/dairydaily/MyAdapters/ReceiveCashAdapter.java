@@ -90,16 +90,22 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
                     String credit = list.get(getAdapterPosition()).getCredit();
                     String debit = list.get(getAdapterPosition()).getDebit();
                     String date = list.get(getAdapterPosition()).getDate();
+                    int unique_id = list.get(getAdapterPosition()).getUnique_Id();
 
                     switch(which){
                         case 0:
-                            new ReceiveCashDialog(context, user_Id, date, title, debit, credit).show();
+                            new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit).show();
                             dialog.dismiss();
                             break;
                         case 1:
-                            helper.deleteReceiveCash(user_Id, date, title, debit, credit);
-                            context.startActivity(new Intent(context, ReceiveCashActivity.class));
+                            helper.deleteReceiveCash(unique_id);
+                            new BackupHandler(context);
+                            ReceiveCashActivity.list = helper.getReceiveCash(user_Id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
+                            ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                            ReceiveCashActivity.recyclerView.setAdapter(adapter);
                             dialog.dismiss();
+//                            context.startActivity(new Intent(context, ReceiveCashActivity.class));
+//                            dialog.dismiss();
                             break;
                         case 2:
                             String toPrint ="\n\n\n"+ date + "\n" + "ID " + user_Id + " " + helper.getBuyerName(user_Id) + "\n" +
@@ -125,6 +131,7 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
                             else{
                                 toast(context, "Bluetooth is off");
                             }
+                            dialog.dismiss();
                         default:
                             dialog.dismiss();
                     }

@@ -35,7 +35,7 @@ public class BuyerRegisterAdapter extends RecyclerView.Adapter<BuyerRegisterAdap
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.buyer_register_layout, viewGroup, false);
-        return new BuyerRegisterAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class RateChartAdapter extends RecyclerView.Adapter<RateChartAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rate_object_layout, viewGroup, false);
-        return new RateChartAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override

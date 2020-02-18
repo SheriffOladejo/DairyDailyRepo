@@ -50,7 +50,7 @@ public class MilkSaleAdapter extends RecyclerView.Adapter<MilkSaleAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.milk_sale_layout, viewGroup, false);
-        return new MilkSaleAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class  ReportByDateAdapter extends RecyclerView.Adapter<ReportByDateAdapt
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.report_by_date_layout, viewGroup, false);
-        return new ReportByDateAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override

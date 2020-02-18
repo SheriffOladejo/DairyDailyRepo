@@ -3,16 +3,18 @@ package com.juicebox.dairydaily.Models;
 public class ReceiveCashModel {
     private String date, title, credit, debit;
     private int id;
+    private int unique_Id;
 
     public ReceiveCashModel() {
     }
 
-    public ReceiveCashModel(String date, String title, String credit, String debit, int id) {
+    public ReceiveCashModel(String date, String title, String credit, String debit, int id, int unique_Id) {
         this.date = date;
         this.title = title;
         this.credit = credit;
         this.debit = debit;
         this.id = id;
+        this.unique_Id = unique_Id;
     }
 
     public String getDate() {
@@ -53,5 +55,13 @@ public class ReceiveCashModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getUnique_Id() {
+        return unique_Id;
+    }
+
+    public void setUnique_Id(int unique_Id) {
+        this.unique_Id = unique_Id;
     }
 }

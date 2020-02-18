@@ -627,6 +627,7 @@
                     android:background="?android:attr/listDivider"/>
 
                 <LinearLayout
+                    android:id="@+id/upgrade"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -638,7 +639,6 @@
                         android:layout_margin="10dp"/>
 
                     <TextView
-                        android:id="@+id/upgrade"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Upgrade To Premium"
@@ -657,6 +657,7 @@
                     android:background="?android:attr/listDivider"/>
 
                 <LinearLayout
+                    android:id="@+id/view_all_entry"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -668,7 +669,6 @@
                         android:layout_margin="10dp"/>
 
                     <TextView
-                        android:id="@+id/view_all_entry"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="View All Entries"
@@ -687,6 +687,7 @@
                     android:background="?android:attr/listDivider"/>
 
                 <LinearLayout
+                    android:id="@+id/milk_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -698,7 +699,6 @@
                         android:layout_margin="10dp"/>
 
                     <TextView
-                        android:id="@+id/milk_history"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Milk History"
@@ -869,6 +869,7 @@
                     android:background="?android:attr/listDivider"/>
 
                 <LinearLayout
+                    android:id="@+id/logout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -880,7 +881,6 @@
                         android:layout_margin="10dp"/>
 
                     <TextView
-                        android:id="@+id/logout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Logout"

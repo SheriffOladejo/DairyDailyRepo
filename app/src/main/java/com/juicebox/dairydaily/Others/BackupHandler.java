@@ -32,33 +32,22 @@ public class BackupHandler {
 
     Context context;
     DbHelper dbHelper;
+    ProgressDialog pd;
 
     public BackupHandler(Context context){
 
-        ProgressDialog pd = new ProgressDialog(context);
+        pd = new ProgressDialog(context);
         pd.setTitle("Updating");
-        pd.setMessage("Please Wait");
+        pd.setMessage("Please Wait...");
         pd.setCancelable(false);
         pd.show();
 
-        CountDownTimer timer = new CountDownTimer(3000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                pd.dismiss();
-            }
-        };
         this.context = context;
         dbHelper = new DbHelper(context);
 
         checkInternetConnect();
         if(isInternetConnected) {
             backupReceiveCash();
-            timer.start();
         }
         else{
             toast(context, "Please connect to the internet");
@@ -415,7 +404,7 @@ public class BackupHandler {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
-                        toast(context, "Data uploaded successfully");
+                        backupExpiryDate();
                     }
                     else{
                         Toast.makeText(context, "Product sale data upload failed.", Toast.LENGTH_SHORT).show();
@@ -424,9 +413,49 @@ public class BackupHandler {
             });
         }
         else{
+            pd.dismiss();
             //toast(context, "Data uploaded successfully");
         }
 
+    }
+
+    private void backupExpiryDate() {
+        JSONObject jsonToUpload = new JSONObject();
+        HashMap<String, Object> toUpload = new HashMap<>();
+
+        String date = "", hasExpired = "";
+        Cursor data = dbHelper.getExpiryDate();
+        if(data.getCount() != 0){
+            while(data.moveToNext()){
+                date = data.getString(data.getColumnIndex("Date"));
+            }
+        }
+
+        if(!date.equals("")){
+            try {
+                jsonToUpload.put("Expiry Date",date);
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+                toUpload.put("Subscription Details", jsonToUpload.toString());
+                ref.updateChildren(toUpload).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()) {
+                            toast(context, "Data uploaded successfully");
+                            pd.dismiss();
+                        }
+                        else{
+
+                        }
+                    }
+                });
+                Log.d("BackupHandler", "backupMilkRateData: onAdd" + jsonToUpload.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            pd.dismiss();
+        }
     }
 
 }

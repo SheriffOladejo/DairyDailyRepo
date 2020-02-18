@@ -2,14 +2,9 @@ package com.juicebox.dairydaily.UI.Dashboard.DrawerLayout;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.PersistableBundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
@@ -19,7 +14,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,13 +22,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.Models.DailySalesObject;
-import com.juicebox.dairydaily.MyAdapters.BuyerRegisterAdapter;
 import com.juicebox.dairydaily.MyAdapters.MilkBuyAdapter;
 import com.juicebox.dairydaily.MyAdapters.MilkSaleAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
@@ -44,22 +33,16 @@ import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
-import com.juicebox.dairydaily.UI.LoginActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import io.paperdb.Paper;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.getEndDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getStartDate;
-import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
-import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class DeleteHistory extends AppCompatActivity {
 
@@ -318,6 +301,18 @@ public class DeleteHistory extends AppCompatActivity {
                     recover.setVisibility(View.VISIBLE);
                     arrowClicked[0] = true;
                 }
+            }
+        });
+        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DeleteHistory.this, UpgradeToPremium.class));
+            }
+        });
+        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

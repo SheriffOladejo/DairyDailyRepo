@@ -1,20 +1,17 @@
 package com.juicebox.dairydaily.UI.Dashboard.SellMilk;
 
-import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.Manifest;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.ParcelUuid;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,53 +23,47 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ScrollView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.Models.DailySalesObject;
-import com.juicebox.dairydaily.Models.ShiftReportModel;
-import com.juicebox.dairydaily.MyAdapters.MilkBuyAdapter;
 import com.juicebox.dairydaily.MyAdapters.MilkSaleAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog2;
-import com.juicebox.dairydaily.Others.SpinnerItem;
+import com.juicebox.dairydaily.Others.Logout;
+import com.juicebox.dairydaily.Others.Prevalent;
+import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.BluetoothConnectionService;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
+import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity;
 import com.juicebox.dairydaily.UI.UsersListActivity;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Set;
-import java.util.UUID;
+import java.util.Date;
+
+import io.paperdb.Paper;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
-import static com.juicebox.dairydaily.Others.UtilityMethods.truncateDouble;
-import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
-import static com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity.printData;
 
 public class MilkSaleEntryActivity extends AppCompatActivity {
 
     private static final String TAG = "MilkSaleEntryActivity";
+
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle toggle;
+    NavigationView navigationView;
 
     double weightTotal = 0;
     double amountTotal = 0;
@@ -117,11 +108,20 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
+        initDashboard();
+
         totalAmount = findViewById(R.id.amountTotal);
         totalWeight = findViewById(R.id.weightTotal);
         fatAverage = findViewById(R.id.fatAverage);
 
         dbHelper = new DbHelper(this);
+
+        drawerLayout = findViewById(R.id.drawerlayout);
+        navigationView = findViewById(R.id.nav_view);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String name_from_user_list = getIntent().getStringExtra("name");
         int id_from_user_list = getIntent().getIntExtra("id", 0);
@@ -299,9 +299,9 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
                     Toast.makeText(MilkSaleEntryActivity.this, "Unable to add entry", Toast.LENGTH_SHORT).show();
                 else {
                     if(dbHelper.addReceiveCash(Id, date, truncate(0.00), Amount, "Sale")){
-                        String toPrint ="\n\n\n"+ date + "\n" + "ID " + Id + " " + name + "\n" +
-                                "SHIFT   | " + shift  +
-                                "\nWEIGHT  | " + Weight + "Ltr\nRATE    | " + rate + "Rs/Ltr\n" + "TOTAL RS| " + Amount + "Rs\n      DAIRYDAILY APP\n\n\n";
+                        String toPrint ="\n\n\n"+ date + "\n" + "ID      : " + Id + " " + name + "\n" +
+                                "SHIFT   :   " + shift  +
+                                "\nWEIGHT  :   " + Weight + "Ltr\nRATE    :   " + rate + "Rs/Ltr\n" + "TOTAL RS:   " + Amount + "Rs\n      DAIRYDAILY APP\n\n\n";
                         ArrayList<DailySalesObject> list = dbHelper.getDailySalesData(date, shift);
                         MilkSaleAdapter adapter = new MilkSaleAdapter(list, this);
                         double weightTotal = 0;
@@ -347,7 +347,10 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
         all_buyers.setText("All Buyers");
         weight.setText("");
         amount_display.setText("Amount");
-        new BackupHandler(MilkSaleEntryActivity.this);
+        Log.d(TAG, "online: " + SellMilkActivity.online);
+        if(SellMilkActivity.online){
+            new BackupHandler(MilkSaleEntryActivity.this);
+        }
     }
 
     boolean isInternetConnected = false;
@@ -365,6 +368,129 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
         }
     }
 
+    void initDashboard(){
+        findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkSaleEntryActivity.this, ProfileActivity.class));
+            }
+        });
+        findViewById(R.id.dashboard).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkSaleEntryActivity.this, DashboardActivity.class));
+                finish();
+            }
+        });
+        findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkSaleEntryActivity.this, ViewAllEntryActivity.class));
+            }
+        });
+        findViewById(R.id.milk_history).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkSaleEntryActivity.this, MilkHistoryActivity.class));
+            }
+        });
+        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Logout(MilkSaleEntryActivity.this);
+            }
+        });
+        findViewById(R.id.recover_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new WarningDialog(MilkSaleEntryActivity.this).show();
+            }
+        });
+        findViewById(R.id.backup_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActivityCompat.requestPermissions(MilkSaleEntryActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                // Send user's phone number for verification
+                Date dateIntermediate = new Date();
+                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+                Paper.book().write(Prevalent.last_update, date);
+                new BackupHandler(MilkSaleEntryActivity.this);
+            }
+        });
+
+        LinearLayout backup, recover, update_rate_charts, erase_milk_history;
+        ImageView arrow = findViewById(R.id.arrow);
+        final boolean[] arrowClicked = {false};
+        backup = findViewById(R.id.backup_data);
+        erase_milk_history = findViewById(R.id.erase_milk_history);
+        update_rate_charts = findViewById(R.id.update_rate_charts);
+        recover = findViewById(R.id.recover_data);
+        update_rate_charts.setVisibility(View.GONE);
+        erase_milk_history.setVisibility(View.GONE);
+        backup.setVisibility(View.GONE);
+        recover.setVisibility(View.GONE);
+        findViewById(R.id.erase_milk_history).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkSaleEntryActivity.this, DeleteHistory.class));
+            }
+        });
+        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(arrowClicked[0]){
+                    backup.setVisibility(View.GONE);
+                    recover.setVisibility(View.GONE);
+                    erase_milk_history.setVisibility(View.GONE);
+                    update_rate_charts.setVisibility(View.GONE);
+                    arrowClicked[0] = false;
+                    arrow.setImageResource(R.drawable.ic_drop_down);
+                }
+                else{
+                    arrow.setImageResource(R.drawable.drop_down);
+                    backup.setVisibility(View.VISIBLE);
+                    erase_milk_history.setVisibility(View.VISIBLE);
+                    update_rate_charts.setVisibility(View.VISIBLE);
+                    recover.setVisibility(View.VISIBLE);
+                    arrowClicked[0] = true;
+                }
+            }
+        });
+        arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(arrowClicked[0]){
+                    backup.setVisibility(View.GONE);
+                    recover.setVisibility(View.GONE);
+                    erase_milk_history.setVisibility(View.GONE);
+                    update_rate_charts.setVisibility(View.GONE);
+                    arrowClicked[0] = false;
+                    arrow.setImageResource(R.drawable.ic_drop_down);
+                }
+                else{
+                    arrow.setImageResource(R.drawable.drop_down);
+                    backup.setVisibility(View.VISIBLE);
+                    erase_milk_history.setVisibility(View.VISIBLE);
+                    update_rate_charts.setVisibility(View.VISIBLE);
+                    recover.setVisibility(View.VISIBLE);
+                    arrowClicked[0] = true;
+                }
+            }
+        });
+        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MilkSaleEntryActivity.this, UpgradeToPremium.class));
+            }
+        });
+        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -389,6 +515,10 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(toggle.onOptionsItemSelected(item))
+            return true;
+
         int id = item.getItemId();
         String line = "--------------------------------";
         String toPrint = "\n\n\nDATE  : " + date + "\nSHIFT : " + shift + "\nRate  :" + " " + rate_view.getText().toString() +"Rs/Ltr\n"+line + "\nID| " + " FAT/SNF  |" + "WEIGHT| " + "AMOUNT\n";
@@ -433,7 +563,6 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(MilkSaleEntryActivity.this, SellMilkActivity.class));
         finish();
     }
 }

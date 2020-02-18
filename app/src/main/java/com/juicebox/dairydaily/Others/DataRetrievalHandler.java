@@ -325,6 +325,37 @@ public class DataRetrievalHandler {
                         //dbHelper.clearRate();
                         JSONObject obj = new JSONObject(retrievedJsonString);
                         dbHelper.setRate(obj.getDouble("Rate"));
+                        retrieveExpiryDate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //toast(context, "Data recovered successfully");
+                }
+                else{
+                    toast(context, "Data recovered successfully");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void retrieveExpiryDate(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+
+                    try {
+                        String retrievedJsonString = dataSnapshot.child("Subscription Details").getValue().toString();
+                        Log.d("RetrievalHandler", "retrieveMilkRateData: " + retrievedJsonString);
+                        //dbHelper.clearRate();
+                        JSONObject obj = new JSONObject(retrievedJsonString);
+                        dbHelper.setExpiryDate(obj.getString("Expiry Date"));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

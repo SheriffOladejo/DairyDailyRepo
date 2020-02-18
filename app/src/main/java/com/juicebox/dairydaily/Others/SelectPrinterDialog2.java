@@ -78,7 +78,7 @@ public class SelectPrinterDialog2  extends Dialog implements View.OnClickListene
         switch (v.getId()){
             case R.id.connect:
                 // Connect Device here
-                SellMilkActivity.connect(clickedDeviceName);
+                //SellMilkActivity.connect(clickedDeviceName);
                 dismiss();
                 break;
             case R.id.close:
