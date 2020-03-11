@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.google.gson.JsonParser;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.paytm.pgsdk.PaytmOrder;
@@ -46,7 +45,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
 
         Paper.init(this);
 
-        mid = "aNSZJV20122648162244"; // your merchant ID
+        mid = "avFYoj33073251095335"; // your merchant ID
         sendUserDetailTOServerdd dl = new sendUserDetailTOServerdd();
         dl.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 // vollye , retrofit, asynch
@@ -78,14 +77,13 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                             "&CHANNEL_ID=WAP"+
                             "&CALLBACK_URL="+verifyurl+
                             "&TXN_AMOUNT="+price+
-                            "&WEBSITE=WEBSTAGING"+
+                            "&WEBSITE=DEFAULT"+
                             "&INDUSTRY_TYPE_ID=Retail";
 
             JSONObject jsonObject = jsonParser.makeHttpRequest(url,"POST",param);
-            Log.d("CheckSum result >>:", "CheckSum Result"+jsonObject.toString());
+            //Log.d("CheckSum result >>:", "CheckSum Result"+jsonObject.toString());
             if(jsonObject != null){
                 try {
-
                     CHECKSUMHASH=jsonObject.has("CHECKSUMHASH")?jsonObject.getString("CHECKSUMHASH"):"";
                     Log.e("CheckSum result >>","Checksum hash: "+CHECKSUMHASH);
 
@@ -103,7 +101,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                 dialog.dismiss();
             }
 
-            PaytmPGService Service = PaytmPGService.getStagingService();
+            PaytmPGService Service = PaytmPGService.getProductionService();
             // when app is ready to publish use production service
             // PaytmPGService  Service = PaytmPGService.getProductionService();
 
@@ -116,7 +114,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
             paramMap.put("CUST_ID", custormerid);
             paramMap.put("CHANNEL_ID", "WAP");
             paramMap.put("TXN_AMOUNT", price);
-            paramMap.put("WEBSITE", "WEBSTAGING");
+            paramMap.put("WEBSITE", "DEFAULT");
             paramMap.put("CALLBACK_URL" ,verifyurl);
             //paramMap.put( "EMAIL" , Paper.book().read(Prevalent.email));
             //paramMap.put( "MOBILE_NO" , Paper.book().read(Prevalent.phone_number));

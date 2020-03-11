@@ -47,8 +47,10 @@ public class AddProductActivity extends AppCompatActivity {
     EditText product_name, rate;
     Button save;
     RecyclerView recyclerView;
+    AddProductAdapter adapter;
 
     DbHelper dbHelper = new DbHelper(this);
+    ArrayList list;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
@@ -80,8 +82,8 @@ public class AddProductActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initDashboard();
 
-        ArrayList list = dbHelper.getProducts();
-        AddProductAdapter adapter = new AddProductAdapter(this, list);
+        list = dbHelper.getProducts();
+        adapter = new AddProductAdapter(this, list);
         recyclerView.setAdapter(adapter);
 
         recyclerView.requestFocus();
@@ -100,8 +102,9 @@ public class AddProductActivity extends AppCompatActivity {
                         toast(AddProductActivity.this, "Unable to add product");
                     else{
                         new BackupHandler(AddProductActivity.this);
-                        startActivity(new Intent(AddProductActivity.this, AddProductActivity.class));
-                        finish();
+                        list = dbHelper.getProducts();
+                        adapter = new AddProductAdapter(AddProductActivity.this, list);
+                        recyclerView.setAdapter(adapter);
                     }
                 }
             }

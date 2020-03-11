@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
 
@@ -125,6 +126,7 @@ public class AddCustomers extends AppCompatActivity {
                                 + lastnameEdittext.getText().toString(),
                         phone_numberEdittext.getText().toString(), addressEdittext.getText().toString(),
                         "Seller");
+                new BackupHandler(AddCustomers.this);
                 Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
                 startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
                 finish();
@@ -135,6 +137,7 @@ public class AddCustomers extends AppCompatActivity {
                                 + lastnameEdittext.getText().toString(),
                         phone_numberEdittext.getText().toString(), addressEdittext.getText().toString(),
                         "Buyer");
+                new BackupHandler(AddCustomers.this);
                 Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
                 startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
                 finish();
@@ -144,6 +147,7 @@ public class AddCustomers extends AppCompatActivity {
                 status = "Seller";
                 if(!sellerExists(id)){
                     if(dbHelper.addSeller(Integer.valueOf(id), convertFirstLetter(fullname), phone_number, address, status)){
+                        new BackupHandler(AddCustomers.this);
                         startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
                         finish();
                     }
@@ -160,6 +164,7 @@ public class AddCustomers extends AppCompatActivity {
                 status = "Buyer";
                 if(!buyerExists(id)){
                     if(dbHelper.addBuyer(Integer.valueOf(id) ,convertFirstLetter(fullname), phone_number, address, status)){
+                        new BackupHandler(AddCustomers.this);
                         startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
                         Log.d(TAG, "saveEntry: " +status);
                         finish();

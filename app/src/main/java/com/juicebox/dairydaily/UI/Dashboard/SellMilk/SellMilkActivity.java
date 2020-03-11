@@ -113,6 +113,7 @@ public class SellMilkActivity extends AppCompatActivity {
     RadioButton rateByFat_button;
     private Switch morning_switch;
     private Switch evening_switch;
+    LinearLayout date_layout;
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -130,6 +131,8 @@ public class SellMilkActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
+        date_layout = findViewById(R.id.date_layout);
+
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -149,6 +152,13 @@ public class SellMilkActivity extends AppCompatActivity {
         dateView = findViewById(R.id.date_textview);
         rate = findViewById(R.id.rate);
         update = findViewById(R.id.update);
+
+        date_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePickerDialog.show();
+            }
+        });
 
         double rateDouble = dbHelper.getRate();
         rate.setText(String.valueOf(rateDouble));
@@ -249,12 +259,12 @@ public class SellMilkActivity extends AppCompatActivity {
 
             }
         });
-        calendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                datePickerDialog.show();
-            }
-        });
+//        calendar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                datePickerDialog.show();
+//            }
+//        });
 
         rateByFat_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -294,11 +304,14 @@ public class SellMilkActivity extends AppCompatActivity {
         if(manager != null){
             boolean is3g = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
             if(is3g){
-                //online_switch.setChecked(true);
+                online_switch.setChecked(true);
+                online = true;
             }
             boolean isWifi = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-            if(isWifi){}
-                //online_switch.setChecked(true);
+            if(isWifi){
+                online_switch.setChecked(true);
+                online = true;
+            }
         }
     }
 

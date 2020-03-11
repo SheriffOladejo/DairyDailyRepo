@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.juicebox.dairydaily.Models.CustomerModels;
+import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.Customers.AddCustomers;
@@ -149,10 +150,12 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
                             if(status.equals("Buyer")){
                                 dbHelper.deleteBuyer(id);
                                 Log.d(TAG, "onClick: buyer" + id);
+                                new BackupHandler(context);
                                 context.startActivity(new Intent(context, CustomersActivity.class));
                             }
                             else if(status.equals("Seller")){
                                 dbHelper.deleteSeller(id);
+                                new BackupHandler(context);
                                 Log.d(TAG, "onClick: seller" + id);
                                 context.startActivity(new Intent(context, CustomersActivity.class));
                             }

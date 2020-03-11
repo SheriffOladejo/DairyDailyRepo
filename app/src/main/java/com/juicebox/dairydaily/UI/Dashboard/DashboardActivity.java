@@ -1,19 +1,15 @@
 package com.juicebox.dairydaily.UI.Dashboard;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,12 +31,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.juicebox.dairydaily.Others.BackupHandler;
-import com.juicebox.dairydaily.Others.DataRetrievalHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
@@ -52,30 +43,22 @@ import com.juicebox.dairydaily.RateChart.RateChartOptions;
 import com.juicebox.dairydaily.UI.BluetoothConnectionService;
 import com.juicebox.dairydaily.UI.Dashboard.AddProducts.AddProductActivity;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
+import com.juicebox.dairydaily.UI.Dashboard.Customers.CustomersActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity;
-import com.juicebox.dairydaily.UI.Dashboard.Customers.CustomersActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity;
-import com.juicebox.dairydaily.UI.LoginActivity;
-import com.juicebox.dairydaily.UI.MainActivity;
-import com.juicebox.dairydaily.UI.SendOtpActivity;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -136,7 +119,7 @@ public class DashboardActivity extends AppCompatActivity {
         if(data.getCount() != 0){
             while(data.moveToNext()){
                 expiryDate = data.getString(data.getColumnIndex("Date"));
-                toast(DashboardActivity.this, expiryDate);
+                //toast(DashboardActivity.this, expiryDate);
                 Log.d(TAG, "Expiry date from cursor: " + expiryDate + "  " + hasExpired);
             }
         }
@@ -605,6 +588,7 @@ public class DashboardActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate( R.menu.sign_up_text, menu );
         inflater.inflate(R.menu.printer, menu);
+        inflater.inflate(R.menu.dashboard_menu, menu);
         MenuItem dateItem = menu.findItem(R.id.sign_up);
         dateItem.setTitle(date);
         return super.onCreateOptionsMenu(menu);
@@ -613,11 +597,18 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if(id == R.id.printer){
-            findBluetoothDevice();
-            dialog = new SelectPrinterDialog(DashboardActivity.this, deviceList, this);
-            dialog.show();
+        switch (id){
+            case R.id.printer:
+                findBluetoothDevice();
+                dialog = new SelectPrinterDialog(DashboardActivity.this, deviceList, this);
+                dialog.show();
+                break;
+            case R.id.help:
+                break;
+            case R.id.message:
+                break;
+            case R.id.whatsapp:
+                break;
         }
         if(toggle.onOptionsItemSelected(item))
             return true;

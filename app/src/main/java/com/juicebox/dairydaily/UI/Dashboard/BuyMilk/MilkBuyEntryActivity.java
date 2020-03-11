@@ -2,6 +2,7 @@ package com.juicebox.dairydaily.UI.Dashboard.BuyMilk;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -36,6 +37,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -78,6 +81,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import io.paperdb.Paper;
 
@@ -94,6 +98,8 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
     public static BluetoothConnectionService bluetoothConnectionService;
 
     boolean wantToUpdate = false;
+    double weightAmount;
+    MilkBuyAdapter adapter;
 
     private static final String TAG = "MilkBuyEntryActivity";
 
@@ -124,8 +130,8 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
     private RadioButton buffalo_button;
     ArrayList<DailyBuyObject> list;
 
-    private EditText id, weight, snf, fat;
-    private TextView seller_display, rate_display, amount_display;
+    private EditText id, weight, snf, fat, rate_display;
+    private TextView seller_display, amount_display;
 
     public static DbHelper dbHelper;
 
@@ -232,7 +238,7 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
 
         list = dbHelper.getDailyBuyData(date, shift);
         Log.d(TAG, "list size: " + list.size());
-        MilkBuyAdapter adapter = new MilkBuyAdapter(this, list);
+        adapter = new MilkBuyAdapter(this, list);
 
         for(DailyBuyObject model : list){
             weightTotal += Double.valueOf(model.getWeight());
@@ -268,6 +274,34 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
                 intent.putExtra("Shift", shift);
                 intent.putExtra("Date", date);
                 startActivity(intent);
+            }
+        });
+
+        rate_display.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                try{
+                    weightAmount = Double.valueOf(weight.getText().toString());
+                }
+                catch(Exception e){
+
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    double amount = weightAmount * Double.valueOf(rate_display.getText().toString());
+                    amount_display.setText(""+amount);
+                }
+                catch(Exception e){
+
+                }
             }
         });
 
@@ -497,7 +531,25 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
                         if(DashboardActivity.bluetoothAdapter != null) {
                             if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
                                 try {
-                                    DashboardActivity.bluetoothConnectionService.write(mybyte);
+                                    Dialog dialog = new Dialog(MilkBuyEntryActivity.this);
+                                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                    dialog.setContentView(R.layout.dialog_want_to_print);
+                                    Button yes = dialog.findViewById(R.id.yes);
+                                    Button no = dialog.findViewById(R.id.no);
+
+                                    yes.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            DashboardActivity.bluetoothConnectionService.write(mybyte);
+                                        }
+                                    });
+                                    no.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    dialog.show();
                                     Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
                                 } catch (Exception e) {
                                     Log.d(TAG, "onOptionsSelected: Unable to print");
@@ -721,6 +773,9 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
                 if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
                     try {
                         DashboardActivity.bluetoothConnectionService.write(mybyte);
+                        list.clear();
+                        adapter = new MilkBuyAdapter(MilkBuyEntryActivity.this, list);
+                        recyclerView.setAdapter(adapter);
                         Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
                     } catch (Exception e) {
                         Log.d(TAG, "onOptionsSelected: Unable to print");

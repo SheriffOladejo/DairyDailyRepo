@@ -24,19 +24,19 @@
             android:layout_marginTop="10dp">
 
             <RadioButton
-                android:id="@+id/buyer"
+                android:id="@+id/seller"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Buyer"
+                android:text="Seller"
                 android:textSize="18sp"
                 android:layout_marginEnd="60dp"
                 android:layout_marginStart="10dp"/>
 
             <RadioButton
-                android:id="@+id/seller"
+                android:id="@+id/buyer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Seller"
+                android:text="Buyer"
                 android:textSize="18sp"
                 android:layout_gravity="end"
                 android:layout_marginEnd="10dp"
@@ -60,6 +60,19 @@
         android:paddingStart="15dp" />
 
     <EditText
+        android:id="@+id/phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/rectangle_border"
+        android:hint="Phone Number"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:inputType="number"
+        android:textAlignment="center"
+        android:paddingStart="15dp" />
+
+    <EditText
         android:id="@+id/first_name"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -76,23 +89,10 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/rectangle_border"
-        android:hint="Last Name"
+        android:hint="Father Name"
         android:layout_marginEnd="30dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
-        android:textAlignment="center"
-        android:paddingStart="15dp" />
-
-    <EditText
-        android:id="@+id/phone_number"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@drawable/rectangle_border"
-        android:hint="Phone Number"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="10dp"
-        android:inputType="number"
         android:textAlignment="center"
         android:paddingStart="15dp" />
 

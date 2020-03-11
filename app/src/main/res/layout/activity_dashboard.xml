@@ -101,88 +101,7 @@
                     </android.support.v7.widget.CardView>
 
                 </LinearLayout>
-                <LinearLayout
-                    android:clipToPadding="false"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.CardView
-                        android:id="@+id/customers"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:layout_width="160dp"
-                        android:layout_height="150dp"
-                        android:layout_margin="10dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center">
-                            <ImageView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                android:background="@drawable/circlebackgroundpurple"
-                                android:src="@drawable/ic_user"
-                                android:backgroundTint="#BA64EB"
-                                android:padding="10dp"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textStyle="bold"
-                                android:layout_marginTop="10dp"
-                                android:text="Customers"/>
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/lightgray"
-                                android:layout_marginTop="10dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginEnd="10dp"/>
 
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-                    <android.support.v7.widget.CardView
-                        android:id="@+id/add_product"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:layout_width="160dp"
-                        android:layout_height="150dp"
-                        android:layout_margin="10dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                android:background="@drawable/circlebackgroundpurple"
-                                android:backgroundTint="#3C48F3"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_plus" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="Add Product"
-                                android:textStyle="bold" />
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_marginTop="10dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginEnd="10dp"
-                                android:background="@color/lightgray" />
-
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-
-                </LinearLayout>
                 <LinearLayout
                     android:clipToPadding="false"
                     android:gravity="center"
@@ -251,7 +170,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="View Report"
+                                android:text="View Seller Report"
                                 android:textStyle="bold" />
 
                             <View
@@ -266,6 +185,90 @@
                     </android.support.v7.widget.CardView>
 
                 </LinearLayout>
+                <LinearLayout
+                    android:clipToPadding="false"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/customers"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:layout_width="160dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:background="@drawable/circlebackgroundpurple"
+                                android:src="@drawable/ic_user"
+                                android:backgroundTint="#BA64EB"
+                                android:padding="10dp"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                android:layout_marginTop="10dp"
+                                android:text="Customers"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/lightgray"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginEnd="10dp"/>
+
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/rate_chart"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:layout_width="160dp"
+                        android:layout_height="150dp"
+                        android:layout_margin="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:background="@drawable/circlebackgroundpurple"
+                                android:backgroundTint="@color/deeppurple"
+                                android:padding="10dp"
+                                android:src="@drawable/ic_infographic" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="RateChart"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@color/lightgray" />
+
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+                </LinearLayout>
+
                 <LinearLayout
                     android:clipToPadding="false"
                     android:gravity="center"
@@ -307,9 +310,8 @@
 
                         </LinearLayout>
                     </android.support.v7.widget.CardView>
-
                     <android.support.v7.widget.CardView
-                        android:id="@+id/rate_chart"
+                        android:id="@+id/add_product"
                         android:foreground="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:layout_width="160dp"
@@ -326,15 +328,15 @@
                                 android:layout_width="64dp"
                                 android:layout_height="64dp"
                                 android:background="@drawable/circlebackgroundpurple"
-                                android:backgroundTint="@color/deeppurple"
+                                android:backgroundTint="#3C48F3"
                                 android:padding="10dp"
-                                android:src="@drawable/ic_infographic" />
+                                android:src="@drawable/ic_plus" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="RateChart"
+                                android:text="Add Product"
                                 android:textStyle="bold" />
 
                             <View

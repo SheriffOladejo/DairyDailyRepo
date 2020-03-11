@@ -8,10 +8,13 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.juicebox.dairydaily.R;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -82,7 +85,17 @@ public class UtilityMethods {
 
     // Display custom toast message
     public static void toast(Context context, String message){
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        Toast toast = new Toast(context);
+        toast.setDuration(Toast.LENGTH_LONG);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.custom_toast, null);
+        TextView textView = view.findViewById(R.id.text);
+        textView.setTextColor(context.getResources().getColor(R.color.black));
+        textView.setText(message);
+        view.setBackgroundColor(context.getResources().getColor(R.color.white));
+        view.setBackgroundResource(R.drawable.rectangle_border);
+        toast.setView(view);
+        toast.show();
     }
 
     // truncate a double value

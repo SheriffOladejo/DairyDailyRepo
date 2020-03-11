@@ -69,6 +69,7 @@ public class BuyMilkActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
+    LinearLayout date_layout;
 
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -87,6 +88,14 @@ public class BuyMilkActivity extends AppCompatActivity {
         ImageView calendarImage = findViewById(R.id.calendar_image);
         scrollview = findViewById(R.id.scrollview);
         proceed = findViewById(R.id.proceed);
+        date_layout = findViewById(R.id.date_layout);
+
+        date_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePickerDialog.show();
+            }
+        });
 
         drawerLayout = findViewById(R.id.drawerlayout);
         navigationView = findViewById(R.id.nav_view);
@@ -118,12 +127,10 @@ public class BuyMilkActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(online_switch.isChecked()){
                     online = true;
-                    Log.d(TAG, "online milk sell: " + online);
                 }
                 else if(!online_switch.isChecked()){
                     online = false;
-                    Log.d(TAG, "online milk sell: " + online);
-                }
+                                    }
             }
         });
 
@@ -181,12 +188,12 @@ public class BuyMilkActivity extends AppCompatActivity {
 
         checkInternetConnect();
 
-        calendarImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                datePickerDialog.show();
-            }
-        });
+//        calendarImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                datePickerDialog.show();
+//            }
+//        });
 
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,11 +217,15 @@ public class BuyMilkActivity extends AppCompatActivity {
 
         if(manager != null){
             boolean is3g = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
-            if(is3g){}
-                //online_switch.setChecked(true);
+            if(is3g){
+                online_switch.setChecked(true);
+                online = true;
+            }
             boolean isWifi = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-            if(isWifi){}
-                //online_switch.setChecked(true);
+            if(isWifi){
+                online_switch.setChecked(true);
+                online = true;
+            }
         }
     }
 
