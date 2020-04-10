@@ -135,6 +135,7 @@ public class CustomersActivity extends AppCompatActivity {
             }
             seller_adapter = new CustomerAdapter(seller_list, this);
             sellers_recyclerview.setAdapter(seller_adapter);
+
             search.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {

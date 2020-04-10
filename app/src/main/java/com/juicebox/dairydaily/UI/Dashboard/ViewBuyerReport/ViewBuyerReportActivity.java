@@ -35,7 +35,7 @@ public class ViewBuyerReportActivity extends AppCompatActivity {
         receive_cash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ViewBuyerReportActivity.this, ReceiveCashActivity.class));
+                startActivity(new Intent(ViewBuyerReportActivity.this, ReceiveCashList.class));
             }
         });
         set_milk_rate.setOnClickListener(new View.OnClickListener() {

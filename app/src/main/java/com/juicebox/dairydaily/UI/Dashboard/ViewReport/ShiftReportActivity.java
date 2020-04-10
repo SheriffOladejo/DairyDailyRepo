@@ -366,10 +366,14 @@ public class ShiftReportActivity extends AppCompatActivity implements DatePicker
         document.add(p1);
         document.add(new Paragraph("Date: "+date,f));
         document.add(new Paragraph("Session: " + shift+"\n\n",f));
+        table.addCell("Average Fat: " + truncate(averageFat));
+        table.addCell("Average SNF: " + truncate(averageSnf));
+        table.addCell("Total Weight: " + truncate(totalWeight));
+        table.addCell("Total Amount: " + truncate(totalAmount));
 
         document.add(table);
 
-        PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2,2,2});
+        PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2});
         table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table1.getDefaultCell().setFixedHeight(20);
         table1.setTotalWidth(PageSize.A4.getWidth());

@@ -18,6 +18,7 @@ import com.juicebox.dairydaily.Models.MilkHistoryObject;
 import com.juicebox.dairydaily.Models.PaymentRegisterModel;
 import com.juicebox.dairydaily.Models.AddProductModel;
 import com.juicebox.dairydaily.Models.ProductSaleModel;
+import com.juicebox.dairydaily.Models.ReceiveCashListModel;
 import com.juicebox.dairydaily.Models.ReceiveCashModel;
 import com.juicebox.dairydaily.Models.ReportByDateModels;
 import com.juicebox.dairydaily.Models.ShiftReportModel;
@@ -408,8 +409,23 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
-    public void deleteReceiveCash(int id){
-        String query = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL6 + " ='" + id + "'";
+    public void deleteReceiveCash(int id, String desc, String date){
+        String query;
+        if(desc.equals("user_id")){
+            query = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL5 + " ='" + id + "'";
+        }
+        else if(desc.equals("delete_from_milk_sale")){
+            query = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL5+ " ='" + id + "' AND " + Rec_COL1 + " ='" + date + "'";
+        }
+        else{
+            query = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL6 + " ='" + id + "'";
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+
+    public void deleteReceiveCash(String startDate, String endDate){
+        String query = "delete from " + receive_cash_table + " where " + Rec_COL1 +" between '" + startDate + "' and '" + endDate + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
     }
@@ -428,7 +444,7 @@ public class DbHelper extends SQLiteOpenHelper {
         ArrayList<BuyerRegisterModel> list = new ArrayList<>();
         ArrayList<BuyerRegisterModel> users = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + milk_sale_table + " WHERE " + Sale_COL7 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+        String query = "SELECT * FROM " + milk_sale_table;// + " WHERE " + Sale_COL7 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
         String query2 = "SELECT ID, Name FROM " + buyers_table;
 
         Cursor data = db.rawQuery(query, null);
@@ -457,6 +473,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 String name = data2.getString(data2.getColumnIndex(BTCOL2));
                 BuyerRegisterModel model2 = new BuyerRegisterModel(name, String.valueOf(0), String.valueOf(0), id);
                 users.add(model2);
+                Log.d(TAG, "gets called");
             }
         }
         else{
@@ -478,16 +495,70 @@ public class DbHelper extends SQLiteOpenHelper {
 
         for(BuyerRegisterModel model : users){
             int id = model.getId();
-            String query3 = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + id + "' AND " + Rec_COL1 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+            double credit =0;
+            double debit=0;
+            String query3 = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + id + "'";// + Rec_COL1 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
             Cursor data3 = db.rawQuery(query3, null);
             if(data3.getCount() != 0){
                 while(data3.moveToNext()){
-                    double credit = Double.valueOf(data3.getString(data3.getColumnIndex(Rec_COL2)));
-                    model.setAmount(String.valueOf(Double.valueOf(model.getAmount()) - credit));
+                    Log.d(TAG, "Credit: " + data3.getColumnIndex(Rec_COL2));
+                    credit += Double.valueOf(data3.getString(data3.getColumnIndex(Rec_COL2)));
+                    debit += Double.valueOf(data3.getString(data3.getColumnIndex(Rec_COL3)));
                 }
+                Log.d(TAG, "credit -debit: " + credit + "  " + debit + "  " + users.get(2).getAmount());
+                model.setAmount(String.valueOf(Double.valueOf((debit-credit))));
+                model.setWeight(String.valueOf(Double.valueOf((debit-credit)/getRate())));
+            }
+            else{
+                Log.d(TAG, "data3 is empty");
             }
         }
         return users;
+    }
+
+    public ArrayList<ReceiveCashListModel> getReceiveCashList(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ArrayList<ReceiveCashListModel> list = new ArrayList<>();
+        String query2 = "SELECT * FROM " + buyers_table;
+        Cursor data1 = db.rawQuery(query2, null);
+        if(data1.getCount()!=0){
+            while(data1.moveToNext()){
+                String name = data1.getString(data1.getColumnIndex(BTCOL2));
+                int id = data1.getInt(data1.getColumnIndex(BTCOL1));
+                ReceiveCashListModel model = new ReceiveCashListModel(""+id, name, "", "");
+                list.add(model);
+            }
+        }
+        Log.d(TAG, "Hello");
+
+        if(list.size() != 0){
+            for(int i=0; i<list.size(); i++){
+                String query = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + list.get(i).getId() + "'";
+                Cursor data = db.rawQuery(query, null);
+                if(data.getCount()!=0){
+                    double debit = 0;
+                    double credit = 0;
+                    double weight = 0;
+                    double remaining_amount=0;
+                    while(data.moveToNext()){
+                        debit += Double.valueOf(data.getString(data.getColumnIndex(Rec_COL3)));
+                        credit += Double.valueOf(data.getString(data.getColumnIndex(Rec_COL2)));
+                    }
+                    try{
+                        weight = (debit-credit)/getRate();
+                        remaining_amount = debit-credit;
+                        list.get(i).setDue(""+remaining_amount);
+                        list.get(i).setWeight(""+weight);
+                    }
+                    catch(Exception e){
+                        list.get(i).setDue("0");
+                        list.get(i).setWeight("0");
+                    }
+                }
+            }
+        }
+        // Log.d(TAG, "List size: " + list.size());
+        return list;
     }
 
     // Get buyer receive cash details
@@ -495,24 +566,17 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<ReceiveCashModel> list = new ArrayList<>();
 
-//      String query1 = "SELECT Date, Credit, Debit FROM " + milk_sale_table + " WHERE ID ='" + id + "' AND " + Sale_COL7 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
-        String query2 = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + id + "' AND " + Rec_COL1 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
 
-//      Cursor data1 = db.rawQuery(query1, null);
+        String query2;
+        if(startDate.equals("") && endDate.equals("")){
+            query2 = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + id + "'";
+        }
+        else{
+            query2 = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + id + "' AND " + Rec_COL1 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+        }
+
         Cursor data2 = db.rawQuery(query2, null);
-//        if(data1.getCount() != 0){
-//            while(data1.moveToNext()){
-//                String date = data1.getString(data1.getColumnIndex(Sale_COL7));
-//                String credit = data1.getString(data1.getColumnIndex(Sale_COL9));
-//                String debit = data1.getString(data1.getColumnIndex(Sale_COL8));
-//                String title = "Milk Sale";
-//                ReceiveCashModel model = new ReceiveCashModel(date, title, credit, debit, id);
-//                list.add(model);
-//            }
-//        }
-//        else{
-//            Log.d(TAG, "getReceiveCash: empty");
-//        }
+
         if(data2.getCount() != 0){
             while(data2.moveToNext()){
                 String title = data2.getString(data2.getColumnIndex(Rec_COL4));
@@ -557,15 +621,27 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     //Delete milk sale entry
-    public void deleteMilkSaleEntry(int unique_ID) {
-        String query = "DELETE FROM " + milk_sale_table + " WHERE " + Unique_ID_Sale + " ='" + unique_ID + "'";
+    public void deleteMilkSaleEntry(int unique_ID, boolean toClear) {
+        String query;
+        if(toClear){
+            query = "DELETE FROM " + milk_sale_table + " WHERE " + Sale_COL1 + " ='" + unique_ID + "'";
+        }
+        else{
+            query = "DELETE FROM " + milk_sale_table + " WHERE " + Unique_ID_Sale + " ='" + unique_ID + "'";
+        }
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
     }
 
     //Delete milk buy entry
-    public void deleteMilkBuyEntry(int unique_ID) {
-        String query = "DELETE FROM " + milk_buy_table + " WHERE " + Unique_ID_Buy + " ='" + unique_ID + "'";
+    public void deleteMilkBuyEntry(int unique_ID, boolean toClear) {
+        String query;
+        if(toClear){
+            query = "DELETE FROM " + milk_buy_table + " WHERE " + Buy_COL1 + " ='" + unique_ID + "'";
+        }
+        else{
+            query = "DELETE FROM " + milk_buy_table + " WHERE " + Unique_ID_Buy + " ='" + unique_ID + "'";
+        }
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
     }
@@ -634,7 +710,7 @@ public class DbHelper extends SQLiteOpenHelper {
         ArrayList<ReportByDateModels> endDay = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, "getReportByDate: " + beginDate+ " " + endDate);
-        String query = "SELECT Date, Rate, Weight, Amount, Shift FROM " + milk_sale_table + " WHERE " + Sale_COL1 + " ='" + id + "' AND "  + Sale_COL7 + " BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+        String query = "SELECT Date, Rate, Weight, Amount, Shift, Credit, Debit FROM " + milk_sale_table + " WHERE " + Sale_COL1 + " ='" + id + "' AND "  + Sale_COL7 + " BETWEEN '" + beginDate + "' AND '" + endDate + "'";
         Cursor data = db.rawQuery(query, null);
         Log.d(TAG, "getReportByDate: after");
         String month = beginDate.substring(3,5);
@@ -646,8 +722,10 @@ public class DbHelper extends SQLiteOpenHelper {
                 String weight = data.getString(data.getColumnIndex(Sale_COL3));
                 String amount = data.getString(data.getColumnIndex(Sale_COL4));
                 String shift = data.getString(data.getColumnIndex(Sale_COL6));
+                String credit = data.getString(data.getColumnIndex(Sale_COL9));
+                String debit = data.getString(data.getColumnIndex(Sale_COL8));
                 String thisMointh = date.substring(3,5);
-                ReportByDateModels model = new ReportByDateModels(date, rate, weight, amount, shift);
+                ReportByDateModels model = new ReportByDateModels(date, rate, weight, amount, shift, credit, debit);
                 list.add(model);
             }
             // Sort list further by shift
@@ -738,6 +816,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 }
             }
         }
+        Log.d(TAG, "Users: " + users.get(2).getAmount());
         return users;
     }
 
@@ -1089,12 +1168,12 @@ public class DbHelper extends SQLiteOpenHelper {
                             contentValues.put(SNFcolumns[11], String.valueOf(lines.get(i).get(11)));
                             contentValues.put(SNFcolumns[12], String.valueOf(lines.get(i).get(12)));
                             contentValues.put(SNFcolumns[13], String.valueOf(lines.get(i).get(13)));
-                            //                    contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
-                            //                    contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
-                            //                    contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
-                            //                    contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
-                            //                    contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
-                            //                    contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
+                            contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
+                            contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
+                            contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
+//                            contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
+//                            contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
+//                            contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
 
 
                             /*
@@ -1133,7 +1212,7 @@ public class DbHelper extends SQLiteOpenHelper {
             List<List<String>> lines = new ArrayList<>();
             List<String> fatList = new ArrayList<>();
 
-            for (double i = 3.0; i <= 6.0; i = i + 0.1) {
+            for (double i = 3.0; i <= 7.0; i = i + 0.1) {
                 Double truncatedValue = BigDecimal.valueOf(i).setScale(1, RoundingMode.HALF_UP).doubleValue();
                 String fat = String.valueOf(truncatedValue);
                 fatList.add(fat);
@@ -1168,12 +1247,12 @@ public class DbHelper extends SQLiteOpenHelper {
                         contentValues.put(SNFcolumns[11], String.valueOf(lines.get(i).get(11)));
                         contentValues.put(SNFcolumns[12], String.valueOf(lines.get(i).get(12)));
                         contentValues.put(SNFcolumns[13], String.valueOf(lines.get(i).get(13)));
-                        //                    contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
-                        //                    contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
-                        //                    contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
-                        //                    contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
-                        //                    contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
-                        //                    contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
+                        contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
+                        contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
+                        contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
+//                        contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
+//                        contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
+//                        contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
 
 
                         /*
@@ -1599,6 +1678,10 @@ public class DbHelper extends SQLiteOpenHelper {
     public void clearRate() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + rate_table);
+    }
+
+    public void destroyDb(){
+        context.deleteDatabase(DATABASE_NAME);
     }
 
     public void deleteHistory(String startDate, String endDate) {

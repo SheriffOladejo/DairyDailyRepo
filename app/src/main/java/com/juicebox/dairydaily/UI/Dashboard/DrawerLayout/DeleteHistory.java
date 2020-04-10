@@ -329,6 +329,7 @@ public class DeleteHistory extends AppCompatActivity {
             return true;
         if(item.getItemId() == R.id.delete){
             dbHelper.deleteHistory(startDate, endDate);
+            dbHelper.deleteReceiveCash(startDate, endDate);
             new BackupHandler(DeleteHistory.this);
 
             buyObjects = dbHelper.getMilkBuyRange(startDate, endDate);

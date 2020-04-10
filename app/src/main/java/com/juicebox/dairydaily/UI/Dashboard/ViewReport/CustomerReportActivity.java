@@ -329,8 +329,6 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double amountTotalDouble = 0;
-                double weightTotalDouble = 0;
                 Log.d(TAG, "Start Date: " + startDate);
                 Log.d(TAG, "End Date: " + endDate);
                 try{
@@ -343,11 +341,11 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
                         CustomerReportAdapter adapter = new CustomerReportAdapter(CustomerReportActivity.this, list);
                         recyclerView.setAdapter(adapter);
                         for(CustomerReportModel model : list){
-                            amountTotalDouble += Double.valueOf(model.getAmount());
-                            weightTotalDouble += Double.valueOf(model.getWeight());
+                            totalAmount += Double.valueOf(model.getAmount());
+                            totalWeight += Double.valueOf(model.getWeight());
                         }
-                        amountTotal.setText(truncate(amountTotalDouble)+"Rs");
-                        weightTotal.setText(String.valueOf(truncate(weightTotalDouble))+"Ltr");
+                        amountTotal.setText(truncate(totalAmount)+"Rs");
+                        weightTotal.setText(String.valueOf(truncate(totalWeight))+"Ltr");
                     }
                 }
                 catch(Exception e){
@@ -472,19 +470,24 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
         Paragraph range = new Paragraph(startDate + " - " + endDate + "\n\n",f);
         range.setAlignment(Element.ALIGN_CENTER);
         document.add(range);
+        table.addCell("Average Fat: " + truncate(averageFat));
+        table.addCell("Average SNF: " + truncate(averageSnf));
+        table.addCell("Total Weight: " + truncate(totalWeight));
+        table.addCell("Total Amount: " + truncate(totalAmount));
         document.add(table);
 
-        PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2,2,2});
+        PdfPTable table1 = new PdfPTable(new float[]{2,2});
         table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table1.getDefaultCell().setFixedHeight(20);
         table1.setTotalWidth(PageSize.A4.getWidth());
 
         table1.setWidthPercentage(100);
         table1.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table1.addCell("Average Fat: " + truncate(averageFat));
-        table1.addCell("Average SNF: " + truncate(averageSnf));
         table1.addCell("Total Weight: " + truncate(totalWeight));
         table1.addCell("Total Amount: " + truncate(totalAmount));
+
+        Log.d(TAG, "Total Weight: " + totalAmount);
+
         document.add(table1);
 
         document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));

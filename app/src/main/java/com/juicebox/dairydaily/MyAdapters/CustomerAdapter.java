@@ -149,17 +149,17 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
                             String status = list.get(getAdapterPosition()).getStatus();
                             if(status.equals("Buyer")){
                                 dbHelper.deleteBuyer(id);
-                                Log.d(TAG, "onClick: buyer" + id);
+                                dbHelper.deleteReceiveCash(id,"user_id", "");
+                                dbHelper.deleteMilkSaleEntry(id, true);
                                 new BackupHandler(context);
                                 context.startActivity(new Intent(context, CustomersActivity.class));
                             }
                             else if(status.equals("Seller")){
                                 dbHelper.deleteSeller(id);
+                                dbHelper.deleteMilkBuyEntry(id, true);
                                 new BackupHandler(context);
-                                Log.d(TAG, "onClick: seller" + id);
                                 context.startActivity(new Intent(context, CustomersActivity.class));
                             }
-                            Log.d(TAG, "onClick: " + id);
                             break;
                     }
                 }

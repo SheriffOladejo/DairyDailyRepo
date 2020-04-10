@@ -1,5 +1,6 @@
 package com.juicebox.dairydaily.UI.Dashboard.DrawerLayout;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.ContactsContract;
@@ -11,17 +12,23 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.prefs.PreferenceChangeEvent;
 
 import io.paperdb.Paper;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    Button name, addresss, email, phone_number, city, state, update, printer;
+    Button name, addresss, email, phone_number, city, state, update, printer, days_remaining, expiry_date;
+    int day, month, year;
+    String day_in_string, month_in_string, year_in_string;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +47,8 @@ public class ProfileActivity extends AppCompatActivity {
         state = findViewById(R.id.state);
         update = findViewById(R.id.lastupdated);
         printer = findViewById(R.id.default_printer);
+        expiry_date = findViewById(R.id.expiry_date);
+        days_remaining = findViewById(R.id.days_remaining);
 
         String nameString = Paper.book().read(Prevalent.name);
         String addressString = Paper.book().read(Prevalent.address);
@@ -49,6 +58,48 @@ public class ProfileActivity extends AppCompatActivity {
         String stateString = Paper.book().read(Prevalent.state);
         String updateString = Paper.book().read(Prevalent.last_update);
         String printerString = Paper.book().read(Prevalent.selected_device);
+
+        String expiry = "";
+        DbHelper helper = new DbHelper(ProfileActivity.this);
+        Cursor data = helper.getExpiryDate();
+        if(data.getCount() != 0){
+            while(data.moveToNext()){
+                expiry = data.getString(data.getColumnIndex("Date"));
+            }
+        }
+        if(expiry.equals("")){
+
+        }
+        else{
+            expiry_date.setText(new SimpleDateFormat("dd/MM/YYYY").format(Long.valueOf(expiry)));
+            String ex = new SimpleDateFormat("dd/MM/YYYY").format(Long.valueOf(expiry));
+            day_in_string = ex.substring(0,2);
+            month_in_string = ex.substring(3,5);
+            year_in_string = ex.substring(6,10);
+
+            if(day_in_string.charAt(0) == '0'){
+                day = Integer.valueOf(day_in_string.substring(1,2));
+            }
+            else{
+                day = Integer.valueOf(day_in_string);
+            }
+
+            if(month_in_string.charAt(0) == '0'){
+                month = Integer.valueOf(month_in_string.substring(1,2));
+            }
+            else{
+                month = Integer.valueOf(month_in_string);
+            }
+            year = Integer.valueOf(year_in_string);
+            long d = 0;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                LocalDate e = LocalDate.of(year, month, day);
+                LocalDate now = LocalDate.now();
+                d = ChronoUnit.DAYS.between(now, e);
+            }
+            days_remaining.setText(""+d);
+        }
+
 
         Animation slide = AnimationUtils.loadAnimation(ProfileActivity.this, R.anim.image_slide_left);
         r1.startAnimation(slide);

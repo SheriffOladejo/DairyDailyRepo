@@ -158,14 +158,17 @@ public class ProductSaleActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().isEmpty()){
-                    double rateValue = Double.valueOf(rate.getText().toString());
-                    double unitsValue = Double.valueOf(units.getText().toString());
-                    amount.setText(String.valueOf(rateValue * unitsValue));
+                try{
+                    if(!s.toString().isEmpty()){
+                        double rateValue = Double.valueOf(rate.getText().toString());
+                        double unitsValue = Double.valueOf(units.getText().toString());
+                        amount.setText(String.valueOf(rateValue * unitsValue));
+                    }
+                    else{
+                        amount.setText("Amount");
+                    }
                 }
-                else{
-                    amount.setText("Amount");
-                }
+                catch (Exception e){}
             }
 
             @Override
@@ -182,14 +185,16 @@ public class ProductSaleActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().equals("")){
-                    int id = Integer.valueOf(s.toString());
-                    String name = dbHelper.getBuyerName(id);
-                    all_buyers.setText(name);
+                try {
+                    if (!s.toString().equals("")) {
+                        int id = Integer.valueOf(s.toString());
+                        String name = dbHelper.getBuyerName(id);
+                        all_buyers.setText(name);
+                    } else {
+                        all_buyers.setText("All Buyers");
+                    }
                 }
-                else{
-                    all_buyers.setText("All Buyers");
-                }
+                catch (Exception e){}
             }
 
             @Override

@@ -60,6 +60,7 @@ import io.paperdb.Paper;
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
+import static com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity.online;
 
 public class MilkSaleEntryActivity extends AppCompatActivity {
 
@@ -325,34 +326,11 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
                         byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
 
                         recyclerView.setAdapter(adapter);
+                        //new BackupHandler(MilkSaleEntryActivity.this);
 
                         if(DashboardActivity.bluetoothAdapter != null) {
                             if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
-                                try {
-                                    Dialog dialog = new Dialog(MilkSaleEntryActivity.this);
-                                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                                    dialog.setContentView(R.layout.dialog_want_to_print);
-                                    Button yes = dialog.findViewById(R.id.yes);
-                                    Button no = dialog.findViewById(R.id.no);
-
-                                    yes.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            DashboardActivity.bluetoothConnectionService.write(mybyte);
-                                        }
-                                    });
-                                    no.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    dialog.show();
-                                    Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
-                                } catch (Exception e) {
-                                    Log.d(TAG, "onOptionsSelected: Unable to print");
-                                    toast(MilkSaleEntryActivity.this, "Unable to print");
-                                }
+                                DashboardActivity.bluetoothConnectionService.write(mybyte);
                             } else {
                                 toast(MilkSaleEntryActivity.this, "Printer is not connected");
                             }
@@ -360,6 +338,9 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
                         else{
                             toast(MilkSaleEntryActivity.this, "Bluetooth is off");
                         }
+                    }
+                    else{
+                        toast(MilkSaleEntryActivity.this, "Unable to add entry to receive cash table");
                     }
                 }
             }
@@ -371,8 +352,8 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
         all_buyers.setText("All Buyers");
         weight.setText("");
         amount_display.setText("Amount");
-        Log.d(TAG, "online: " + SellMilkActivity.online);
-        if(SellMilkActivity.online){
+        Log.d(TAG, "online: " + online);
+        if(online){
             new BackupHandler(MilkSaleEntryActivity.this);
         }
     }

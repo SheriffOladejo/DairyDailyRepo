@@ -441,10 +441,15 @@ public class BackupHandler {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
                             toast(context, "Data uploaded successfully");
-                            pd.dismiss();
+                            try{
+                                pd.dismiss();
+                            }
+                            catch (Exception e){
+
+                            }
                         }
                         else{
-
+                            toast(context, "Unable to backup");
                         }
                     }
                 });

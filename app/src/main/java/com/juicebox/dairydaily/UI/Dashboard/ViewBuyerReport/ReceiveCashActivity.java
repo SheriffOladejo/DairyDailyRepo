@@ -2,6 +2,7 @@ package com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +53,7 @@ import com.juicebox.dairydaily.MyAdapters.ReceiveCashAdapter;
 import com.juicebox.dairydaily.MyAdapters.ReportByDateAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
+import com.juicebox.dairydaily.Others.LoadingBar;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.ReceiveCashDialog;
@@ -93,10 +96,10 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
 
     private static final int PERMISSION_REQUEST_CODE = 1;
     File pdfFile;
+    TextView nameView;
     ImageView start_date_image;
     ImageView end_date_image;
     TextView start_date_text_view, end_date_text_view;
-    TextView names;
 
     private static final String TAG = "ReceiveCashActivity";
 
@@ -105,16 +108,28 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
     NavigationView navigationView;
 
     public static ArrayList<ReceiveCashModel> list;
-    double creditTotal = 0;
-    double debitTotal = 0;
-    double remain = 0;
+    public static double creditTotal = 0;
+    public static double debitTotal = 0;
+    public static double remain = 0;
 
-    EditText id;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        creditTotal = 0;
+        debitTotal = 0;
+        remain = 0;
+    }
+
+    ProgressDialog loadingBar;
+
+    ProgressBar progressBar;
 
     Button go, receive_cash, send_msg;
     public static RecyclerView recyclerView;
+    public static ReceiveCashAdapter adapter;
 
     int idInt;
+    String name;
 
     public static String startDate, endDate;
 
@@ -123,6 +138,9 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
 
     public DbHelper dbHelper = new DbHelper(this);
 
+    public static TextView totalCredit;
+    public static TextView totalDebit;
+    public static TextView remaining;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -133,6 +151,10 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         getSupportActionBar().setHomeButtonEnabled(true);
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
+        progressBar = new ProgressBar(this);
+
+        loadingBar = new ProgressDialog(this);
+
         drawerLayout = findViewById(R.id.drawerlayout);
         navigationView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
@@ -142,21 +164,35 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
 
         initDashboard();
 
+        idInt = getIntent().getIntExtra("id", 0);
+        name = getIntent().getStringExtra("name");
+
         start_date_image = findViewById(R.id.start_date_image);
         end_date_image = findViewById(R.id.end_date_image_view);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
-        names = findViewById(R.id.name);
-        id = findViewById(R.id.id);
         go = findViewById(R.id.go);
-        final TextView totalCredit = findViewById(R.id.totalCredit);
-        final TextView totalDebit = findViewById(R.id.totalDebit);
-        final TextView remaining = findViewById(R.id.remaining);
+        totalCredit = findViewById(R.id.totalCredit);
+        totalDebit = findViewById(R.id.totalDebit);
+        remaining = findViewById(R.id.remaining);
         receive_cash = findViewById(R.id.receive_cash);
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         send_msg = findViewById(R.id.send_msg);
+        nameView = findViewById(R.id.name);
 
+        list = dbHelper.getReceiveCash(idInt, "", "");
+        Log.d("Sheriff", "receive cash: " + list.size());
+        adapter = new ReceiveCashAdapter(ReceiveCashActivity.this, list);
+        for(ReceiveCashModel model : list){
+            creditTotal += Double.valueOf(model.getCredit());
+            debitTotal += Double.valueOf(model.getDebit());
+        }
+        remain = creditTotal - debitTotal;
+        totalCredit.setText(String.valueOf(truncate(creditTotal)) + "Rs");
+        totalDebit.setText(String.valueOf(truncate(debitTotal)) + "Rs");
+        remaining.setText(String.valueOf(truncate(-remain)) + "Rs");
+        recyclerView.setAdapter(adapter);
 
         send_msg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,84 +214,21 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         receive_cash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
-                    idInt = Integer.valueOf(id.getText().toString());
-                }
-                catch(Exception e){
-
-                }
                 new ReceiveCashDialog(ReceiveCashActivity.this, idInt).show();
             }
         });
 
-        idInt = getIntent().getIntExtra("id", 0);
-        String name = getIntent().getStringExtra("name");
-        try{
-            if(!name.equals("")){
-                names.setText(name);
-            }
-        }
-        catch(Exception e){}
-        if(idInt != 0){
-            id.setText(String.valueOf(idInt));
-        }
-
-        names.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ReceiveCashActivity.this, UsersListActivity.class);
-                intent.putExtra("From", "ReceiveCash");
-                startActivity(intent);
-            }
-        });
-
-        id.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                try{
-                    if(!s.toString().equals("")){
-                        int id = Integer.valueOf(s.toString());
-                        String name = dbHelper.getBuyerName(id);
-                        if(name.equals("")){
-                            names.setText("Not Found");
-                        }
-                        else{
-                        names.setText(name);
-                        }
-                    }
-                    else{
-                        names.setText("All Buyers");
-                    }
-                }
-                catch(Exception e){
-
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
+        nameView.setText(name);
         go.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        try{
-                            idInt = Integer.valueOf(id.getText().toString());
-                        }
-                        catch(Exception e){
-                            idInt = -1;
-                        }
+                        creditTotal = 0;
+                        debitTotal=0;
+                        remain=0;
 
                         if(idInt != -1){
-                            if(names.getText().toString().equals("All Buyers") || names.getText().toString().equals("Not Found")){
+                            if(name.equals("All Buyers") || name.equals("Not Found")){
 
                             }
                             else{
@@ -330,6 +303,8 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loadingBar.setTitle("Wait...");
+                loadingBar.show();
                 createPdfWrapper();
             }
         });
@@ -418,7 +393,7 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         Paragraph p1 = new Paragraph("Username: " + Paper.book().read(Prevalent.name) + "\nPhone Number: " + Paper.book().read(Prevalent.phone_number),f);
         p1.setAlignment(Element.ALIGN_CENTER);
         document.add(new Paragraph(date,f));
-        document.add(new Paragraph("ID: " + idInt + "\nName: " + names.getText().toString(),f));
+        document.add(new Paragraph("ID: " + idInt + "\nName: " + name,f));
         Paragraph range = new Paragraph(startDate + " - " + endDate + "\n\n",f);
         range.setAlignment(Element.ALIGN_CENTER);
         document.add(range);
@@ -437,6 +412,7 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
 
         document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
         document.close();
+        loadingBar.dismiss();
         previewPdf();
     }
 
@@ -594,7 +570,7 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
             return true;
         int id = item.getItemId();
         if (id == R.id.printer) {
-            if(list!=null){
+            if(!list.isEmpty()){
                 //Collections.reverse(list);
                 String line = "------------------------------";
                 Date dateIntermediate = new Date();

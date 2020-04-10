@@ -98,7 +98,7 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
                             dialog.dismiss();
                             break;
                         case 1:
-                            helper.deleteReceiveCash(unique_id);
+                            helper.deleteReceiveCash(unique_id, "","");
                             new BackupHandler(context);
                             ReceiveCashActivity.list = helper.getReceiveCash(user_Id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
                             ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);

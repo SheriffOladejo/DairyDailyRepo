@@ -24,6 +24,7 @@ import java.util.List;
 public class CowTab1 extends Fragment {
 
     private static final String TAG = "CowTab1";
+    public static RecyclerView recyclerView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -42,7 +43,7 @@ public class CowTab1 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tab1, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
+        recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         List<RateChartModel> list = new ArrayList<>();
         DbHelper dbHelper = new DbHelper(getContext());

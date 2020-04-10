@@ -33,7 +33,8 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.getLastname;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
 
-public class MilkSaleAdapter extends RecyclerView.Adapter<MilkSaleAdapter.ViewHolder> {
+public class
+MilkSaleAdapter extends RecyclerView.Adapter<MilkSaleAdapter.ViewHolder> {
 
     List<DailySalesObject> list;
     Context context;
@@ -123,8 +124,8 @@ public class MilkSaleAdapter extends RecyclerView.Adapter<MilkSaleAdapter.ViewHo
                             dialog.dismiss();
                             break;
                         case 1:
-                            int unique_Id1 = list.get(getAdapterPosition()).getUnique_id();
-                            helper.deleteMilkSaleEntry(unique_Id1);
+                            helper.deleteMilkSaleEntry(unique_Id, false);
+                            helper.deleteReceiveCash(user_Id, "delete_from_milk_sale",date);
                             list = MilkSaleEntryActivity.dbHelper.getDailySalesData(date, shift);
                             Log.d(TAG, "list size: " + list.size());
                             MilkSaleAdapter adapter = new MilkSaleAdapter(list, context);

@@ -528,33 +528,10 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
 
                         recyclerView.setAdapter(adapter);
 
+                        //new BackupHandler(MilkBuyEntryActivity.this);
                         if(DashboardActivity.bluetoothAdapter != null) {
                             if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
-                                try {
-                                    Dialog dialog = new Dialog(MilkBuyEntryActivity.this);
-                                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                                    dialog.setContentView(R.layout.dialog_want_to_print);
-                                    Button yes = dialog.findViewById(R.id.yes);
-                                    Button no = dialog.findViewById(R.id.no);
-
-                                    yes.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            DashboardActivity.bluetoothConnectionService.write(mybyte);
-                                        }
-                                    });
-                                    no.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    dialog.show();
-                                    Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
-                                } catch (Exception e) {
-                                    Log.d(TAG, "onOptionsSelected: Unable to print");
-                                    toast(MilkBuyEntryActivity.this, "Unable to print");
-                                }
+                                DashboardActivity.bluetoothConnectionService.write(mybyte);
                             } else {
                                 toast(MilkBuyEntryActivity.this, "Printer is not connected");
                             }

@@ -1,11 +1,21 @@
 package com.juicebox.dairydaily.UI;
 
+import android.Manifest;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +23,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.juicebox.dairydaily.CowChart.CowSNF;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
@@ -30,6 +44,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -183,6 +198,9 @@ public class SendOtpActivity extends AppCompatActivity {
                 otpCode = otp.getText().toString();
                 if(otpCode.isEmpty())
                     otp.setError("OTP is required");
+                ProgressDialog progressDialog = new ProgressDialog(SendOtpActivity.this);
+                progressDialog.setTitle("Verifying");
+                progressDialog.setCancelable(false);
                 progressDialog.show();
                 sendVerificationCode(otpCode);
             }
@@ -252,6 +270,7 @@ public class SendOtpActivity extends AppCompatActivity {
         Paper.book().write(Prevalent.offline_password, offline_password);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(phoneNumber);
+
         ref.updateChildren(details).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -263,7 +282,6 @@ public class SendOtpActivity extends AppCompatActivity {
                     c.setTime(new Date());
                     c.add(Calendar.DATE, 31);
                     helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
-
                     startActivity(new Intent(SendOtpActivity.this, DashboardActivity.class));
                     finish();
                 }
@@ -277,5 +295,8 @@ public class SendOtpActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

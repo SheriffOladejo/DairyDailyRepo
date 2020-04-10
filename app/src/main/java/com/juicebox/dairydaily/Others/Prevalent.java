@@ -12,4 +12,7 @@ public class Prevalent {
     public static final String email = "Email";
     public static String address = "Address";
     public static String last_update = "Update";
+    public static double starter = 0.00;
+    public static double spark = 0.00;
+    public static double enterprise = 0.00;
 }

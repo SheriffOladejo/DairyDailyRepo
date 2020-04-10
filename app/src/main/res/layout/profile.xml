@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:src="@drawable/ic_person"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/view"
@@ -131,7 +131,30 @@
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/printerview"
-            android:layout_marginBottom="41dp"
+            android:background="@drawable/rectangle_border"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:layout_marginTop="10dp"
+            android:text="Nothing"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/default_printer"
+            android:layout_marginTop="20dp"
+            android:text="Days Remaining" />
+
+        <Button
+            android:id="@+id/days_remaining"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/days"
             android:background="@drawable/rectangle_border"
             android:backgroundTint="@color/colorPrimaryDark"
             android:paddingStart="3dp"
@@ -147,7 +170,7 @@
         android:id="@+id/relativeLayout4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="30dp"
@@ -238,6 +261,29 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_below="@id/lastupdatedview"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rectangle_border"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:text="Last Backup"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/expiry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expiry Date"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/lastupdated"/>
+
+        <Button
+            android:id="@+id/expiry_date"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/expiry"
             android:layout_marginTop="10dp"
             android:background="@drawable/rectangle_border"
             android:backgroundTint="@color/colorPrimaryDark"

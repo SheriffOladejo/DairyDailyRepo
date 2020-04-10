@@ -5,11 +5,16 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.paytm.pgsdk.PaytmOrder;
@@ -19,12 +24,15 @@ import com.paytm.pgsdk.PaytmPaymentTransactionCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
 import io.paperdb.Paper;
+
+import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 
 public class CheckSum extends AppCompatActivity implements PaytmPaymentTransactionCallback {
 
@@ -141,25 +149,44 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
         Log.e("checksum ", "Paytm response " + bundle.toString());
         String status = bundle.getString("RESPMSG");
         if(status != null){
-            String expiryDate="";
             if(status.equals("Txn Success")){
-                Cursor data = helper.getExpiryDate();
-                if(data.getCount() != 0){
-                    while(data.moveToNext()){
-                        expiryDate = data.getString(data.getColumnIndex("Date"));
-                        Log.d(TAG, "Expiry date from cursor: " + expiryDate);
-                    }
-                }
                 Calendar c = Calendar.getInstance();
-                c.setTime(new Date(Long.valueOf(expiryDate)));
-                if(price.equals("149.99"))
+                c.setTime(new Date());
+                if(price.equals(""+Prevalent.starter))
                     c.add(Calendar.DATE, 100);
-                else if(price.equals("249.99"))
+                else if(price.equals(""+Prevalent.spark))
                     c.add(Calendar.DATE, 200);
-                else if(price.equals("449.99"))
+                else if(price.equals(""+Prevalent.enterprise))
                     c.add(Calendar.DATE, 370);
                 helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
-                Toast.makeText(CheckSum.this, "Payment Successful.", Toast.LENGTH_SHORT).show();
+                String date = new SimpleDateFormat("dd/MM/YYYY").format(new Date());
+                HashMap<String, Object> map = new HashMap<>();
+//                map.put("Transaction Date", date);
+//                map.put("Transaction Amount", price);
+//                map.put("Expiry Date", ""+c.getTime().getTime());
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("Transaction Date", date);
+                    jsonObject.put("Transaction Amount", price);
+                    jsonObject.put("Expiry Date", ""+c.getTime().getTime());
+                    map.put("Payment History", jsonObject.toString());
+                } catch (JSONException e) {
+                    toast(CheckSum.this, "Unable to create JSONObject");
+                }
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Payment History").child(""+System.currentTimeMillis());
+                DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("Users").child(getIntent().getStringExtra("phone_number")).child("Expiry Date");
+                ref1.setValue(""+c.getTime().getTime());
+
+                ref.updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(CheckSum.this, "Payment Successful.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                });
+
             }
             else{
                 Toast.makeText(CheckSum.this, "Payment Failed. \nContact the app admin if your account is debited.", Toast.LENGTH_LONG).show();

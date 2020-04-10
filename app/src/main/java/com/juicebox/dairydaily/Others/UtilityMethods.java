@@ -90,9 +90,9 @@ public class UtilityMethods {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.custom_toast, null);
         TextView textView = view.findViewById(R.id.text);
-        textView.setTextColor(context.getResources().getColor(R.color.black));
+        textView.setTextColor(context.getResources().getColor(R.color.white));
         textView.setText(message);
-        view.setBackgroundColor(context.getResources().getColor(R.color.white));
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
         view.setBackgroundResource(R.drawable.rectangle_border);
         toast.setView(view);
         toast.show();

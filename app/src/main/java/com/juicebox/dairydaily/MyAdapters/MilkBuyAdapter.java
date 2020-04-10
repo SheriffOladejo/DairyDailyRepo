@@ -125,7 +125,7 @@ public class MilkBuyAdapter extends RecyclerView.Adapter<MilkBuyAdapter.ViewHold
                             break;
                         case 1:
                             int unique_Id1 = list.get(getAdapterPosition()).getUnique_Id();
-                            helper.deleteMilkBuyEntry(unique_Id1);
+                            helper.deleteMilkBuyEntry(unique_Id1, false);
                             list = MilkBuyEntryActivity.dbHelper.getDailyBuyData(date, shift);
                             Log.d(TAG, "list size: " + list.size());
                             MilkBuyAdapter adapter = new MilkBuyAdapter(context, list);

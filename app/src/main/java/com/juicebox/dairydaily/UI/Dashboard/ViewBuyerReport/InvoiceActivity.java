@@ -39,6 +39,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.juicebox.dairydaily.Models.BuyerRegisterModel;
+import com.juicebox.dairydaily.Models.ReceiveCashListModel;
 import com.juicebox.dairydaily.MyAdapters.BuyerRegisterAdapter;
 import com.juicebox.dairydaily.MyAdapters.InvoiceAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
@@ -76,14 +77,15 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 public class InvoiceActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 1;
-    ImageView start_date_image;
-    ImageView end_date_image;
-    TextView start_date_text_view, end_date_text_view;
+//    ImageView start_date_image;
+//    ImageView end_date_image;
+//    TextView start_date_text_view, end_date_text_view;
     ConstraintLayout scrollview;
     private static final String TAG = "InvoiceActivity";
-    RecyclerView recyclerView;
+    public static RecyclerView recyclerView;
+    public static InvoiceAdapter adapter;
     Button print;
-    ArrayList<BuyerRegisterModel> list;
+    public static ArrayList<ReceiveCashListModel> list;
     DbHelper dbHelper = new DbHelper(this);
     File pdfFile;
 
@@ -91,7 +93,7 @@ public class InvoiceActivity extends AppCompatActivity {
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
 
-    String startDate, endDate;
+    //String startDate, endDate;
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -114,11 +116,11 @@ public class InvoiceActivity extends AppCompatActivity {
         initDashboard();
 
         // Initialize widgets
-        start_date_image = findViewById(R.id.start_date_image_view);
+        //start_date_image = findViewById(R.id.start_date_image_view);
         scrollview = findViewById(R.id.constraintlayout);
-        end_date_image = findViewById(R.id.end_date_image_view);
-        start_date_text_view = findViewById(R.id.start_date_text_view);
-        end_date_text_view = findViewById(R.id.end_date_text_view);
+//        end_date_image = findViewById(R.id.end_date_image_view);
+//        start_date_text_view = findViewById(R.id.start_date_text_view);
+//        end_date_text_view = findViewById(R.id.end_date_text_view);
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         print = findViewById(R.id.print);
@@ -141,13 +143,13 @@ public class InvoiceActivity extends AppCompatActivity {
                     String line = "------------------------------";
                     Date dateIntermediate = new Date();
                     String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-                    String toPrint ="\n"+date + "\n"+ startDate + " To " + endDate + "\nID| "  + " NAME   |" + "WEIGHT|" + "AMOUNT|\n" +line + "\n";
+                    String toPrint ="\n"+date + "\n"+ "\nID| "  + " NAME   |" + "WEIGHT|" + "AMOUNT|\n" +line + "\n";
 
                     double totalAmount = 0,totalWeight = 0;
-                    for(BuyerRegisterModel object : list){
-                        int id = object.getId();
+                    for(ReceiveCashListModel object : list){
+                        String id = object.getId();
                         String name = getFirstname(object.getName());
-                        String amount = object.getAmount();
+                        String amount = object.getDue();
                         String weight = object.getWeight();
                         totalAmount += Double.valueOf(amount);
                         totalWeight += Double.valueOf(weight);
@@ -180,82 +182,84 @@ public class InvoiceActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-        final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
-        startDate = getStartDate();
-        endDate = getEndDate();
-
-        start_date_text_view.setText(startDate);
-        end_date_text_view.setText(endDate);
-
-        start_date_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startDatePickerDialog.show();
-            }
-        });
-        end_date_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                endDatePickerDialog.show();
-            }
-        });
-
-        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                    else{
-                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                }
-                else{
-                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    start_date_text_view.setText(startDate);
-                }
-            }
-        });
-
-        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        endDate = year+ "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                    else{
-                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                }
-                else{
-                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    end_date_text_view.setText(endDate);
-                }
-            }
-        });
-        list = dbHelper.getInvoice(startDate, endDate);
-        InvoiceAdapter adapter = new InvoiceAdapter(InvoiceActivity.this, list);
+        list = dbHelper.getReceiveCashList();
+        adapter = new InvoiceAdapter(InvoiceActivity.this, list);
         recyclerView.setAdapter(adapter);
 
-        // Hook up the "Go" button
-        findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String startDate = start_date_text_view.getText().toString();
-                String endDate = end_date_text_view.getText().toString();
-                list = dbHelper.getInvoice(startDate, endDate);
-                InvoiceAdapter adapter = new InvoiceAdapter(InvoiceActivity.this, list);
-                recyclerView.setAdapter(adapter);
-            }
-        });
+
+        //final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
+//        startDate = getStartDate();
+//        endDate = getEndDate();
+//
+//        start_date_text_view.setText(startDate);
+//        end_date_text_view.setText(endDate);
+//
+//        start_date_image.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startDatePickerDialog.show();
+//            }
+//        });
+//        end_date_image.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                endDatePickerDialog.show();
+//            }
+//        });
+//
+//        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//                if(String.valueOf(month).length() == 1){
+//                    if(String.valueOf(dayOfMonth).length() == 1){
+//                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+//                        start_date_text_view.setText(startDate);
+//                    }
+//                    else{
+//                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+//                        start_date_text_view.setText(startDate);
+//                    }
+//                }
+//                else{
+//                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
+//                    start_date_text_view.setText(startDate);
+//                }
+//            }
+//        });
+//
+//        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//                if(String.valueOf(month).length() == 1){
+//                    if(String.valueOf(dayOfMonth).length() == 1){
+//                        endDate = year+ "-0" + (month+1) + "-" + "0"+dayOfMonth;
+//                        end_date_text_view.setText(endDate);
+//                    }
+//                    else{
+//                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+//                        end_date_text_view.setText(endDate);
+//                    }
+//                }
+//                else{
+//                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
+//                    end_date_text_view.setText(endDate);
+//                }
+//            }
+//        });
+//        list = dbHelper.getInvoice("", "");
+//        InvoiceAdapter adapter = new InvoiceAdapter(InvoiceActivity.this, list);
+//        recyclerView.setAdapter(adapter);
+
+//        findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String startDate = start_date_text_view.getText().toString();
+//                String endDate = end_date_text_view.getText().toString();
+//                list = dbHelper.getInvoice(startDate, endDate);
+//                InvoiceAdapter adapter = new InvoiceAdapter(InvoiceActivity.this, list);
+//                recyclerView.setAdapter(adapter);
+//            }
+//        });
     }
 
     private void createPdfWrapper() {
@@ -307,7 +311,7 @@ public class InvoiceActivity extends AppCompatActivity {
             table.addCell(String.valueOf(list.get(j).getId()));
             table.addCell(list.get(j).getName());
             table.addCell(list.get(j).getWeight());
-            table.addCell(list.get(j).getAmount());
+            table.addCell(list.get(j).getDue());
             table.addCell("Unpaid");
         }
 
@@ -322,9 +326,8 @@ public class InvoiceActivity extends AppCompatActivity {
         Paragraph p1 = new Paragraph("Username: " + Paper.book().read(Prevalent.name) + "\nPhone Number: " + Paper.book().read(Prevalent.phone_number),f);
         p1.setAlignment(Element.ALIGN_CENTER);
         document.add(new Paragraph("Date: "+date+"\n\n",f));
-        Paragraph range = new Paragraph(startDate + " - " + endDate + "\n\n",f);
-        range.setAlignment(Element.ALIGN_CENTER);
         document.add(table);
+
 
         document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
         document.close();

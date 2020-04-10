@@ -4,20 +4,20 @@
 
     <item
         android:id="@+id/message"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:icon="@drawable/ic_envelope"
-        android:title="Message"/>
+        android:title="Messages from Admin"/>
 
     <item
         android:id="@+id/whatsapp"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:icon="@drawable/ic_whatsapp"
-        android:title="Printer"/>
+        android:title="Send Admin a message"/>
 
 
     <item
         android:id="@+id/help"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:icon="@drawable/ic_help"
         android:title="Help"/>
 </menu>

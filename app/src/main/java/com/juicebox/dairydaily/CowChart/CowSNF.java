@@ -1,17 +1,26 @@
 package com.juicebox.dairydaily.CowChart;
 
 import android.Manifest;
+import android.app.DownloadManager;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,8 +34,21 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.juicebox.dairydaily.Models.RateChartModel;
 import com.juicebox.dairydaily.MyAdapters.PagerAdapter;
+import com.juicebox.dairydaily.MyAdapters.RateChartAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
@@ -45,9 +67,11 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.paperdb.Paper;
 
+import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 
 
@@ -76,10 +100,15 @@ public class CowSNF extends AppCompatActivity implements
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
+    Uri fileUri;
+
+    long downloadId;
+
+    ProgressDialog progressDialog;
 
     private DbHelper dbHelper;
     private static final String TAG = "CowSNF";
-    Button load_from_memory, cancel, back;
+    Button load_from_memory, cancel, back, update_from_server;
     ConstraintLayout rate_values, directory_view;
     ListView navigate_phone;
 
@@ -96,6 +125,29 @@ public class CowSNF extends AppCompatActivity implements
     String lastDirectory;
     int count = 0;
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode){
+            case 1:
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+
+                }
+                else{
+                    toast(CowSNF.this, "Permission Denied");
+                }
+                break;
+            case 2:
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+
+                }
+                else{
+                    toast(CowSNF.this, "External storage write permission Denied");
+                }
+            default:
+                break;
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -106,6 +158,8 @@ public class CowSNF extends AppCompatActivity implements
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         dbHelper = new DbHelper(this);
 
+        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
         viewPager = findViewById(R.id.view_pager);
         load_from_memory = findViewById(R.id.load_from_memory);
         rate_values = findViewById(R.id.rate_values);
@@ -114,7 +168,14 @@ public class CowSNF extends AppCompatActivity implements
         cancel = findViewById(R.id.cancel);
         back = findViewById(R.id.back);
         directory_view.setVisibility(View.GONE);
+        update_from_server = findViewById(R.id.update_from_server);
         //navigate_phone.setVisibility(View.GONE);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Updating Rate Chart");
+        progressDialog.setCancelable(false);
+
+        //checkRateFileStatus();
 
         nameOfSnf = getIntent().getStringExtra("Name");
         if(nameOfSnf.equals("Cow"))
@@ -154,6 +215,7 @@ public class CowSNF extends AppCompatActivity implements
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+        hideKeyboard(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
@@ -189,6 +251,13 @@ public class CowSNF extends AppCompatActivity implements
                     checkInternalStorage();
                     Log.d(TAG, "back button: " + pathHistory.get(count));
                 }
+            }
+        });
+
+        update_from_server.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateFromServer("");
             }
         });
 
@@ -246,16 +315,252 @@ public class CowSNF extends AppCompatActivity implements
         load_from_memory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                rate_values.setVisibility(View.GONE);
-                directory_view.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle("Select File");
-                count = 0;
-                pathHistory = new ArrayList<>();
-                pathHistory.add(count, System.getenv("EXTERNAL_STORAGE"));
-                checkInternalStorage();
+//                rate_values.setVisibility(View.GONE);
+//                directory_view.setVisibility(View.VISIBLE);
+//                getSupportActionBar().setTitle("Select File");
+//                count = 0;
+//                pathHistory = new ArrayList<>();
+//                pathHistory.add(count, System.getenv("EXTERNAL_STORAGE"));
+//                checkInternalStorage();
+                selectFileToUpload();
+
             }
         });
 
+    }
+
+    private void selectFileToUpload() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
+        intent.setType("*/*");
+        //intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, 1);
+    }
+
+    private void uploadSelectedFile() {
+        String filename = "Rate File";
+        StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child(filename);
+        ref.putFile(fileUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()){
+                    updateFromServer("");
+                }
+                else{
+                    Toast.makeText(CowSNF.this, "Something went wrong while uploading the file." + task.getException(), Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1 && resultCode == RESULT_OK && data != null){
+            fileUri = data.getData();
+            if(fileUri != null){
+                if(fileUri.getPath().endsWith(".csv")){
+                    progressDialog.show();
+                    uploadSelectedFile();
+                }
+                else{
+                    Toast.makeText(CowSNF.this, "Please select a CSV file.", Toast.LENGTH_LONG).show();
+                }
+            }
+            else{
+                Toast.makeText(CowSNF.this, "Please select a file.", Toast.LENGTH_LONG).show();
+            }
+            //selectedFile.setText(fileUri.getPath());
+        }
+        else{
+            Toast.makeText(CowSNF.this, "Please select a CSV file.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void updateFromServer(String l) {
+        progressDialog.show();
+        if(l.equals("")){
+            StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
+            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()){
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Personal Rate File Status");
+                        ref.setValue("old");
+                        String url = task.getResult().toString();
+                        Toast.makeText(CowSNF.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                        DownloadFile(CowSNF.this, "Rate File", ".csv", "/dairyDaily", url);
+                    }
+                    else{
+                        Toast.makeText(CowSNF.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                }
+            });
+        }
+        else{
+            String filename = "Rate File";
+            StorageReference ref = FirebaseStorage.getInstance().getReference().child("Rate Chart").child(filename);
+            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()){
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("General Rate File Status");
+                        ref.setValue("old");
+                        String url = task.getResult().toString();
+                        Toast.makeText(CowSNF.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                        DownloadFile(CowSNF.this, "Rate File", ".csv", "/dairyDaily", url);
+                    }
+                    else{
+                        Toast.makeText(CowSNF.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                }
+            });
+        }
+    }
+
+    private void checkRateFileStatus() {
+        ProgressDialog dialog = new ProgressDialog(CowSNF.this);
+        dialog.setTitle("Please Wait...");
+        dialog.setCancelable(false);
+        dialog.show();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Personal Rate File Status");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    dialog.dismiss();
+                    String value = dataSnapshot.getValue().toString();
+                    if(value.equals("new")){
+                        updateFromServer("");
+                    }
+                    else{
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("General Rate File Status");
+                        ref.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    dialog.dismiss();
+                                    String value = dataSnapshot.getValue().toString();
+                                    if(value.equals("new")){
+                                        updateFromServer("l");
+                                    }
+                                }
+                                else{
+                                    dialog.dismiss();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+                else{
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("General Rate File Status");
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                dialog.dismiss();
+                                String value = dataSnapshot.getValue().toString();
+                                //Toast.makeText(CowSNF.this, value, Toast.LENGTH_LONG).show();
+                                if(value.equals("new")){
+                                    updateFromServer("l");
+                                }
+                            }
+                            else{
+                                dialog.dismiss();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        //dialog.dismiss();
+    }
+
+    private void DownloadFile(Context context, String fileName, String fileExtension, String destinationDirectoy, String url) {
+        File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
+        file.delete();
+        if(ContextCompat.checkSelfPermission(CowSNF.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(CowSNF.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ){
+            ActivityCompat.requestPermissions(CowSNF.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName+fileExtension);
+        request.setTitle("Rate File");
+        downloadId = downloadManager.enqueue(request);
+        //Toast.makeText(DashboardActivity.this,"Directory for file: " + downloadManager.getUriForDownloadedFile(downloadId), Toast.LENGTH_LONG).show();
+    }
+
+    private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+            if(downloadId == id){
+                DbHelper helper = new DbHelper(CowSNF.this);
+                helper.clearSNFTable();
+                helper.createSNFTable(Environment.getExternalStorageDirectory() + "/Download/Rate File.csv");
+                List<RateChartModel> list = new ArrayList<>();
+                DbHelper dbHelper = new DbHelper(CowSNF.this);
+
+                String nameOfSnf = getIntent().getStringExtra("Name");
+                if(nameOfSnf.equals("Buffalo")){
+
+                    Cursor data = dbHelper.getBuffaloSNFTable();
+
+                    if(data.getCount() != 0){
+                        while(data.moveToNext()){
+                            list.add(new RateChartModel(data.getString(0), data.getString(1)));
+                            //Log.d(TAG, "CowTab1: " + data.getString(0) + " " + data.getString(1));
+                        }
+                    }else{
+                    }
+                    RateChartAdapter adapter = new RateChartAdapter(list);
+                    CowTab1.recyclerView.setAdapter(adapter);
+                }
+                else if(nameOfSnf.equals("Cow")) {
+                    Cursor data = dbHelper.getSNFTable();
+
+                    if (data.getCount() != 0) {
+                        while (data.moveToNext()) {
+                            list.add(new RateChartModel(data.getString(0), data.getString(1)));
+                            //Log.d(TAG, "CowTab1: " + data.getString(0) + " " + data.getString(1));
+                        }
+                    } else {
+                    }
+                    RateChartAdapter adapter = new RateChartAdapter(list);
+                    CowTab1.recyclerView.setAdapter(adapter);
+                }
+                File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
+                boolean deleted = file.delete();
+                progressDialog.dismiss();
+                Toast.makeText(CowSNF.this, "Chart Updated", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onDownloadComplete);
     }
 
     void initDashboard(){
@@ -426,11 +731,17 @@ public class CowSNF extends AppCompatActivity implements
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkFilePermissions() {
+        if(ContextCompat.checkSelfPermission(CowSNF.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(CowSNF.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ){
+            ActivityCompat.requestPermissions(CowSNF.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
             int permissionCheck = this.checkSelfPermission("Manifest.Permission.READ_EXTERNAL_STORAGE");
             permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
             if(permissionCheck != 0){
                 this.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1001);
+                this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
             }
             else{
                 Log.d(TAG, "checkPermission: No need to check permission, SDK version  LOLLIPOP");

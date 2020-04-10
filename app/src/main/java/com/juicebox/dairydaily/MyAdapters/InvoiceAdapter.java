@@ -10,19 +10,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.juicebox.dairydaily.Models.BuyerRegisterModel;
+import com.juicebox.dairydaily.Models.ReceiveCashListModel;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
 
 import java.util.ArrayList;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.getFirstname;
+import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
 
 public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {
 
     Context context;
-    ArrayList<BuyerRegisterModel> list;
+    ArrayList<ReceiveCashListModel> list;
 
-    public InvoiceAdapter(Context context, ArrayList<BuyerRegisterModel> list){
+    public InvoiceAdapter(Context context, ArrayList<ReceiveCashListModel> list){
         this.context = context;
         this.list = list;
     }
@@ -39,7 +41,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHold
         String id = String.valueOf(list.get(i).getId());
         String name = list.get(i).getName();
         String weight = list.get(i).getWeight();
-        String amount = list.get(i).getAmount();
+        String amount = list.get(i).getDue();
         String sr = String.valueOf(i+1);
 
         viewHolder.setData(sr, id, name, weight, amount);
@@ -70,6 +72,18 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHold
             nameView.setText(id+"."+getFirstname(name));
             weightView.setText(weight);
             amountView.setText(amount);
+            if(weight.equals("")){
+                weightView.setText("0");
+            }
+            else{
+                weightView.setText(""+truncate(Double.valueOf(weight)));
+            }
+            if(amount.equals("")){
+                amountView.setText("0");
+            }
+            else{
+                amountView.setText(""+truncate(Double.valueOf(amount)));
+            }
         }
     }
 }

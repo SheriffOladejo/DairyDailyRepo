@@ -180,6 +180,11 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
         final RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        start_morning_radio.setChecked(true);
+        end_evening_radio.setChecked(true);
+        startShift = "Morning";
+        endShift = "Evening";
+
         findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -207,7 +212,7 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
             @Override
             public void onClick(View v) {
 
-                if(list!=null){
+                if(!list.isEmpty()){
 
                     Date dateIntermediate = new Date();
                     String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
@@ -221,6 +226,8 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
                         String name = getFirstname(object.getName());
                         String amount = object.getAmount();
                         String weight = object.getWeight();
+                        if(amount.equals("0"))
+                            list.remove(object);
                         weightTotal += Double.valueOf(object.getWeight());
                         amountTotal += Double.valueOf(object.getAmount());
                         toPrint += id + "|" +name + " | " + weight + "| " + amount + "| \n";
@@ -428,6 +435,8 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
         Paragraph range = new Paragraph(startDate + " - " + endDate + "\n\n",f);
         range.setAlignment(Element.ALIGN_CENTER);
         document.add(range);
+//        table.addCell("Total Weight: " + truncate(weightTotal));
+//        table.addCell("Total Amount: " +truncate(amountTotal));
         document.add(table);
 
         PdfPTable table1 = new PdfPTable(new float[]{2,2});
@@ -439,8 +448,11 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
         table1.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
         table1.addCell("Total Weight: " + truncate(weightTotal));
         table1.addCell("Total Amount: " +truncate(amountTotal));
+        Log.d(TAG, "Total Amount: " + truncate(weightTotal));
 
-        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
+        document.add(table1);
+
+        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/com.juicebox.dairyDaily",f));
         document.close();
         previewPdf();
     }
@@ -651,7 +663,6 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(PaymentRegisterActivity.this, ViewReportActivity.class));
         finish();
     }
 

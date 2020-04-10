@@ -139,9 +139,6 @@ public class ViewReportByDateActivity extends AppCompatActivity implements DateP
 
     String startDate, endDate, startShift, endShift;
 
-    DatePickerDialog startDatePickerDialog;
-    DatePickerDialog endDatePickerDialog;
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -183,6 +180,9 @@ public class ViewReportByDateActivity extends AppCompatActivity implements DateP
         go = findViewById(R.id.go);
         id = findViewById(R.id.id);
         buyers = findViewById(R.id.buyers);
+
+        start_morning_radio.setChecked(true);
+        end_evening_radio.setChecked(true);
 
         findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -541,11 +541,6 @@ public class ViewReportByDateActivity extends AppCompatActivity implements DateP
             table.addCell(list.get(j).getRate());
             table.addCell(list.get(j).getWeight());
             table.addCell(list.get(j).getAmount());
-            Log.d(TAG, "Date: " + list.get(j).getDate());
-            Log.d(TAG, "Amount: " + list.get(j).getAmount());
-            Log.d(TAG, "Shift: " + list.get(j).getShift());
-            Log.d(TAG, "Weight: " + list.get(j).getWeight());
-            Log.d(TAG, "Rate: " + list.get(j).getRate());
         }
 
         PdfWriter.getInstance(document, outputStream);

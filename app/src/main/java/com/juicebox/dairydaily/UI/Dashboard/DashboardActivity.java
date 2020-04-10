@@ -1,18 +1,26 @@
 package com.juicebox.dairydaily.UI.Dashboard;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,17 +28,39 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
+import com.esotericsoftware.kryo.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.juicebox.dairydaily.CowChart.CowSNF;
+import com.juicebox.dairydaily.Models.MessagesModel;
+import com.juicebox.dairydaily.MyAdapters.MessagesAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
@@ -53,12 +83,20 @@ import com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -78,12 +116,37 @@ public class DashboardActivity extends AppCompatActivity {
     public static SelectPrinterDialog dialog;
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    private ImageView imageView1, imageView2, imageView3, imageView4;
+    ViewFlipper viewFlipper;
+
+    public static boolean can_pay =false;
+
+    DatabaseReference ref;
+    String message, time, status;
+    public static boolean isReminderShown = false;
+    public static boolean showReminder = false;
+
+    ImageView printer, whatsapp, help;
+    RelativeLayout notif;
+
+    Toolbar toolbar;
+
+    ProgressDialog progressDialog;
+
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
+    ArrayList<MessagesModel> messages;
+
+    long downloadId;
 
     boolean isExpired = false;
 
+    int numberOfMessages = 0;
+    TextView notif_count;
+
+
+    public static String show = "";
     CardView view_report, buyer_report, add_product, rate_chart;
     CardView buy_milk, sell_milk, customers, product_sale;
     LinearLayout linearLayout;
@@ -94,33 +157,85 @@ public class DashboardActivity extends AppCompatActivity {
 
     DbHelper helper;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        Paper.init(this);
 
-        getSupportActionBar().setTitle("Dashboard");
+        //getSupportActionBar().setTitle("Dashboard");
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
         helper = new DbHelper(this);
-//
-//        Calendar c = Calendar.getInstance();
-//        c.setTime(new Date());
-//        c.add(Calendar.DATE, 31);
-//        helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Updating Rate Chart...");
+        progressDialog.setCancelable(false);
+
+        //checkFilePermissions();
+        if(ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ){
+            ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Messages");
+        messages = new ArrayList<>();
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        try{
+                            message = snapshot.child("message").getValue().toString();
+                            time = snapshot.child("time").getValue().toString();
+                            status = snapshot.child("status").getValue().toString();
+                            if(status.equals("unread")){
+                                numberOfMessages++;
+                            MessagesModel model = new MessagesModel(message, time, status);
+                            messages.add(model);}
+                        }
+                        catch(Exception e){}
+                    }
+                    notif_count.setText(""+numberOfMessages);
+                    //89admin_messages.setTitle("Messages From Admin("+numberOfMessages+")");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        ref2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String expiry = dataSnapshot.child("Expiry Date").getValue().toString();
+                    helper.setExpiryDate(expiry);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        checkRateFileStatus();
 
         Date dateIntermediate = new Date();
         date = new SimpleDateFormat("dd-MM-YYYY").format(dateIntermediate);
         Log.d(TAG, "Date: "+ date);
 
-        Paper.init(this);
-
         Cursor data = helper.getExpiryDate();
         if(data.getCount() != 0){
             while(data.moveToNext()){
                 expiryDate = data.getString(data.getColumnIndex("Date"));
-                //toast(DashboardActivity.this, expiryDate);
-                Log.d(TAG, "Expiry date from cursor: " + expiryDate + "  " + hasExpired);
             }
         }
 
@@ -133,34 +248,9 @@ public class DashboardActivity extends AppCompatActivity {
             isExpired = false;
         }
 
-//        if(date.equals(expiryDate))
-//            helper.setExpiryDate(expiryDate);
-//
-//        Date todayDate = null, myExpiryDate = null;
-//
-//        try {
-//            todayDate = new SimpleDateFormat("dd-MM-YYYY").parse(date);
-//            myExpiryDate = new SimpleDateFormat("dd-MM-YYYY").parse(expiryDate);
-//            Log.d(TAG, "Today Date: " + todayDate + "   MyExpiryDate: " + myExpiryDate);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if(myExpiryDate != null && todayDate != null){
-//            if(myExpiryDate.compareTo(todayDate) >0 ){
-//                helper.setExpiryDate(expiryDate);
-//                isExpired = false;
-//                Log.d(TAG, "Expirty date greater: " + expiryDate + "  " + isExpired);
-//                Log.d(TAG, "Expirty date is after now");
-//            }
-//            else if(myExpiryDate.compareTo(todayDate)<0){
-//                helper.setExpiryDate(expiryDate);
-//                isExpired = true;
-//                Log.d(TAG, "Expirty date less: " + expiryDate + "  " + isExpired);
-//                Log.d(TAG, "Expirty date is before now");
-//            }
-//        }
-//        Log.d(TAG, "Expiry date" + myExpiryDate + "   " + todayDate + "    " + expiryDate);
+        if(Long.valueOf(expiryDate) - cal.getTime().getTime() < 864000000 && Long.valueOf(expiryDate) - cal.getTime().getTime()>0){
+            showReminder = true;
+        }
 
         view_report = findViewById(R.id.view_report);
         buy_milk = findViewById(R.id.buy_milk_image);
@@ -171,6 +261,154 @@ public class DashboardActivity extends AppCompatActivity {
         product_sale = findViewById(R.id.product_sale);
         rate_chart = findViewById(R.id.rate_chart);
         linearLayout = findViewById(R.id.ll);
+        notif_count = findViewById(R.id.notif_count);
+        printer = findViewById(R.id.printer);
+        whatsapp = findViewById(R.id.whatsapp);
+        notif = findViewById(R.id.notif);
+        help = findViewById(R.id.help);
+        toolbar = findViewById(R.id.toolbar);
+        imageView1 = findViewById(R.id.image1);
+        imageView2 = findViewById(R.id.image2);
+        imageView3 = findViewById(R.id.image3);
+        imageView4 = findViewById(R.id.image4);
+
+        viewFlipper = findViewById(R.id.viewflipper);
+        viewFlipper.setVisibility(View.GONE);
+
+        StorageReference reference1 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 1");
+        StorageReference reference2 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 2");
+        StorageReference reference3 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 3");
+        StorageReference reference4 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 4");
+
+        reference1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                String url = task.getResult().toString();
+                Picasso.get().load(url).into(imageView1);
+            }
+        });
+
+        reference2.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                String url = task.getResult().toString();
+                Picasso.get().load(url).into(imageView2);
+            }
+        });
+
+        reference3.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                String url = task.getResult().toString();
+                Picasso.get().load(url).into(imageView3);
+            }
+        });
+
+        DatabaseReference reference5 = FirebaseDatabase.getInstance().getReference().child("Show Ads");
+        reference5.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    show = dataSnapshot.getValue().toString();
+                    if(show.equals("true")){
+                        viewFlipper.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        viewFlipper.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        reference4.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                String url = task.getResult().toString();
+                Picasso.get().load(url).into(imageView4);
+                viewFlipper.setVisibility(View.VISIBLE);
+            }
+        });
+
+        notif.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog dialog = new Dialog(DashboardActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.messges_dialog);
+                RecyclerView recyclerView = dialog.findViewById(R.id.recyclerview);
+                TextView ok = dialog.findViewById(R.id.ok);
+                TextView delete = dialog.findViewById(R.id.delete);
+                recyclerView.setLayoutManager(new LinearLayoutManager(DashboardActivity.this));
+                Collections.reverse(messages);
+                MessagesAdapter adapter = new MessagesAdapter(DashboardActivity.this, messages);
+                recyclerView.setAdapter(adapter);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        ref.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    toast(DashboardActivity.this, "Notifs deleted");
+                                }
+                            }
+                        });
+                    }
+                });
+                ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
+
+        help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        printer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findBluetoothDevice();
+                dialog = new SelectPrinterDialog(DashboardActivity.this, deviceList, DashboardActivity.this);
+                dialog.show();
+            }
+        });
+
+        if(show.equals("true")){
+            viewFlipper.setVisibility(View.VISIBLE);
+        }
+        else{
+            viewFlipper.setVisibility(View.GONE);
+        }
+
+        whatsapp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sendintent = new Intent("android.intent.action.MAIN");
+                String formattedPhoneNumber = "918449852828";
+                sendintent.setAction(Intent.ACTION_SEND);
+                sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
+                sendintent.setType("text/plain");
+                sendintent.setPackage("com.whatsapp");
+                sendintent.putExtra("jid", formattedPhoneNumber+"@s.whatsapp.net");
+                startActivity(sendintent);
+            }
+        });
+
+        setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawerlayout);
         navigationView = findViewById(R.id.nav_view);
@@ -205,18 +443,22 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        if(ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
-        ){
-            ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS}, 1);
-        }
-
         product_sale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                // startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
                 if(!isExpired){
-                    startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
+                    if(showReminder){
+                        if(!isReminderShown){
+                            isReminderShown = true;
+                            startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                        }
+                        else{
+                            startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
+                        }
+                    }
+                    else
+                        startActivity(new Intent(DashboardActivity.this, ProductSaleActivity.class));
                 }
                 else{
                     startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
@@ -226,9 +468,20 @@ public class DashboardActivity extends AppCompatActivity {
         add_product.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                toast(DashboardActivity.this, showReminder+"");
                 //startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
                 if(!isExpired){
-                    startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
+                    if(showReminder){
+                        if(!isReminderShown){
+                            isReminderShown = true;
+                            startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                        }
+                        else{
+                            startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
+                        }
+                    }
+                    else
+                        startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
                 }
                 else{
                     startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
@@ -251,7 +504,17 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!isExpired){
-                    startActivity(new Intent(DashboardActivity.this, BuyMilkActivity.class));
+                    if(showReminder){
+                        if(!isReminderShown){
+                            isReminderShown = true;
+                            startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                        }
+                        else{
+                            startActivity(new Intent(DashboardActivity.this, BuyMilkActivity.class));
+                        }
+                    }
+                    else
+                        startActivity(new Intent(DashboardActivity.this, BuyMilkActivity.class));
                 }
                 else{
                     startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
@@ -263,7 +526,17 @@ public class DashboardActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
                 if(!isExpired){
-                    startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
+                    if(showReminder){
+                        if(!isReminderShown){
+                            isReminderShown = true;
+                            startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                        }
+                        else{
+                            startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
+                        }
+                    }
+                    else
+                        startActivity(new Intent(DashboardActivity.this, SellMilkActivity.class));
                 }
                 else{
                     startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
@@ -273,14 +546,177 @@ public class DashboardActivity extends AppCompatActivity {
         view_report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, ViewReportActivity.class));
+                if(showReminder){
+                    if(!isReminderShown){
+                        isReminderShown = true;
+                        startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
+                    }
+                    else{
+                        startActivity(new Intent(DashboardActivity.this, ViewReportActivity.class));
+                    }
+                }
+                else
+                    startActivity(new Intent(DashboardActivity.this, ViewReportActivity.class));
+            }
+        });
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Pricing");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String starter = dataSnapshot.child("Starter Plan").getValue().toString();
+                    String spark = dataSnapshot.child("Spark Plan").getValue().toString();
+                    String enterprise = dataSnapshot.child("Enterprise Plan").getValue().toString();
+                    try{
+                        double starter_double = Double.valueOf(starter);
+                        double spark_double = Double.valueOf(spark);
+                        double enterprise_double = Double.valueOf(enterprise);
+                        Prevalent.starter = starter_double;
+                        Prevalent.enterprise = enterprise_double;
+                        Prevalent.spark = spark_double;
+                        can_pay = true;
+                    }
+                    catch(Exception e){
+                        Toast.makeText(DashboardActivity.this, "Unable to load pricing", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
 
         //Broadcasts when bond state changes(i.e pairing)
         IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
 //        registerReceiver(mBroadcastReceiver4, intentFilter);
+        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onDownloadComplete);
+    }
+
+    private void  updateFromServer(String l) {
+        progressDialog.show();
+        if(l.equals("")){
+            StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
+            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()){
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Personal Rate File Status");
+                        ref.setValue("old");
+                        String url = task.getResult().toString();
+                        Toast.makeText(DashboardActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                        DownloadFile(DashboardActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+                    }
+                    else{
+                        Toast.makeText(DashboardActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                }
+            });
+        }
+        else{
+            String filename = "Rate File";
+            StorageReference ref = FirebaseStorage.getInstance().getReference().child("Rate Chart").child(filename);
+            ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()){
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("General Rate File Status");
+                        ref.setValue("old");
+                        String url = task.getResult().toString();
+                        Toast.makeText(DashboardActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                        DownloadFile(DashboardActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+                    }
+                    else{
+                        Toast.makeText(DashboardActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                }
+            });
+        }
+    }
+
+    private void checkRateFileStatus() {
+        ProgressDialog dialog = new ProgressDialog(DashboardActivity.this);
+        dialog.setTitle("Please Wait...");
+        dialog.setCancelable(false);
+        dialog.show();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Personal Rate File Status");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    dialog.dismiss();
+                    String value = dataSnapshot.getValue().toString();
+                    if(value.equals("new")){
+                        updateFromServer("");
+                    }
+                    else{
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("General Rate File Status");
+                        ref.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.exists()){
+                                    dialog.dismiss();
+                                    String value = dataSnapshot.getValue().toString();
+                                    if(value.equals("new")){
+                                        updateFromServer("l");
+                                    }
+                                }
+                                else{
+                                    dialog.dismiss();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+                else{
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("General Rate File Status");
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                               // dialog.dismiss();
+                                String value = dataSnapshot.getValue().toString();
+                                //Toast.makeText(CowSNF.this, value, Toast.LENGTH_LONG).show();
+                                if(value.equals("new")){
+                                    updateFromServer("l");
+                                }
+                            }
+                            else{
+                                dialog.dismiss();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        dialog.dismiss();
+    }
+
 
     void initDashboard(){
         findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
@@ -355,6 +791,27 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(DashboardActivity.this, DeleteHistory.class));
             }
         });
+        update_rate_charts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressDialog.show();
+                StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
+                ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if(task.isSuccessful()){
+                            String url = task.getResult().toString();
+                            Toast.makeText(DashboardActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                            DownloadFile(DashboardActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+                        }
+                        else{
+                            Toast.makeText(DashboardActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                        }
+                    }
+                });
+            }
+        });
         findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -397,7 +854,64 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             }
         });
+
+
     }
+
+
+    private void DownloadFile(Context context, String fileName, String fileExtension, String destinationDirectoy, String url) {
+        File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
+        file.delete();
+        if(ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ){
+            ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName+fileExtension);
+        request.setTitle("Rate File");
+        downloadId = downloadManager.enqueue(request);
+        //Toast.makeText(DashboardActivity.this,"Directory for file: " + downloadManager.getUriForDownloadedFile(downloadId), Toast.LENGTH_LONG).show();
+    }
+
+    private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+            if(downloadId == id){
+                DbHelper helper = new DbHelper(DashboardActivity.this);
+                helper.clearSNFTable();
+                helper.createSNFTable(Environment.getExternalStorageDirectory() + "/Download/Rate File.csv");
+                File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
+                file.delete();
+                progressDialog.dismiss();
+                Toast.makeText(DashboardActivity.this, "Chart Updated", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+//    @RequiresApi(api = Build.VERSION_CODES.M)
+//    private void checkFilePermissions() {
+//        if(ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+//                || ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+//        ){
+//            ActivityCompat.requestPermissions(DashboardActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+//        }
+//        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
+//            int permissionCheck = this.checkSelfPermission("Manifest.Permission.READ_EXTERNAL_STORAGE");
+//            permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+//            if(permissionCheck != 0){
+//                this.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1001);
+//                this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
+//            }
+//            else{
+//                Log.d(TAG, "checkPermission: No need to check permission, SDK version  LOLLIPOP");
+//            }
+//        }
+//    }
 
     private BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
         @Override
@@ -449,13 +963,20 @@ public class DashboardActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch(requestCode){
             case 1:
-                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
-
+                if((grantResults.length > 0) && (grantResults[2] == PackageManager.PERMISSION_GRANTED)){
+                    toast(DashboardActivity.this, "Permission granted");
                 }
                 else{
                     toast(DashboardActivity.this, "Permission Denied");
                 }
                 break;
+            case 2:
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+
+                }
+                else{
+                    toast(DashboardActivity.this, "External storage write permission Denied");
+                }
             default:
                 break;
         }
@@ -583,15 +1104,15 @@ public class DashboardActivity extends AppCompatActivity {
 
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate( R.menu.sign_up_text, menu );
-        inflater.inflate(R.menu.printer, menu);
-        inflater.inflate(R.menu.dashboard_menu, menu);
-        MenuItem dateItem = menu.findItem(R.id.sign_up);
-        dateItem.setTitle(date);
-        return super.onCreateOptionsMenu(menu);
+//        inflater.inflate(R.menu.printer, menu);
+//        inflater.inflate(R.menu.dashboard_action_bar_items, menu);
+//        admin_messages = menu.findItem(R.id.message);
+//        admin_messages.setTitle("Messages From Admin("+numberOfMessages+")");
+        return true;
     }
 
     @Override
@@ -606,8 +1127,47 @@ public class DashboardActivity extends AppCompatActivity {
             case R.id.help:
                 break;
             case R.id.message:
+                Dialog dialog = new Dialog(DashboardActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.messges_dialog);
+                RecyclerView recyclerView = dialog.findViewById(R.id.recyclerview);
+                TextView ok = dialog.findViewById(R.id.ok);
+                TextView delete = dialog.findViewById(R.id.delete);
+                recyclerView.setLayoutManager(new LinearLayoutManager(DashboardActivity.this));
+                Collections.reverse(messages);
+                MessagesAdapter adapter = new MessagesAdapter(DashboardActivity.this, messages);
+                recyclerView.setAdapter(adapter);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        ref.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    toast(DashboardActivity.this, "Notifs deleted");
+                                }
+                            }
+                        });
+                    }
+                });
+                ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
                 break;
             case R.id.whatsapp:
+                Intent sendintent = new Intent("android.intent.action.MAIN");
+                String formattedPhoneNumber = "918449852828";
+                sendintent.setAction(Intent.ACTION_SEND);
+                sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
+                sendintent.setType("text/plain");
+                sendintent.setPackage("com.whatsapp");
+                sendintent.putExtra("jid", formattedPhoneNumber+"@s.whatsapp.net");
+                startActivity(sendintent);
                 break;
         }
         if(toggle.onOptionsItemSelected(item))

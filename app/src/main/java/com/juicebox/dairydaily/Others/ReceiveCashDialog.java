@@ -9,16 +9,23 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
+import com.juicebox.dairydaily.Models.ReceiveCashModel;
+import com.juicebox.dairydaily.MyAdapters.InvoiceAdapter;
 import com.juicebox.dairydaily.MyAdapters.ReceiveCashAdapter;
+import com.juicebox.dairydaily.MyAdapters.ReceiveCashListAdapter;
 import com.juicebox.dairydaily.R;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.InvoiceActivity;
 import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashList;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
+import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
 
 public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
 
@@ -28,6 +35,8 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
     DbHelper dbHelper;
     int id;
     int unique_id;
+
+    ProgressBar progressBar;
 
     String date, titleString, debit, credit;
     boolean wantToUpdate = false;
@@ -79,12 +88,28 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                 }
                 else{
                     if(wantToUpdate){
-                        Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
+                        //Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
                         dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString);
                         new BackupHandler(context);
-                        ReceiveCashActivity.list = dbHelper.getReceiveCash(id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
+                        ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
                         ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
-                        ReceiveCashActivity.recyclerView.setAdapter(adapter);
+                        ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
+                        ReceiveCashActivity.creditTotal = 0;
+                        ReceiveCashActivity.debitTotal = 0;
+                        ReceiveCashActivity.remain=0;
+
+                        for(ReceiveCashModel model : ReceiveCashActivity.list){
+                            ReceiveCashActivity.creditTotal += Double.valueOf(model.getCredit());
+                            ReceiveCashActivity.debitTotal += Double.valueOf(model.getDebit());
+                        }
+
+                        ReceiveCashActivity.remain = ReceiveCashActivity.creditTotal - ReceiveCashActivity.debitTotal;
+                        ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
+                        ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
+                        ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
+                        InvoiceActivity.list = dbHelper.getReceiveCashList();
+                        InvoiceActivity.adapter = new InvoiceAdapter(getContext(), InvoiceActivity.list);
+                        InvoiceActivity.recyclerView.setAdapter(InvoiceActivity.adapter);
                         dismiss();
                     }
                     else{
@@ -95,9 +120,26 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                         }
                         else{
                             new BackupHandler(context);
-                            ReceiveCashActivity.list = dbHelper.getReceiveCash(id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
+                            ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
                             ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
                             ReceiveCashActivity.recyclerView.setAdapter(adapter);
+                            ReceiveCashList.list = dbHelper.getReceiveCashList();
+                            ReceiveCashList.adapter = new ReceiveCashListAdapter(getContext(), ReceiveCashList.list);
+                            ReceiveCashList.recyclerView.setAdapter(ReceiveCashList.adapter);
+                            ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
+                            ReceiveCashActivity.adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                            ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
+                            ReceiveCashActivity.creditTotal = 0;
+                            ReceiveCashActivity.debitTotal = 0;
+                            for(ReceiveCashModel model : ReceiveCashActivity.list){
+                                ReceiveCashActivity.creditTotal += Double.valueOf(model.getCredit());
+                                ReceiveCashActivity.debitTotal += Double.valueOf(model.getDebit());
+                            }
+                            ReceiveCashActivity.remain =0;
+                            ReceiveCashActivity.remain = ReceiveCashActivity.creditTotal - ReceiveCashActivity.debitTotal;
+                            ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
+                            ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
+                            ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
                             dismiss();
                             //context.startActivity(new Intent(context, ReceiveCashActivity.class));
                         }

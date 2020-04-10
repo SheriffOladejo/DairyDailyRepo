@@ -16,6 +16,7 @@ import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.CheckSum;
+import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,7 @@ import io.paperdb.Paper;
 
 public class UpgradeToPremium extends AppCompatActivity {
 
-    TextView expiry_date;
+    TextView expiry_date, price, price1, price2;
     DbHelper helper;
 
     boolean isInternetConnected = false;
@@ -55,6 +56,13 @@ public class UpgradeToPremium extends AppCompatActivity {
 
         String orderId = String.valueOf(System.currentTimeMillis());
         String customerId = String.valueOf(System.currentTimeMillis());
+        price = findViewById(R.id.price);
+        price1 = findViewById(R.id.price1);
+        price2 = findViewById(R.id.price2);
+
+        price.setText(""+Prevalent.starter);
+        price1.setText(""+Prevalent.spark);
+        price2.setText(""+Prevalent.enterprise);
 
         helper = new DbHelper(this);
 
@@ -77,43 +85,52 @@ public class UpgradeToPremium extends AppCompatActivity {
         findViewById(R.id.priceButton1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isInternetConnected)
-                    Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
-                else{
-                    Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
-                    intent.putExtra("orderId", orderId);
-                    intent.putExtra("customerId", customerId);
-                    intent.putExtra("price", "149.99");
-                    startActivity(intent);
+                if(DashboardActivity.can_pay){
+                    if(!isInternetConnected)
+                        Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
+                    else{
+                        Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
+                        intent.putExtra("orderId", orderId);
+                        intent.putExtra("customerId", customerId);
+                        intent.putExtra("price", ""+Prevalent.starter);
+                        startActivity(intent);
+                    }
                 }
+
             }
         });
         findViewById(R.id.priceButton2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isInternetConnected)
-                    Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
-                else{
-                    Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
-                    intent.putExtra("orderId", orderId);
-                    intent.putExtra("customerId", customerId);
-                    intent.putExtra("price", "249.99");
-                    startActivity(intent);
+                if(DashboardActivity.can_pay){
+                    if(!isInternetConnected)
+                        Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
+                    else{
+                        Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
+                        intent.putExtra("orderId", orderId);
+                        intent.putExtra("customerId", customerId);
+                        intent.putExtra("price", ""+Prevalent.spark);
+                        startActivity(intent);
+                    }
                 }
+
             }
         });
         findViewById(R.id.priceButton3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isInternetConnected)
-                    Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
-                else{
-                    Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
-                    intent.putExtra("orderId", orderId);
-                    intent.putExtra("customerId", customerId);
-                    intent.putExtra("price", "449.99");
-                    startActivity(intent);
+                if(DashboardActivity.can_pay){
+                    if(!isInternetConnected)
+                        Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
+                    else{
+                        Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
+                        intent.putExtra("orderId", orderId);
+                        intent.putExtra("customerId", customerId);
+                        intent.putExtra("price", ""+Prevalent.enterprise);
+                        startActivity(intent);
+                    }
                 }
+
             }
         });
     }
@@ -127,6 +144,9 @@ public class UpgradeToPremium extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.close){
+            if(DashboardActivity.showReminder){
+
+            }
             finish();
             return true;
         }

@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_centerInParent="true">
@@ -19,7 +19,7 @@
             android:paddingStart="20dp"
             android:text="Date"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/fat"
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="Fat"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/snf"
@@ -39,7 +39,7 @@
             android:layout_marginStart="10dp"
             android:textColor="@android:color/black"
             android:text="SNF"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/weight"
@@ -49,7 +49,7 @@
             android:layout_marginStart="15dp"
             android:text="Weight"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/amount"
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:text="Amount"
-            android:textSize="16sp"/>
+            android:textSize="14sp"/>
     </LinearLayout>
 
     <View

@@ -156,6 +156,7 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
         print = findViewById(R.id.print);
 
         initDashboard();
+        phone_number = Paper.book().read(Prevalent.phone_number);
 
         drawerLayout = findViewById(R.id.drawerlayout);
         navigationView = findViewById(R.id.nav_view);
@@ -197,7 +198,7 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
             @Override
             public void onClick(View v) {
 
-                if(list!=null){
+                if(!list.isEmpty()){
                     String line = "--------------------------------";
                     Date dateIntermediate = new Date();
                     String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
@@ -209,6 +210,8 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
                         String name = getFirstname(object.getName());
                         String amount = object.getAmount();
                         String weight = object.getWeight();
+                        if(amount.equals("0"))
+                            list.remove(object);
                         totalAmount += Double.valueOf(amount);
                         totalWeight += Double.valueOf(weight);
                         toPrint += id + " | "+name + " | " + weight + "|" + amount + "|\n";
@@ -386,7 +389,7 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
         document.add(range);
         document.add(table);
 
-        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
+        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/com.juicebox.dairyDaily",f));
         document.close();
         previewPdf();
     }

@@ -6,16 +6,20 @@ public class ReportByDateModels {
     private String weight;
     private String amount;
     private String shift;
+    private String credit;
+    private String debit;
 
     public ReportByDateModels() {
     }
 
-    public ReportByDateModels(String date, String rate, String weight, String amount, String shift) {
+    public ReportByDateModels(String date, String rate, String weight, String amount, String shift, String credit, String debit) {
         this.date = date;
         this.rate = rate;
         this.weight = weight;
         this.amount = amount;
         this.shift = shift;
+        this.credit = credit;
+        this.debit = debit;
     }
 
     public String getDate() {
@@ -56,5 +60,21 @@ public class ReportByDateModels {
 
     public void setShift(String shift) {
         this.shift = shift;
+    }
+
+    public String getCredit() {
+        return credit;
+    }
+
+    public void setCredit(String credit) {
+        this.credit = credit;
+    }
+
+    public String getDebit() {
+        return debit;
+    }
+
+    public void setDebit(String debit) {
+        this.debit = debit;
     }
 }

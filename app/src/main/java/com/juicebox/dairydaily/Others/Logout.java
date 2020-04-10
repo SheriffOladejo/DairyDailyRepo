@@ -60,6 +60,7 @@ public class Logout extends AppCompatActivity {
                 helper.clearProducts();
                 helper.clearProductSale();
                 helper.clearRate();
+                helper.destroyDb();
                 String lastUpdated = Paper.book().read(Prevalent.last_update);
                 String defaultPrinter = Paper.book().read(Prevalent.selected_device);
                 HashMap<String, Object> details = new HashMap<>();

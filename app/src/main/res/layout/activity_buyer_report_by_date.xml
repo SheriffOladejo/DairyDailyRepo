@@ -267,7 +267,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout5" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/linearLayout9"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -278,48 +278,77 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view2">
 
-        <TextView
-            android:layout_width="100dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
-            android:text="Date"
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
+            android:layout_margin="8dp">
 
-        <TextView
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="10dp"
-            android:text="Rs/Ltr"
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="70dp"
+                android:textAlignment="center"
+                android:layout_marginStart="10dp"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"/>
 
-        <TextView
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
-            android:text="Weight"
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/rate"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:layout_marginStart="8dp"
+                android:textColor="@android:color/white"
+                android:text="Rate"
+                android:textSize="13sp"/>
 
-        <TextView
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
-            android:text="Amount"
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/weight"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Weight"
+                android:layout_marginStart="8dp"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/amount"
+                android:layout_width="60dp"
+                android:textAlignment="center"
+                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:text="Amount"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/credit"
+                android:layout_width="50dp"
+                android:textAlignment="center"
+                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:text="Credit"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/debit"
+                android:layout_width="50dp"
+                android:textAlignment="center"
+                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:text="Debit"
+                android:textSize="13sp"/>
 
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"

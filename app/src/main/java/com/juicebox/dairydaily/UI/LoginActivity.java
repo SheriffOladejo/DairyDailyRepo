@@ -1,13 +1,23 @@
 package com.juicebox.dairydaily.UI;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
@@ -25,7 +35,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DataRetrievalHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
@@ -47,6 +60,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -73,6 +87,9 @@ public class LoginActivity extends AppCompatActivity {
     // access all auto complete text views
     AutoCompleteTextView actState;
     AutoCompleteTextView actCity;
+    public static String expiry = "";
+
+    private static int logged_in = 0;
 
     private int duration;
     private ScrollView login_view;
@@ -121,6 +138,10 @@ public class LoginActivity extends AppCompatActivity {
     EditText emailWidget;
     ImageView logoImage;
 
+    Long downloadId;
+    StorageReference ref1;
+    String url;
+
     // login widgets
     EditText loginPhoneNumber;
     EditText loginPassword;
@@ -131,15 +152,45 @@ public class LoginActivity extends AppCompatActivity {
     TextView forgot_password;
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode){
+            case 1:
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    toast(LoginActivity.this, "Permission granted");
+                }
+                else{
+                    toast(LoginActivity.this, "Permission Denied");
+                }
+                break;
+            case 2:
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+
+                }
+                else{
+                    toast(LoginActivity.this, "External storage write permission Denied");
+                }
+            default:
+                break;
+        }
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+        if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ){
+            ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
 
         login_view = findViewById(R.id.login_view);
         sign_up_view = findViewById(R.id.sign_up_view);
 
+
+        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         frameLayout = findViewById(R.id.framelayout);
         helper = new DbHelper(this);
 
@@ -311,6 +362,21 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog.setCancelable(false);
             progressDialog.show();
 
+            ref1 = FirebaseStorage.getInstance().getReference().child("Rate Chart").child("Rate File");
+            ref1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()){
+                        url = task.getResult().toString();
+                        //Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                        DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+                    }
+                    else{
+                        Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
             // We first want to check if the phone number exists and if the password matches.
             Log.d(TAG, "verifyLogin: before");
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
@@ -319,54 +385,57 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
-                        String password = dataSnapshot.child("Password").getValue().toString();
-                        if(password.equals(login_password)){
-                            Log.d(TAG, "verifyLogin: password equal");
-                            if(remember_me){
-                                Paper.book().write(Prevalent.remember_me, "True");
+                        if(logged_in != 1){
+                            String password = dataSnapshot.child("Password").getValue().toString();
+                            if(password.equals(login_password)){
+                                Log.d(TAG, "verifyLogin: password equal");
+                                if(remember_me){
+                                    Paper.book().write(Prevalent.remember_me, "True");
+                                }
+                                Log.d(TAG, "verifyLogin: started");
+                                String firstname = dataSnapshot.child("Firstname").getValue().toString();
+                                String lastname = dataSnapshot.child("Lastname").getValue().toString();
+                                String phone_number = dataSnapshot.child("Phone Number").getValue().toString();
+                                String email = dataSnapshot.child("Email").getValue().toString();
+                                String city = dataSnapshot.child("City").getValue().toString();
+                                String address = dataSnapshot.child("Address").getValue().toString();
+                                String state = dataSnapshot.child("State").getValue().toString();
+                                String offline_password = dataSnapshot.child("Offline Password").getValue().toString();
+                                String expiry_date = dataSnapshot.child("Expiry Date").getValue().toString();
+                                Log.d(TAG, "expiry" + expiry_date);
+                                String last_backup;
+                                String default_device;
+                                try{
+                                    last_backup = dataSnapshot.child("Last backup").getValue().toString();
+                                    default_device = dataSnapshot.child("Default Printer").getValue().toString();
+                                }
+                                catch(Exception e){
+                                    last_backup = "";
+                                    default_device = "";
+                                }
+                                Log.d(TAG, "verifyLogin: " + offline_password);
+                                Paper.book().write(Prevalent.offline_password, offline_password);
+                                Paper.book().write(Prevalent.name, firstname + " " + lastname);
+                                Paper.book().write(Prevalent.has_account, "True");
+                                Paper.book().write(Prevalent.phone_number, phone_number);
+                                Paper.book().write(Prevalent.city, city);
+                                Paper.book().write(Prevalent.email, email);
+                                Paper.book().write(Prevalent.address, address);
+                                Paper.book().write(Prevalent.selected_device, default_device);
+                                helper.setExpiryDate(expiry_date);
+                                Paper.book().write(Prevalent.last_update, last_backup);
+                                Paper.book().write(Prevalent.state,state);
+                                new DataRetrievalHandler(LoginActivity.this);
+                                Log.d(TAG, "verifyLogin: " + Paper.book().read(Prevalent.phone_number));
+                                progressDialog.dismiss();
+                                logged_in = 1;
+                                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
+                                finish();
                             }
-                            Log.d(TAG, "verifyLogin: started");
-                            String firstname = dataSnapshot.child("Firstname").getValue().toString();
-                            String lastname = dataSnapshot.child("Lastname").getValue().toString();
-                            String phone_number = dataSnapshot.child("Phone Number").getValue().toString();
-                            String email = dataSnapshot.child("Email").getValue().toString();
-                            String city = dataSnapshot.child("City").getValue().toString();
-                            String address = dataSnapshot.child("Address").getValue().toString();
-                            String state = dataSnapshot.child("State").getValue().toString();
-                            String offline_password = dataSnapshot.child("Offline Password").getValue().toString();
-                            String expiry_date = dataSnapshot.child("Expiry Date").getValue().toString();
-                            Log.d(TAG, "expiry" + expiry_date);
-                            String last_backup;
-                            String default_device;
-                            try{
-                                last_backup = dataSnapshot.child("Last backup").getValue().toString();
-                                default_device = dataSnapshot.child("Default Printer").getValue().toString();
+                            else{
+                                progressDialog.dismiss();
+                                useSnackBar("Incorrect password", frameLayout);
                             }
-                            catch(Exception e){
-                                last_backup = "";
-                                default_device = "";
-                            }
-                            Log.d(TAG, "verifyLogin: " + offline_password);
-                            Paper.book().write(Prevalent.offline_password, offline_password);
-                            Paper.book().write(Prevalent.name, firstname + " " + lastname);
-                            Paper.book().write(Prevalent.has_account, "True");
-                            Paper.book().write(Prevalent.phone_number, phone_number);
-                            Paper.book().write(Prevalent.city, city);
-                            Paper.book().write(Prevalent.email, email);
-                            Paper.book().write(Prevalent.address, address);
-                            Paper.book().write(Prevalent.selected_device, default_device);
-                            helper.setExpiryDate(expiry_date);
-                            Paper.book().write(Prevalent.last_update, last_backup);
-                            Paper.book().write(Prevalent.state,state);
-                            new DataRetrievalHandler(LoginActivity.this);
-                            Log.d(TAG, "verifyLogin: " + Paper.book().read(Prevalent.phone_number));
-                            progressDialog.dismiss();
-                            startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
-                            finish();
-                        }
-                        else{
-                            progressDialog.dismiss();
-                            useSnackBar("Incorrect password", frameLayout);
                         }
                     }
                     else{
@@ -469,6 +538,7 @@ public class LoginActivity extends AppCompatActivity {
                                                     if(task.isSuccessful()){
                                                         progressDialog.dismiss();
                                                         Log.d(TAG, "createUserEmail: verification sent");
+                                                        //DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
                                                         useSnackBar("A verification link has been sent to your email.", frameLayout);
                                                     }
                                                     else{
@@ -540,6 +610,37 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    private void DownloadFile(Context context, String fileName, String fileExtension, String destinationDirectoy, String url) {
+        File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
+        file.delete();
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName+fileExtension);
+        request.setTitle("Rate File");
+        downloadId = downloadManager.enqueue(request);
+        //Toast.makeText(DashboardActivity.this,"Directory for file: " + downloadManager.getUriForDownloadedFile(downloadId), Toast.LENGTH_LONG).show();
+    }
+
+    private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+            if(downloadId == id){
+                DbHelper helper = new DbHelper(LoginActivity.this);
+                helper.clearSNFTable();
+                helper.createSNFTable(Environment.getExternalStorageDirectory() + "/Download/Rate File.csv");
+            }
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onDownloadComplete);
     }
 
     // Method that retrieves user email
@@ -693,7 +794,7 @@ public class LoginActivity extends AppCompatActivity {
         nextView.setVisibility(View.VISIBLE);
 
         // Animate the content view to 100% opacity, and clear any animation
-        // listener set on the view.
+        // listener set on  1the view.
         nextView.animate()
                 .alpha(1f)
                 .setDuration(duration)

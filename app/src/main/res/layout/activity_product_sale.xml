@@ -29,6 +29,7 @@
             <EditText
                 android:id="@+id/id"
                 android:layout_width="160dp"
+                android:inputType="number"
                 android:layout_height="40dp"
                 android:background="@drawable/rectangle_border"
                 android:hint="ID"
@@ -88,6 +89,7 @@
                 android:layout_height="40dp"
                 android:background="@drawable/rectangle_border"
                 android:hint="Units"
+                android:inputType="number"
                 android:textColor="#373737"
                 android:textColorHint="#373737"
                 android:textAlignment="center"
