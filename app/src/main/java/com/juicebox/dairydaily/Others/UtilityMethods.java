@@ -5,8 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.Snackbar;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +13,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.juicebox.dairydaily.R;
 
 import java.math.BigDecimal;
@@ -30,7 +32,7 @@ public class UtilityMethods {
     public static void useSnackBar(String snackBarMessage, View linearLayout){
         Snackbar snackbar = Snackbar.make(linearLayout, snackBarMessage, Snackbar.LENGTH_SHORT);
         View snackView = snackbar.getView();
-        TextView textView = snackView.findViewById(android.support.design.R.id.snackbar_text);
+        TextView textView = snackView.findViewById(R.id.snackbar_text);
         textView.setTextColor(Color.WHITE);
         snackbar.show();
     }
@@ -92,7 +94,7 @@ public class UtilityMethods {
         TextView textView = view.findViewById(R.id.text);
         textView.setTextColor(context.getResources().getColor(R.color.white));
         textView.setText(message);
-        view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+        view.setBackgroundColor(context.getResources().getColor(R.color.black));
         view.setBackgroundResource(R.drawable.rectangle_border);
         toast.setView(view);
         toast.show();
@@ -135,7 +137,14 @@ public class UtilityMethods {
 
     public static String getEndDate(){
         Date dateIntermediate = new Date();
-        final String dateText = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        String dateText;
+        try{
+            DateFormat df = new DateFormat();
+            dateText = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            dateText = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
         String endDay = "";
         String endDate = "";
         String endMonth = "";
@@ -205,9 +214,14 @@ public class UtilityMethods {
 
     public static String getStartDate(){
         Date dateIntermediate = new Date();
-        String dateText1 = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-        String dateText = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
-        Log.d("Utility", "getStartDate: dateText " + dateText);
+        String dateText;
+        try{
+            DateFormat df = new DateFormat();
+            dateText = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            dateText = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
         String startDate;
         String startDay;
         String todayDay = dateText.substring(8,10);

@@ -12,13 +12,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -37,15 +31,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.juicebox.dairydaily.Others.BackupHandler;
-import com.juicebox.dairydaily.Others.DataRetrievalHandler;
-import com.juicebox.dairydaily.Others.DbHelper;
-import com.juicebox.dairydaily.Others.Prevalent;
-import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -55,6 +46,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.juicebox.dairydaily.Others.DataRetrievalHandler;
+import com.juicebox.dairydaily.Others.DbHelper;
+import com.juicebox.dairydaily.Others.Prevalent;
+import com.juicebox.dairydaily.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,10 +60,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -138,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText emailWidget;
     ImageView logoImage;
 
-    Long downloadId;
+    private static Long downloadId;
     StorageReference ref1;
     String url;
 
@@ -178,6 +172,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Paper.init(this);
 
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -241,6 +237,7 @@ public class LoginActivity extends AppCompatActivity {
                     progressDialog.setTitle("Updating Password...");
                     progressDialog.setCancelable(false);
                     progressDialog.show();
+
                     String password = loginPhoneNumber.getText().toString();
                     String confirm_password = loginPassword.getText().toString();
                     if(password.isEmpty() || confirm_password.isEmpty()){
@@ -315,17 +312,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loginPhoneNumber.setHint("Phone Number");
                 loginPassword.setHint("Email Address");
-                login.setText("Retrieve");
+                login.setText("Send OTP");
                 forgot = true;
                 rememberMe.setVisibility(View.INVISIBLE);
                 loginPassword.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 loginPhoneNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
-                useSnackBar("Enter your phone number and email address", frameLayout);
+                useSnackBar("You'll receive an OTP to the registered number", frameLayout);
             }
         });
         callAll();
-
-        Paper.init(this);
 
         String remember = Paper.book().read(Prevalent.remember_me);
         Log.d(TAG,"remember: " + remember);
@@ -427,14 +422,38 @@ public class LoginActivity extends AppCompatActivity {
                                 Paper.book().write(Prevalent.state,state);
                                 new DataRetrievalHandler(LoginActivity.this);
                                 Log.d(TAG, "verifyLogin: " + Paper.book().read(Prevalent.phone_number));
-                                progressDialog.dismiss();
+                                try{
+                                    progressDialog.dismiss();
+                                }
+                                catch(Exception e){}
                                 logged_in = 1;
-                                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
-                                finish();
+                                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if(task.isSuccessful()){
+                                            startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
+                                            finish();
+                                        }
+                                        else{
+                                            toast(LoginActivity.this, "Something went wrong");
+                                            try {
+                                                progressDialog.dismiss();
+                                            }
+                                            catch(Exception e){
+
+                                            }
+                                        }
+                                    }
+                                });
+
                             }
                             else{
+                                try{
                                 progressDialog.dismiss();
-                                useSnackBar("Incorrect password", frameLayout);
+                                useSnackBar("Incorrect password", frameLayout);}
+                                catch(Exception e){
+
+                                }
                             }
                         }
                     }
@@ -515,9 +534,23 @@ public class LoginActivity extends AppCompatActivity {
             else {
                 if(sign_up_password.equals(confirm_password)){
 
-                    progressDialog.setTitle("Verifying Email...");
+                    progressDialog.setTitle("Please Wait...");
                     progressDialog.setCancelable(false);
                     progressDialog.show();
+                    ref1 = FirebaseStorage.getInstance().getReference().child("Rate Chart").child("Rate File");
+                    ref1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if(task.isSuccessful()){
+                                url = task.getResult().toString();
+                                //Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                                DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+                            }
+                            else{
+                                Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
 
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(sign_up_phone_number);
                     ref.addValueEventListener(new ValueEventListener() {
@@ -532,63 +565,76 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if(task.isSuccessful()){
-                                            mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if(task.isSuccessful()){
-                                                        progressDialog.dismiss();
-                                                        Log.d(TAG, "createUserEmail: verification sent");
-                                                        //DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
-                                                        useSnackBar("A verification link has been sent to your email.", frameLayout);
-                                                    }
-                                                    else{
-                                                        progressDialog.dismiss();
-                                                        useSnackBar("Unable to verify email", frameLayout);
-                                                    }
-                                                }
-                                            });
+                                            Intent intent = new Intent(LoginActivity.this, SendOtpActivity.class);
+                                            intent.putExtra("phoneNumber", sign_up_phone_number);
+                                            intent.putExtra("Firstname", firstname_string);
+                                            intent.putExtra("Lastname", lastname_string);
+                                            intent.putExtra("Password", sign_up_password);
+                                            intent.putExtra("Address", street_address);
+                                            intent.putExtra("Country Code", country_code_sign_up);
+                                            intent.putExtra("Offline Password", offlinePassword);
+                                            intent.putExtra("Email", email);
+                                            intent.putExtra("City", city);
+                                            intent.putExtra("State", state);
+                                            startActivity(intent);
+                                            finish();
+//                                            mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                @Override
+//                                                public void onComplete(@NonNull Task<Void> task) {
+//                                                    if(task.isSuccessful()){
+//                                                        progressDialog.dismiss();
+//                                                        Log.d(TAG, "createUserEmail: verification sent");
+//                                                        //DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+//                                                        useSnackBar("A verification link has been sent to your email.", frameLayout);
+//                                                    }
+//                                                    else{
+//                                                        progressDialog.dismiss();
+//                                                        useSnackBar("Unable to verify email", frameLayout);
+//                                                    }
+//                                                }
+//                                            });
                                         }
                                         else{
-                                            mAuth.signInWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                                    if(task.isSuccessful()){
-                                                        if(mAuth.getCurrentUser().isEmailVerified()){
-                                                            Log.d(TAG,  "Email: " + mAuth.getCurrentUser().getEmail());
-                                                            //Log.d(TAG, "Has account", Paper.book().read(Prevalent.has_account));
-                                                            if(Paper.book().read(Prevalent.has_account)!= null && Paper.book().read(Prevalent.has_account).equals("True")){
-                                                                new DataRetrievalHandler(LoginActivity.this);
-                                                                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
-                                                                finish();
-                                                            }
-                                                            else{
-                                                                Intent intent = new Intent(LoginActivity.this, SendOtpActivity.class);
-                                                                intent.putExtra("phoneNumber", sign_up_phone_number);
-                                                                intent.putExtra("Firstname", firstname_string);
-                                                                intent.putExtra("Lastname", lastname_string);
-                                                                intent.putExtra("Password", sign_up_password);
-                                                                intent.putExtra("Address", street_address);
-                                                                intent.putExtra("Country Code", country_code_sign_up);
-                                                                intent.putExtra("Offline Password", offlinePassword);
-                                                                intent.putExtra("Email", email);
-                                                                intent.putExtra("City", city);
-                                                                intent.putExtra("State", state);
-                                                                startActivity(intent);
-                                                                finish();
-                                                                // Remember to add state and city values too
-                                                            }
-                                                        }
-                                                        else{
-                                                            progressDialog.dismiss();
-                                                            useSnackBar("Please verify your email", frameLayout);
-                                                        }
-                                                    }
-                                                    else{
-                                                        progressDialog.dismiss();
-                                                        useSnackBar(task.getException().getMessage(), frameLayout);
-                                                    }
-                                                }
-                                            });
+//                                            mAuth.signInWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                                                @Override
+//                                                public void onComplete(@NonNull Task<AuthResult> task) {
+//                                                    if(task.isSuccessful()){
+//                                                        if(mAuth.getCurrentUser().isEmailVerified()){
+//                                                            Log.d(TAG,  "Email: " + mAuth.getCurrentUser().getEmail());
+//                                                            //Log.d(TAG, "Has account", Paper.book().read(Prevalent.has_account));
+//                                                            if(Paper.book().read(Prevalent.has_account)!= null && Paper.book().read(Prevalent.has_account).equals("True")){
+//                                                                new DataRetrievalHandler(LoginActivity.this);
+//                                                                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
+//                                                                finish();
+//                                                            }
+//                                                            else{
+//                                                                Intent intent = new Intent(LoginActivity.this, SendOtpActivity.class);
+//                                                                intent.putExtra("phoneNumber", sign_up_phone_number);
+//                                                                intent.putExtra("Firstname", firstname_string);
+//                                                                intent.putExtra("Lastname", lastname_string);
+//                                                                intent.putExtra("Password", sign_up_password);
+//                                                                intent.putExtra("Address", street_address);
+//                                                                intent.putExtra("Country Code", country_code_sign_up);
+//                                                                intent.putExtra("Offline Password", offlinePassword);
+//                                                                intent.putExtra("Email", email);
+//                                                                intent.putExtra("City", city);
+//                                                                intent.putExtra("State", state);
+//                                                                startActivity(intent);
+//                                                                finish();
+//                                                                // Remember to add state and city values too
+//                                                            }
+//                                                        }
+//                                                        else{
+//                                                            progressDialog.dismiss();
+//                                                            useSnackBar("Please verify your email", frameLayout);
+//                                                        }
+//                                                    }
+//                                                    else{
+//                                                        progressDialog.dismiss();
+//                                                        useSnackBar(task.getException().getMessage(), frameLayout);
+//                                                    }
+//                                                }
+//                                            });
                                         }
                                     }
                                 });
@@ -661,43 +707,44 @@ public class LoginActivity extends AppCompatActivity {
             useSnackBar("All fields are required", frameLayout);
             progressDialog.dismiss();
         }
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    String retrievedEmail = dataSnapshot.child("Email").getValue().toString();
-                    if(login_password.equals(retrievedEmail)){
-                        progressDialog.dismiss();
-                        loginPhoneNumber.setText("");
-                        loginPassword.setText("");
-                        loginPhoneNumber.setHint("Password");
-                        loginPassword.setHint("Confirm Password");
-                        login.setText("Update");
-                        updatePassword = true;
-                        forgot = false;
-                        control = false;
-                        loginPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        loginPhoneNumber.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        useSnackBar("Update your password", frameLayout);
+        else{
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        String retrievedEmail = dataSnapshot.child("Email").getValue().toString();
+                        if(login_password.equals(retrievedEmail)){
+                            progressDialog.dismiss();
+                            loginPhoneNumber.setText("");
+                            loginPassword.setText("");
+                            loginPhoneNumber.setHint("Password");
+                            loginPassword.setHint("Confirm Password");
+                            login.setText("Update");
+                            updatePassword = true;
+                            forgot = false;
+                            control = false;
+                            loginPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            loginPhoneNumber.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            useSnackBar("Update your password", frameLayout);
+                        }
+                        else{
+                            progressDialog.dismiss();
+                            useSnackBar("Email not found", frameLayout);
+                        }
                     }
                     else{
                         progressDialog.dismiss();
-                        useSnackBar("Email not found", frameLayout);
+                        useSnackBar("Phone Number not found", frameLayout);
                     }
                 }
-                else{
-                    progressDialog.dismiss();
-                    useSnackBar("Phone Number not found", frameLayout);
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+            });
+        }
     }
 
     public void callAll()

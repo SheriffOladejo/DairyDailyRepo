@@ -1,21 +1,10 @@
 package com.juicebox.dairydaily.UI.Dashboard.SellMilk;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,14 +12,23 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.juicebox.dairydaily.Models.DailySalesObject;
 import com.juicebox.dairydaily.MyAdapters.MilkSaleAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
@@ -39,15 +37,15 @@ import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
 import com.juicebox.dairydaily.UI.UsersListActivity;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
@@ -72,9 +70,9 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
 
     MilkSaleAdapter adapter;
 
-    double weightTotal = 0;
-    double amountTotal = 0;
-    double averageFat = 0;
+    public static double weightTotal = 0;
+    public static double amountTotal = 0;
+    public static double averageFat = 0;
 
     ArrayList<DailySalesObject> list;
     static ConstraintLayout scrollview;
@@ -83,9 +81,9 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
 
     EditText id, weight;
     TextView all_buyers, amount_display, rate_view;
-    TextView totalAmount;
-    TextView totalWeight;
-    TextView fatAverage;
+    public static TextView totalAmount;
+    public static TextView totalWeight;
+    public static TextView fatAverage;
 
     MenuItem day, evening;
     public static RecyclerView recyclerView;
@@ -181,6 +179,10 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
         });
 
         list = dbHelper.getDailySalesData(date, shift);
+
+        weightTotal = 0;
+        amountTotal=0;
+        averageFat=0;
 
         for(DailySalesObject model : list){
             weightTotal += Double.valueOf(model.getWeight());
@@ -311,9 +313,9 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
                                 "\nWEIGHT  :   " + Weight + "Ltr\nRATE    :   " + rate + "Rs/Ltr\n" + "TOTAL RS:   " + Amount + "Rs\n      DAIRYDAILY APP\n\n\n";
                         ArrayList<DailySalesObject> list = dbHelper.getDailySalesData(date, shift);
                         MilkSaleAdapter adapter = new MilkSaleAdapter(list, this);
-                        double weightTotal = 0;
-                        double amountTotal = 0;
-                        double averageFat = 0;
+                        weightTotal = 0;
+                        amountTotal = 0;
+                        averageFat = 0;
                         for(DailySalesObject model : list){
                             weightTotal += Double.valueOf(model.getWeight());
                             amountTotal += Double.valueOf(model.getAmount());
@@ -525,8 +527,9 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
             return true;
 
         int id = item.getItemId();
+        list = dbHelper.getDailySalesData(date, shift);
         String line = "--------------------------------";
-        String toPrint = "\n\n\nDATE  : " + date + "\nSHIFT : " + shift + "\nRate  :" + " " + rate_view.getText().toString() +"Rs/Ltr\n"+line + "\nID| " + " FAT/SNF  |" + "WEIGHT| " + "AMOUNT\n";
+        String toPrint = "\n\n\nDATE  : " + date + "\nSHIFT : " + shift + "\nRate  :" + " " + rate_view.getText().toString() +"Rs/Ltr\n"+line + "\nID | " + " FAT/SNF  |" + "WEIGHT| " + "AMOUNT\n";
         if(id == R.id.printer){
             if(list.isEmpty()){
                 toast(MilkSaleEntryActivity.this, "Nothing to print");
@@ -539,7 +542,7 @@ public class MilkSaleEntryActivity extends AppCompatActivity {
                     double fat = object.getRate();
                     double weight = object.getWeight();
                     double snf = 0.00;
-                    toPrint += sellerId + "| " +truncate(fat) + "-" + truncate(snf) +"| "  + truncate(weight) + "| " + truncate(amount) + "\n";
+                    toPrint += StringUtils.rightPad(""+sellerId, 3, "") + "|" +truncate(fat) + "-" + truncate(snf) +" |"  + StringUtils.rightPad(""+truncate(weight), 6,"") + "|" + StringUtils.rightPad(truncate(amount), 6, "") + "\n";
                 }
                 toPrint += line + "\n";
                 toPrint += "TOTAL AMOUNT: " + amountTotal + "Rs";

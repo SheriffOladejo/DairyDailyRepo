@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.DrawerLayout android:layout_height="match_parent"
+<androidx.drawerlayout.widget.DrawerLayout android:layout_height="match_parent"
     android:id="@+id/drawerlayout"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
@@ -54,7 +54,7 @@
                 android:layout_centerInParent="true">
 
                 <RelativeLayout
-                    android:id="@+id/relative_layout"
+                    android:id="@+id/cal1"
                     android:layout_width="160dp"
                     android:layout_height="40dp"
                     android:layout_marginStart="10dp"
@@ -89,6 +89,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/cal2"
                     android:layout_width="160dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="10dp"
@@ -245,7 +246,7 @@
 
         </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -257,7 +258,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearLayout">
 
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:id="@+id/li"
@@ -406,9 +407,9 @@
 
     </RelativeLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.design.widget.NavigationView
+    <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="260dp"
         android:layout_height="match_parent"
@@ -778,6 +779,6 @@
 
         </ScrollView>
 
-    </android.support.design.widget.NavigationView>
+    </com.google.android.material.navigation.NavigationView>
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

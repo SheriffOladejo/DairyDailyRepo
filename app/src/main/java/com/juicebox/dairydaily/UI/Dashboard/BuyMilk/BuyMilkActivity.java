@@ -2,22 +2,17 @@ package com.juicebox.dairydaily.UI.Dashboard.BuyMilk;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Menu;
+import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,6 +20,15 @@ import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
@@ -36,7 +40,6 @@ import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -49,7 +52,7 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 //Activity for buying milk
 
-public class BuyMilkActivity extends AppCompatActivity {
+public class BuyMilkActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Button proceed;
 
@@ -70,6 +73,7 @@ public class BuyMilkActivity extends AppCompatActivity {
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
     LinearLayout date_layout;
+    CalendarView datePicker;
 
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -89,14 +93,36 @@ public class BuyMilkActivity extends AppCompatActivity {
         scrollview = findViewById(R.id.scrollview);
         proceed = findViewById(R.id.proceed);
         date_layout = findViewById(R.id.date_layout);
+        datePicker = findViewById(R.id.date_picker);
+
+//        // Check for date picker dialog permission
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            datePickerDialog = new DatePickerDialog(this);
+//            date_layout.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    //datePickerDialog.show();
+//                    showCalendarDialog();
+//                }
+//            });
+//        }
+//        else{
+//            datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+//                @Override
+//                public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+//
+//                }
+//            });
+//
+//        }
 
         date_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePickerDialog.show();
+                //datePickerDialog.show();
+                showCalendarDialog();
             }
         });
-
         drawerLayout = findViewById(R.id.drawerlayout);
         navigationView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
@@ -139,35 +165,36 @@ public class BuyMilkActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Buy Milk");
 
-        // Check for date picker dialog permission
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            datePickerDialog = new DatePickerDialog(this);
-        }
-
-        datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        dateView.setText(date);
-                    }
-                    else{
-                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        dateView.setText(date);
-                    }
-                }
-                else{
-                    date = year + "-" + (month+1) + "-" + dayOfMonth;
-                    dateView.setText(date);
-                }
-            }
-        });
+//        datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//
+//                if(String.valueOf(month).length() == 1){
+//                    if(String.valueOf(dayOfMonth).length() == 1){
+//                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+//                        dateView.setText(date);
+//                    }
+//                    else{
+//                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
+//                        dateView.setText(date);
+//                    }
+//                }
+//                else{
+//                    date = year + "-" + (month+1) + "-" + dayOfMonth;
+//                    dateView.setText(date);
+//                }
+//            }
+//        });
 
 
         Date dateIntermediate = new Date();
-        date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
         dateView.setText(date);
 
         // Check time whether its morning or evening and check shift switches accordingly
@@ -210,6 +237,34 @@ public class BuyMilkActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void showCalendarDialog() {
+        Dialog dialog = new Dialog(BuyMilkActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        dateView.setText(date);
+                    }
+                    else{
+                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        dateView.setText(date);
+                    }
+                }
+                else{
+                    date = year + "-" + (month+1) + "-" + dayOfMonth;
+                    dateView.setText(date);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     public void checkInternetConnect(){
@@ -363,5 +418,23 @@ public class BuyMilkActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        if(String.valueOf(month).length() == 1){
+            if(String.valueOf(dayOfMonth).length() == 1){
+                date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                dateView.setText(date);
+            }
+            else{
+                date = year + "-0" + (month+1) + "-" + dayOfMonth;
+                dateView.setText(date);
+            }
+        }
+        else{
+            date = year + "-" + (month+1) + "-" + dayOfMonth;
+            dateView.setText(date);
+        }
     }
 }

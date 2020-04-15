@@ -1,29 +1,24 @@
 package com.juicebox.dairydaily.UI;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.hanks.passcodeview.PasscodeView;
-import com.juicebox.dairydaily.Others.DataRetrievalHandler;
 import com.juicebox.dairydaily.Others.Prevalent;
-import com.juicebox.dairydaily.Others.SpinnerItem;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import io.paperdb.Paper;
 
-import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 

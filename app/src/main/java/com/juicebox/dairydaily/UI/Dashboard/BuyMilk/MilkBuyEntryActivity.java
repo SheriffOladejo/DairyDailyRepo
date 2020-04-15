@@ -1,34 +1,12 @@
 package com.juicebox.dairydaily.UI.Dashboard.BuyMilk;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.ParcelUuid;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,51 +15,48 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.MyAdapters.MilkBuyAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
+import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.WarningDialog;
-import com.juicebox.dairydaily.UI.BluetoothConnectionService;
-import com.juicebox.dairydaily.Others.DbHelper;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog;
-import com.juicebox.dairydaily.Others.SpinnerItem;
 import com.juicebox.dairydaily.R;
+import com.juicebox.dairydaily.UI.BluetoothConnectionService;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
-import com.juicebox.dairydaily.UI.MainActivity;
 import com.juicebox.dairydaily.UI.UsersListActivity;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import io.paperdb.Paper;
 
@@ -90,7 +65,6 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncateDouble;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
-import static com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity.scrollview;
 
 public class MilkBuyEntryActivity extends AppCompatActivity {
 
@@ -118,11 +92,11 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
 
     boolean printed = false;
 
-    double weightTotal = 0;
-    double amountTotal = 0;
-    double averageFat = 0;
+    public static double weightTotal = 0;
+    public static double amountTotal = 0;
+    public static double averageFat = 0;
 
-    TextView totalAmount, totalWeight, fatAverage;
+    public static TextView totalAmount, totalWeight, fatAverage;
 
     String passedDate;
 
@@ -239,6 +213,10 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
         list = dbHelper.getDailyBuyData(date, shift);
         Log.d(TAG, "list size: " + list.size());
         adapter = new MilkBuyAdapter(this, list);
+
+        weightTotal = 0;
+        amountTotal = 0;
+        averageFat = 0;
 
         for(DailyBuyObject model : list){
             weightTotal += Double.valueOf(model.getWeight());
@@ -511,9 +489,9 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
                         ArrayList<DailyBuyObject> list = dbHelper.getDailyBuyData(date, shift);
                         Log.d(TAG, "list size: " + list.size());
                         MilkBuyAdapter adapter = new MilkBuyAdapter(this, list);
-                        double weightTotal = 0;
-                        double amountTotal = 0;
-                        double averageFat = 0;
+                        weightTotal = 0;
+                        amountTotal = 0;
+                        averageFat = 0;
                         for(DailyBuyObject model : list){
                             weightTotal += Double.valueOf(model.getWeight());
                             amountTotal += Double.valueOf(model.getAmount());
@@ -725,18 +703,19 @@ public class MilkBuyEntryActivity extends AppCompatActivity {
         if(toggle.onOptionsItemSelected(item))
             return true;
         String line = "--------------------------------";
-        String toPrint = "\nDATE  |" + date + "\nSHIFT |" + shift + "\n"+line +  "\nID| " + "FAT/SNF |" + "RATE |" + "WEIGHT|" + "AMOUNT\n";
+        list = dbHelper.getDailyBuyData(date, shift);
+        String toPrint = "\nDATE  |" + date + "\nSHIFT |" + shift + "\n"+line +  "\nID | " + "FAT/SNF |" + "RATE |" + "WEIGHT|" + "AMOUNT\n";
         if (id == R.id.printer) {
             Collections.reverse(list);
             for (DailyBuyObject object : list) {
                 int sellerId = object.getId();
-                String amount = truncate(object.getAmount());
+                String amount = StringUtils.rightPad(StringUtils.truncate(truncate(object.getAmount()), 6), 6, " ");
                 String fat = truncate(object.getFat());
                 String snf = truncate(object.getSnf());
-                String rate = truncate(object.getRate());
-                String weight = truncate(object.getWeight());
-
-                toPrint += sellerId + "|" + fat + "-" + snf + "|" + rate + "|"  + weight + "|" + amount + "\n";
+                String rate = StringUtils.rightPad(truncate(object.getRate()), 5, " ");
+                String weight = StringUtils.rightPad(truncate(object.getWeight()), 6, " ");
+                Log.d(TAG, "amount:" +amount);
+                toPrint += StringUtils.rightPad(""+sellerId, 3, "") + "|" + fat + "-" + snf + "|" + rate + "|"  + weight + "|" + amount + "\\n";
             }
             toPrint += line + "\n";
             toPrint += "TOTAL AMOUNT: " + truncate(amountTotal) + "Rs";

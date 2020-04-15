@@ -1,41 +1,41 @@
 package com.juicebox.dairydaily.UI.Dashboard.DrawerLayout;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
-import android.os.PersistableBundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -46,9 +46,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.juicebox.dairydaily.Models.BuyerRegisterModel;
 import com.juicebox.dairydaily.Models.MilkHistoryObject;
-import com.juicebox.dairydaily.MyAdapters.BuyerRegisterAdapter;
 import com.juicebox.dairydaily.MyAdapters.MilkHistoryAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
@@ -56,11 +54,7 @@ import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity;
-import com.juicebox.dairydaily.UI.LoginActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,7 +63,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import io.paperdb.Paper;
@@ -78,14 +71,12 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.getEndDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
-import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
-public class MilkHistoryActivity extends AppCompatActivity{
+public class MilkHistoryActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 1;
     File pdfFile;
-    ImageView start_date_image;
-    ImageView end_date_image;
+    RelativeLayout cal1, cal2;
     TextView weightTotal, amountTotal;
     TextView start_date_text_view, end_date_text_view;
     RecyclerView recyclerView;
@@ -103,6 +94,7 @@ public class MilkHistoryActivity extends AppCompatActivity{
 
     String startDate, endDate;
 
+    @TargetApi(Build.VERSION_CODES.O)
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,12 +107,12 @@ public class MilkHistoryActivity extends AppCompatActivity{
         getSupportActionBar().setTitle("Milk History");
         //getSupportActionBar().setHomeButtonEnabled(true);
         // Initialize widgets
-        start_date_image = findViewById(R.id.start_date_image_view);
         navigationView = findViewById(R.id.nav_view);
         weightTotal = findViewById(R.id.weightTotal);
         amountTotal = findViewById(R.id.amountTotal);
         scrollview = findViewById(R.id.constraintlayout);
-        end_date_image = findViewById(R.id.end_date_image_view);
+        cal1= findViewById(R.id.cal1);
+        cal2 = findViewById(R.id.cal2);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
         recyclerView = findViewById(R.id.recyclerview);
@@ -130,23 +122,22 @@ public class MilkHistoryActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(layoutManager);
         print = findViewById(R.id.print);
 
-        final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
         startDate = getStartDate();
         endDate = getEndDate();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
 
-        start_date_image.setOnClickListener(new View.OnClickListener() {
+        cal1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDatePickerDialog.show();
+                showCalendarDialog1();
             }
         });
-        end_date_image.setOnClickListener(new View.OnClickListener() {
+        cal2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endDatePickerDialog.show();
+                showCalendarDialog2();
             }
         });
 
@@ -169,28 +160,6 @@ public class MilkHistoryActivity extends AppCompatActivity{
             }
         });
 
-
-        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                    else{
-                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                }
-                else{
-                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    start_date_text_view.setText(startDate);
-
-                }
-            }
-        });
-
         findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -198,25 +167,6 @@ public class MilkHistoryActivity extends AppCompatActivity{
             }
         });
 
-        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                    else{
-                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                }
-                else{
-                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    end_date_text_view.setText(endDate);
-                }
-            }
-        });
 
         Log.d("MilkHistory", "startDate, endDate: " + startDate + " " + endDate);
         list = helper.getMilkHistory(startDate, endDate);
@@ -233,6 +183,7 @@ public class MilkHistoryActivity extends AppCompatActivity{
         initDashboard();
         // Hook up the "Go" button
         findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 String startDate = start_date_text_view.getText().toString();
@@ -249,6 +200,63 @@ public class MilkHistoryActivity extends AppCompatActivity{
                 recyclerView.setAdapter(adapter);
             }
         });
+    }
+
+    private void showCalendarDialog1() {
+        Dialog dialog = new Dialog(MilkHistoryActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                    else{
+                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                }
+                else{
+                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    start_date_text_view.setText(startDate);
+
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showCalendarDialog2() {
+        Dialog dialog = new Dialog(MilkHistoryActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                    else{
+                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                }
+                else{
+                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    end_date_text_view.setText(endDate);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     private void createPdfWrapper() {
@@ -268,7 +276,15 @@ public class MilkHistoryActivity extends AppCompatActivity{
             docFolder.mkdirs();
             Log.i(TAG, "Created a new directory for buyerregister");
         }
-        String date = new SimpleDateFormat("dd-MM-YYYY").format(new Date());
+        String date;
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", new Date()).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
+        }
+
         String pdfName = date + ".pdf";
         pdfFile = new File(docFolder.getAbsolutePath(), pdfName);
 
@@ -397,7 +413,15 @@ public class MilkHistoryActivity extends AppCompatActivity{
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 // Send user's phone number for verification
                 Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+                String date;
+                try{
+                    DateFormat df = new DateFormat();
+                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                }
+                catch(Exception e){
+                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                }
+
                 Paper.book().write(Prevalent.last_update, date);
                 new BackupHandler(MilkHistoryActivity.this);
             }

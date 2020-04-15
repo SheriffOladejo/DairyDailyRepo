@@ -1,18 +1,21 @@
 package com.juicebox.dairydaily.MyAdapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.juicebox.dairydaily.Models.MessagesModel;
 import com.juicebox.dairydaily.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder> {
 
@@ -37,7 +40,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         String time = list.get(i).getTime();
         String status = list.get(i).getStatus();
 
-        String date = new SimpleDateFormat("dd/MM/YYYY").format(Long.valueOf(time));
+        String date;
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", new Date(Long.valueOf(time))).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(new Date(Long.valueOf(time)));
+        }
+
         viewHolder.setData(date, message);
     }
 

@@ -4,13 +4,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
@@ -18,7 +19,6 @@ import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.CheckSum;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -74,12 +74,15 @@ public class UpgradeToPremium extends AppCompatActivity {
                 date = data.getString(data.getColumnIndex("Date"));
             }
         }
-        String format = "";
-        try {
-            format = new SimpleDateFormat("dd-MM-YYYY").format(new Date(Long.valueOf(date)));
-        } catch (Exception e) {
-            e.printStackTrace();
+        String format;
+        try{
+            DateFormat df = new DateFormat();
+            format = df.format("yyyy-MM-dd", new Date(Long.valueOf(date))).toString();
         }
+        catch(Exception e){
+            format = new SimpleDateFormat("YYYY-MM-dd").format(new Date(Long.valueOf(date)));
+        }
+
         expiry_date.setText("Expiry Date: " + format);
 
         findViewById(R.id.priceButton1).setOnClickListener(new View.OnClickListener() {

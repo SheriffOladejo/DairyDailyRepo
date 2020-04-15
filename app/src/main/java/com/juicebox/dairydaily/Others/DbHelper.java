@@ -6,9 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.juicebox.dairydaily.Models.BuyerRegisterModel;
 import com.juicebox.dairydaily.Models.CustomerReportModel;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
@@ -816,7 +818,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 }
             }
         }
-        Log.d(TAG, "Users: " + users.get(2).getAmount());
         return users;
     }
 
@@ -1099,15 +1100,14 @@ public class DbHelper extends SQLiteOpenHelper {
                     DailySalesObject object = new DailySalesObject(id, name, Double.valueOf(weight), Double.valueOf(amount),
                             Double.valueOf(rate), shift, date, Double.valueOf(debit), Double.valueOf(credit), unique_id);
                     list.add(object);
-                    Log.d(TAG, "listSize: " + list.size());
                 }
                 else{
-                    Log.d(TAG, "getSalesData: date not equal : " + data.getString(7) + dateToGet);
+
                 }
             }
         }
         else{
-            Log.d(TAG, "getSalesData: data is empty");
+
         }
         return list;
     }

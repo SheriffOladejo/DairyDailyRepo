@@ -2,32 +2,18 @@ package com.juicebox.dairydaily.UI.Dashboard.SellMilk;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ParcelUuid;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -37,18 +23,22 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog2;
-import com.juicebox.dairydaily.Others.SpinnerItem;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.BluetoothConnectionService;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
@@ -56,24 +46,15 @@ import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 
 import io.paperdb.Paper;
 
-import static com.juicebox.dairydaily.Others.UtilityMethods.checkBTPermissions;
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
-import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class SellMilkActivity extends AppCompatActivity {
@@ -95,7 +76,6 @@ public class SellMilkActivity extends AppCompatActivity {
     private static final String TAG = "SellMilkActivity";
 
     // Date picker dialog pops up on calendar image click
-    DatePickerDialog datePickerDialog;
     TextView dateView;
     Switch online_switch;
 
@@ -156,7 +136,7 @@ public class SellMilkActivity extends AppCompatActivity {
         date_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePickerDialog.show();
+                showCalendarDialog();
             }
         });
 
@@ -188,35 +168,16 @@ public class SellMilkActivity extends AppCompatActivity {
             }
         });
 
-        // Check for date picker dialog permission
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            datePickerDialog = new DatePickerDialog(this);
-        }
 
         Date dateIntermediate = new Date();
-        date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
         dateView.setText(date);
-
-        datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        dateView.setText(date);
-                    }
-                    else{
-                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        dateView.setText(date);
-                    }
-                }
-                else{
-                    date = year + "-" + (month+1) + "-" + dayOfMonth;
-                    dateView.setText(date);
-                }
-            }
-        });
 
         Calendar dateTime = Calendar.getInstance();
         if(dateTime.get(Calendar.AM_PM) == Calendar.AM){
@@ -313,6 +274,34 @@ public class SellMilkActivity extends AppCompatActivity {
                 online = true;
             }
         }
+    }
+
+    private void showCalendarDialog() {
+        Dialog dialog = new Dialog(SellMilkActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        dateView.setText(date);
+                    }
+                    else{
+                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        dateView.setText(date);
+                    }
+                }
+                else{
+                    date = year + "-" + (month+1) + "-" + dayOfMonth;
+                    dateView.setText(date);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     void initDashboard(){

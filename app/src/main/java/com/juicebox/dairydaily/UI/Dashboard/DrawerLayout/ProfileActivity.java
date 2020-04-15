@@ -2,9 +2,7 @@ package com.juicebox.dairydaily.UI.Dashboard.DrawerLayout;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
@@ -12,15 +10,15 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.prefs.PreferenceChangeEvent;
 
 import io.paperdb.Paper;
 
@@ -71,8 +69,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         }
         else{
-            expiry_date.setText(new SimpleDateFormat("dd/MM/YYYY").format(Long.valueOf(expiry)));
-            String ex = new SimpleDateFormat("dd/MM/YYYY").format(Long.valueOf(expiry));
+            String ex;
+            try{
+                DateFormat df = new DateFormat();
+                ex = df.format("dd/MM/yyyy", Long.valueOf(expiry)).toString();
+            }
+            catch(Exception e){
+                ex = new SimpleDateFormat("dd/MM/YYYY").format(Long.valueOf(expiry));
+            }
+            expiry_date.setText(ex);
             day_in_string = ex.substring(0,2);
             month_in_string = ex.substring(3,5);
             year_in_string = ex.substring(6,10);

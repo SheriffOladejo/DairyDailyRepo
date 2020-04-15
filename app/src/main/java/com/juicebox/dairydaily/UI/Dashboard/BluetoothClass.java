@@ -9,12 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.RequiresApi;
+
 import com.juicebox.dairydaily.Others.SpinnerItem;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
 
 import java.io.IOException;
 import java.io.InputStream;

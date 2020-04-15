@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:foreground="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:id="@+id/cow_snf"
@@ -48,9 +48,9 @@
                     android:layout_marginEnd="10dp"/>
 
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/buffalo_snf"
             android:foreground="?android:attr/selectableItemBackground"
             android:clickable="true"
@@ -84,7 +84,7 @@
                     android:layout_marginEnd="10dp"/>
 
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </LinearLayout>

@@ -1,12 +1,13 @@
 package com.juicebox.dairydaily.UI;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.R;

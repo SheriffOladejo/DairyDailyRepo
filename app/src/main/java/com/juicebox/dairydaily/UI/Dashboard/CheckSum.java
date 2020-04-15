@@ -2,14 +2,14 @@ package com.juicebox.dairydaily.UI.Dashboard;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,6 +24,7 @@ import com.paytm.pgsdk.PaytmPaymentTransactionCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,14 +45,13 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
 //        setContentView(R.layout.activity_main);
         //initOrderId();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        Paper.init(this);
         helper = new DbHelper(this);
 
         Intent intent = getIntent();
         orderId = intent.getExtras().getString("orderId");
         custormerid = intent.getExtras().getString("customerId");
         price = intent.getExtras().getString("price");
-
-        Paper.init(this);
 
         mid = "avFYoj33073251095335"; // your merchant ID
         sendUserDetailTOServerdd dl = new sendUserDetailTOServerdd();
@@ -159,11 +159,9 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                 else if(price.equals(""+Prevalent.enterprise))
                     c.add(Calendar.DATE, 370);
                 helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
+                Toast.makeText(CheckSum.this, ""+c.getTime(), Toast.LENGTH_LONG).show();
                 String date = new SimpleDateFormat("dd/MM/YYYY").format(new Date());
                 HashMap<String, Object> map = new HashMap<>();
-//                map.put("Transaction Date", date);
-//                map.put("Transaction Amount", price);
-//                map.put("Expiry Date", ""+c.getTime().getTime());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("Transaction Date", date);
@@ -174,7 +172,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                     toast(CheckSum.this, "Unable to create JSONObject");
                 }
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Payment History").child(""+System.currentTimeMillis());
-                DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("Users").child(getIntent().getStringExtra("phone_number")).child("Expiry Date");
+                DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Expiry Date");
                 ref1.setValue(""+c.getTime().getTime());
 
                 ref.updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {

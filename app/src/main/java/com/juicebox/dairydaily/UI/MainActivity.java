@@ -1,8 +1,9 @@
 package com.juicebox.dairydaily.UI;
 
 import android.app.DatePickerDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.juicebox.dairydaily.R;
 

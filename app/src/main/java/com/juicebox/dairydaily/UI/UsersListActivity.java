@@ -1,36 +1,27 @@
 package com.juicebox.dairydaily.UI;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.juicebox.dairydaily.Models.CustomerModels;
 import com.juicebox.dairydaily.MyAdapters.UsersListAdapter;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
-import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 
 public class UsersListActivity extends AppCompatActivity {
     LinearLayout seller_layout;

@@ -2,33 +2,39 @@ package com.juicebox.dairydaily.UI.Dashboard.ViewReport;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -53,6 +59,8 @@ import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -142,7 +150,14 @@ public class ShiftReportActivity extends AppCompatActivity implements DatePicker
         go = findViewById(R.id.go);
 
         Date dateIntermediate = new Date();
-        final String dateText = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        String dateText;
+        try{
+            DateFormat df = new DateFormat();
+            dateText = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            dateText = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
         select_date_text_view.setText(dateText);
 
         findViewById(R.id.send_msg).setOnClickListener(new View.OnClickListener() {
@@ -185,20 +200,28 @@ public class ShiftReportActivity extends AppCompatActivity implements DatePicker
                     Date dateIntermediate = new Date();
                     String line = "--------------------------------";
 
-                    String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-                    String toPrint = "\nDate | " + date + "\n" + "Shift | " + shift + "\n";
-                    toPrint += "ID |Weight| FAT | Rate |Amount\n" + line + "\n";
+                    String date;
+                    try{
+                        DateFormat df = new DateFormat();
+                        date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                    }
+                    catch(Exception e){
+                        date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                    }
+                    String toPrint = "\nDate  | " + date + "\n" + "Shift | " + shift + "\n" + line + "\n";
+                    toPrint += "ID |Weight| FAT | Rate |Amount\n";
 
                     for(ShiftReportModel object : list){
                         int id = object.getId();
-                        String amount = truncate(Double.valueOf(object.getAmount()));
-                        String fat = truncate(Double.valueOf(object.getFat()));
-                        String rate = truncate(Double.valueOf(object.getRate()));
-                        String weight = truncate(Double.valueOf(object.getWeight()));
-                        toPrint += id + "  |" + weight + " |" + fat + " | " + rate + "|" + amount + " | \n";
+                        String amount = StringUtils.rightPad(StringUtils.truncate(object.getAmount(),6), 6, "");
+                        String fat = StringUtils.rightPad(truncate(Double.valueOf(object.getFat())), 5, "");
+                        String rate = StringUtils.rightPad(truncate(Double.valueOf(object.getRate())) ,6, "");
+                        String weight = StringUtils.rightPad(truncate(Double.valueOf(object.getWeight())), 6, "");
+                        toPrint += StringUtils.rightPad(""+id, 3, "") + "|" + weight + "|" + fat + "|" + rate + "|" + amount + "| \n";
                     }
-                    toPrint += "TOTAL WEIGHT | " + totalWeight+"Ltr" + "\n";
-                    toPrint += "TOTAL AMOUNT | " + truncate(totalAmount)+"Rs" + "\n";
+                    toPrint += line + "\nTOTAL WEIGHT : " + totalWeight+"Ltr" + "\n";
+                    toPrint += "TOTAL AMOUNT : " + truncate(totalAmount)+"Rs" + "\n" + line;
+                    toPrint += "\n       DIARYDAILY APP";
                     Log.d(TAG, "toPrint: " + toPrint);
 
                     byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
@@ -246,27 +269,6 @@ public class ShiftReportActivity extends AppCompatActivity implements DatePicker
             }
         });
 
-        datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        select_date_text_view.setText(date);
-                    }
-                    else{
-                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        select_date_text_view.setText(date);
-                    }
-                }
-                else{
-                    date = year + "-" + (month+1) + "-" + dayOfMonth;
-                    select_date_text_view.setText(date);
-                }
-            }
-        });
-
         morning_radio.setChecked(true);
         shift = "Morning";
 
@@ -292,9 +294,37 @@ public class ShiftReportActivity extends AppCompatActivity implements DatePicker
         select_date_image_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePickerDialog.show();
+                showCalendarDialog1();
             }
         });
+    }
+
+    private void showCalendarDialog1() {
+        Dialog dialog = new Dialog(ShiftReportActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        select_date_text_view.setText(date);
+                    }
+                    else{
+                        date = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        select_date_text_view.setText(date);
+                    }
+                }
+                else{
+                    date = year + "-" + (month+1) + "-" + dayOfMonth;
+                    select_date_text_view.setText(date);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     private void createPdfWrapper() {
@@ -452,7 +482,14 @@ public class ShiftReportActivity extends AppCompatActivity implements DatePicker
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 // Send user's phone number for verification
                 Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+                String date;
+                try{
+                    DateFormat df = new DateFormat();
+                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                }
+                catch(Exception e){
+                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                }
                 Paper.book().write(Prevalent.last_update, date);
                 new BackupHandler(ShiftReportActivity.this);
             }

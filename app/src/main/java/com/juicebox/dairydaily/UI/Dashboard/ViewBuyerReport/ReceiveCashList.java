@@ -1,14 +1,13 @@
 package com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.juicebox.dairydaily.Models.ReceiveCashListModel;
-import com.juicebox.dairydaily.MyAdapters.ReceiveCashAdapter;
 import com.juicebox.dairydaily.MyAdapters.ReceiveCashListAdapter;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.R;
@@ -32,7 +31,6 @@ public class ReceiveCashList extends AppCompatActivity {
         list = helper.getReceiveCashList();
         adapter = new ReceiveCashListAdapter(this, list);
         recyclerView.setAdapter(adapter);
-
     }
 
     @Override

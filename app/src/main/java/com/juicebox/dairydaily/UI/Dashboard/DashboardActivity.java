@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,19 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelUuid;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,19 +33,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.esotericsoftware.kryo.util.Util;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.juicebox.dairydaily.CowChart.CowSNF;
 import com.juicebox.dairydaily.Models.MessagesModel;
 import com.juicebox.dairydaily.MyAdapters.MessagesAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
@@ -85,18 +82,14 @@ import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActiv
 import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -146,7 +139,7 @@ public class DashboardActivity extends AppCompatActivity {
     TextView notif_count;
 
 
-    public static String show = "";
+    public String show = "";
     CardView view_report, buyer_report, add_product, rate_chart;
     CardView buy_milk, sell_milk, customers, product_sale;
     LinearLayout linearLayout;
@@ -199,6 +192,7 @@ public class DashboardActivity extends AppCompatActivity {
                         }
                         catch(Exception e){}
                     }
+                    notif_count.setVisibility(View.VISIBLE);
                     notif_count.setText(""+numberOfMessages);
                     //89admin_messages.setTitle("Messages From Admin("+numberOfMessages+")");
                 }
@@ -229,7 +223,13 @@ public class DashboardActivity extends AppCompatActivity {
         checkRateFileStatus();
 
         Date dateIntermediate = new Date();
-        date = new SimpleDateFormat("dd-MM-YYYY").format(dateIntermediate);
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
         Log.d(TAG, "Date: "+ date);
 
         Cursor data = helper.getExpiryDate();
@@ -262,6 +262,7 @@ public class DashboardActivity extends AppCompatActivity {
         rate_chart = findViewById(R.id.rate_chart);
         linearLayout = findViewById(R.id.ll);
         notif_count = findViewById(R.id.notif_count);
+        notif_count.setVisibility(View.GONE);
         printer = findViewById(R.id.printer);
         whatsapp = findViewById(R.id.whatsapp);
         notif = findViewById(R.id.notif);
@@ -283,24 +284,32 @@ public class DashboardActivity extends AppCompatActivity {
         reference1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
+                try{
                 String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView1);
+                Picasso.get().load(url).into(imageView1);}
+                catch(Exception e){}
             }
         });
 
         reference2.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
+                try{
                 String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView2);
+                Picasso.get().load(url).into(imageView2);}
+                catch(Exception e){}
             }
         });
 
         reference3.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
+                try{
                 String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView3);
+                Picasso.get().load(url).into(imageView3); }
+                catch (Exception e){
+
+                }
             }
         });
 
@@ -313,7 +322,7 @@ public class DashboardActivity extends AppCompatActivity {
                     if(show.equals("true")){
                         viewFlipper.setVisibility(View.VISIBLE);
                     }
-                    else{
+                    else if(show.equals("false")){
                         viewFlipper.setVisibility(View.GONE);
                     }
                 }
@@ -328,9 +337,11 @@ public class DashboardActivity extends AppCompatActivity {
         reference4.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
+                try{
                 String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView4);
-                viewFlipper.setVisibility(View.VISIBLE);
+                Picasso.get().load(url).into(imageView4);}
+                catch(Exception e){}
+                //viewFlipper.setVisibility(View.VISIBLE);
             }
         });
 
@@ -365,6 +376,7 @@ public class DashboardActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         dialog.dismiss();
+                        //bluetoothConnectionService.write("m68fn".getBytes(Charset.defaultCharset()));
                     }
                 });
                 dialog.show();
@@ -374,7 +386,7 @@ public class DashboardActivity extends AppCompatActivity {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //bluetoothConnectionService.write("8f6my".getBytes(Charset.defaultCharset()));
             }
         });
 
@@ -390,7 +402,7 @@ public class DashboardActivity extends AppCompatActivity {
         if(show.equals("true")){
             viewFlipper.setVisibility(View.VISIBLE);
         }
-        else{
+        else if(show.equals("false")){
             viewFlipper.setVisibility(View.GONE);
         }
 
@@ -417,9 +429,9 @@ public class DashboardActivity extends AppCompatActivity {
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        bluetoothAdapter.enable();
-        pairedDevice = bluetoothAdapter.getBondedDevices();
+//        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//        bluetoothAdapter.enable();
+//        pairedDevice = bluetoothAdapter.getBondedDevices();
 
         Animation slide = AnimationUtils.loadAnimation(DashboardActivity.this, R.anim.image_slide_left);
         //Animation slideLL = AnimationUtils.loadAnimation(this, R.anim.image_slide_up);
@@ -963,11 +975,11 @@ public class DashboardActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch(requestCode){
             case 1:
-                if((grantResults.length > 0) && (grantResults[2] == PackageManager.PERMISSION_GRANTED)){
-                    toast(DashboardActivity.this, "Permission granted");
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    //toast(DashboardActivity.this, "Permission granted");
                 }
                 else{
-                    toast(DashboardActivity.this, "Permission Denied");
+                    //toast(DashboardActivity.this, "Permission Denied");
                 }
                 break;
             case 2:
@@ -975,7 +987,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                 }
                 else{
-                    toast(DashboardActivity.this, "External storage write permission Denied");
+                    //toast(DashboardActivity.this, "External storage write permission Denied");
                 }
             default:
                 break;

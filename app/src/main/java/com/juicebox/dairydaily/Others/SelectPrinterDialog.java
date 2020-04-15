@@ -7,7 +7,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -17,19 +16,12 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import com.juicebox.dairydaily.MyAdapters.SpinnerAdapter;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.BluetoothConnectionService;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity;
 
 import java.util.ArrayList;
 

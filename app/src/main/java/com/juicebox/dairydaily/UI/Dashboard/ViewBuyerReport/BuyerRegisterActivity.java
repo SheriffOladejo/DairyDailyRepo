@@ -1,51 +1,44 @@
 package com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelUuid;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.util.IOUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.ImgRaw;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -57,42 +50,27 @@ import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog;
-import com.juicebox.dairydaily.Others.SpinnerItem;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.BluetoothConnectionService;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity;
 
-import java.io.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import io.paperdb.Paper;
 
@@ -102,12 +80,9 @@ import static com.juicebox.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
-import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class BuyerRegisterActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    ImageView start_date_image;
-    ImageView end_date_image;
     TextView start_date_text_view, end_date_text_view;
     RecyclerView recyclerView;
 
@@ -124,6 +99,7 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
     NavigationView navigationView;
 
     static ConstraintLayout scrollview;
+    RelativeLayout cal1, cal2;
 
     Button print;
 
@@ -146,9 +122,9 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
         hideKeyboard(this);
 
         // Initialize widgets
-        start_date_image = findViewById(R.id.start_date_image_view);
+        cal1 = findViewById(R.id.cal1);
+        cal2 = findViewById(R.id.cal2);
         scrollview = findViewById(R.id.constraintlayout);
-        end_date_image = findViewById(R.id.end_date_image_view);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
         recyclerView = findViewById(R.id.recyclerview);
@@ -164,6 +140,20 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        cal1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCalendarDialog1();
+            }
+        });
+
+        cal2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCalendarDialog2();
+            }
+        });
 
         findViewById(R.id.send_msg).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,22 +189,27 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
             public void onClick(View v) {
 
                 if(!list.isEmpty()){
-                    String line = "--------------------------------";
+                    ArrayList<BuyerRegisterModel> toRemove = new ArrayList<>();
+                    String line = "----------------------------";
                     Date dateIntermediate = new Date();
                     String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
-                    String toPrint ="\n\n"+date+"\n"+ startDate + " To " + endDate + "\nID| "  + " NAME   |" + "WEIGHT|" + "AMOUNT|\n" +line + "\n";
+                    String toPrint ="\n\n"+date+"\n"+ startDate + " To " + endDate + "\nID | "  + " NAME   |" + "WEIGHT|" + "AMOUNT|\n" +line + "\n";
 
                     double totalAmount = 0,totalWeight = 0;
                     for(BuyerRegisterModel object : list){
-                        int id = object.getId();
-                        String name = getFirstname(object.getName());
                         String amount = object.getAmount();
-                        String weight = object.getWeight();
                         if(amount.equals("0"))
-                            list.remove(object);
+                            toRemove.add(object);
+                    }
+                    list.removeAll(toRemove);
+                    for(BuyerRegisterModel object: list){
+                        int id = object.getId();
+                        String name = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getName()), 9), 9, "");
+                        String amount = StringUtils.rightPad(StringUtils.truncate(object.getAmount(),6), 6, "");
+                        String weight = StringUtils.rightPad(object.getWeight(),6,"");
                         totalAmount += Double.valueOf(amount);
                         totalWeight += Double.valueOf(weight);
-                        toPrint += id + " | "+name + " | " + weight + "|" + amount + "|\n";
+                        toPrint += StringUtils.rightPad(""+id, 3, "") + "|"+name + "|" + weight + "|" + amount + "|\n";
                     }
                     toPrint += line + "\n";
                     toPrint += "TOTAL AMOUNT: "+ totalAmount + "Rs\n";
@@ -244,8 +239,6 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
             }
         });
 
-
-        final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
         startDate = getStartDate();
         endDate = getEndDate();
         Log.d(TAG, "StartDate, endDate: " + startDate + " " + endDate);
@@ -253,59 +246,46 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
 
-        start_date_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startDatePickerDialog.show();
-            }
-        });
-        end_date_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                endDatePickerDialog.show();
-            }
-        });
-
-        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                    else{
-                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                }
-                else{
-                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    start_date_text_view.setText(startDate);
-
-                }
-            }
-        });
-
-        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                    else{
-                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                }
-                else{
-                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    end_date_text_view.setText(endDate);
-                }
-            }
-        });
+//        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//                if(String.valueOf(month).length() == 1){
+//                    if(String.valueOf(dayOfMonth).length() == 1){
+//                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+//                        start_date_text_view.setText(startDate);
+//                    }
+//                    else{
+//                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+//                        start_date_text_view.setText(startDate);
+//                    }
+//                }
+//                else{
+//                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
+//                    start_date_text_view.setText(startDate);
+//
+//                }
+//            }
+//        });
+//
+//        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//                if(String.valueOf(month).length() == 1){
+//                    if(String.valueOf(dayOfMonth).length() == 1){
+//                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+//                        end_date_text_view.setText(endDate);
+//                    }
+//                    else{
+//                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+//                        end_date_text_view.setText(endDate);
+//                    }
+//                }
+//                else{
+//                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
+//                    end_date_text_view.setText(endDate);
+//                }
+//            }
+//        });
         list = dbHelper.getBuyerRegister(startDate, endDate);
         BuyerRegisterAdapter adapter = new BuyerRegisterAdapter(BuyerRegisterActivity.this, list);
         recyclerView.setAdapter(adapter);
@@ -321,6 +301,63 @@ public class BuyerRegisterActivity extends AppCompatActivity implements DatePick
                 recyclerView.setAdapter(adapter);
             }
         });
+    }
+
+    private void showCalendarDialog1() {
+        Dialog dialog = new Dialog(BuyerRegisterActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                    else{
+                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                }
+                else{
+                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    start_date_text_view.setText(startDate);
+
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showCalendarDialog2() {
+        Dialog dialog = new Dialog(BuyerRegisterActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                    else{
+                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                }
+                else{
+                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    end_date_text_view.setText(endDate);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     private void createPdfWrapper() {

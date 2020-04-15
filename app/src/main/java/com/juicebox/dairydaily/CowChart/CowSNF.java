@@ -13,18 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,8 +24,21 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -355,23 +356,21 @@ public class CowSNF extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1 && resultCode == RESULT_OK && data != null){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             fileUri = data.getData();
-            if(fileUri != null){
-                if(fileUri.getPath().endsWith(".csv")){
+            if (fileUri != null) {
+                if (fileUri.getPath().endsWith(".csv")) {
                     progressDialog.show();
                     uploadSelectedFile();
-                }
-                else{
+                } else {
                     Toast.makeText(CowSNF.this, "Please select a CSV file.", Toast.LENGTH_LONG).show();
                 }
-            }
-            else{
+            } else {
                 Toast.makeText(CowSNF.this, "Please select a file.", Toast.LENGTH_LONG).show();
             }
             //selectedFile.setText(fileUri.getPath());
-        }
-        else{
+        } else {
             Toast.makeText(CowSNF.this, "Please select a CSV file.", Toast.LENGTH_LONG).show();
         }
     }
@@ -736,17 +735,17 @@ public class CowSNF extends AppCompatActivity implements
         ){
             ActivityCompat.requestPermissions(CowSNF.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            int permissionCheck = this.checkSelfPermission("Manifest.Permission.READ_EXTERNAL_STORAGE");
-            permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
-            if(permissionCheck != 0){
-                this.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1001);
-                this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
-            }
-            else{
-                Log.d(TAG, "checkPermission: No need to check permission, SDK version  LOLLIPOP");
-            }
-        }
+//        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
+//            int permissionCheck = this.checkSelfPermission("Manifest.Permission.READ_EXTERNAL_STORAGE");
+//            permissionCheck += this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+//            if(permissionCheck != 0){
+//                this.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1001);
+//                this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
+//            }
+//            else{
+//                Log.d(TAG, "checkPermission: No need to check permission, SDK version  LOLLIPOP");
+//            }
+//        }
     }
 
     @Override

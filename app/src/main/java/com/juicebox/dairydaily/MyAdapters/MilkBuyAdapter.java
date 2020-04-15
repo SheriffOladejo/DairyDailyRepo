@@ -4,8 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
+import static com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity.fatAverage;
 
 public class MilkBuyAdapter extends RecyclerView.Adapter<MilkBuyAdapter.ViewHolder> {
 
@@ -128,6 +129,17 @@ public class MilkBuyAdapter extends RecyclerView.Adapter<MilkBuyAdapter.ViewHold
                             helper.deleteMilkBuyEntry(unique_Id1, false);
                             list = MilkBuyEntryActivity.dbHelper.getDailyBuyData(date, shift);
                             Log.d(TAG, "list size: " + list.size());
+                            MilkBuyEntryActivity.weightTotal = 0;
+                            MilkBuyEntryActivity.amountTotal = 0;
+                            MilkBuyEntryActivity.averageFat = 0;
+                            for(DailyBuyObject model : list){
+                                MilkBuyEntryActivity.weightTotal += Double.valueOf(model.getWeight());
+                                MilkBuyEntryActivity.amountTotal += Double.valueOf(model.getAmount());
+                                MilkBuyEntryActivity.averageFat += Double.valueOf(model.getFat());
+                            }
+                            MilkBuyEntryActivity.totalAmount.setText(String.valueOf(truncate(MilkBuyEntryActivity.amountTotal)) + "Rs");
+                            MilkBuyEntryActivity.totalWeight.setText(String.valueOf(truncate(MilkBuyEntryActivity.weightTotal)) + "Ltr");
+                            fatAverage.setText(String.valueOf(truncate(MilkBuyEntryActivity.averageFat/list.size())) + "%");
                             MilkBuyAdapter adapter = new MilkBuyAdapter(context, list);
                             MilkBuyEntryActivity.recyclerView.setAdapter(adapter);
                             new BackupHandler(context);

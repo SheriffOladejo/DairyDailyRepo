@@ -1,12 +1,13 @@
 package com.juicebox.dairydaily.MyAdapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.juicebox.dairydaily.Models.AddProductModel;
 import com.juicebox.dairydaily.Others.ProductSpinnerItem;

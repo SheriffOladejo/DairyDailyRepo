@@ -1,14 +1,15 @@
 package com.juicebox.dairydaily.Others;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
@@ -77,8 +78,7 @@ public class PhoneAuth extends AppCompatActivity {
                 // This callback is invoked if an invalid request for verification is made,
                 // for instance if the the phone number format is not valid.
 
-                if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                } else if (e instanceof FirebaseTooManyRequestsException) {
+                if (e instanceof FirebaseTooManyRequestsException) {
                     // An Error 419 means too many requests have been made and you ahve to upgrade plan.
                     useSnackBar("Error 419", linearLayout);
                 }
@@ -148,10 +148,7 @@ public class PhoneAuth extends AppCompatActivity {
                             // Sign in failed, display a message and update the UI
                             //Log.w(TAG, "signInWithCredential:failure", task.getException());
                             useSnackBar("Sign in failed", linearLayout);
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                // The verification code entered was invalid
-                                useSnackBar("Invalid verification code", linearLayout);
-                            }
+                            task.getException();
                         }
                     }
                 });

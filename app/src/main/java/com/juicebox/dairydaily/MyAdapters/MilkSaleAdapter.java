@@ -4,8 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,6 +128,17 @@ MilkSaleAdapter extends RecyclerView.Adapter<MilkSaleAdapter.ViewHolder> {
                             helper.deleteReceiveCash(user_Id, "delete_from_milk_sale",date);
                             list = MilkSaleEntryActivity.dbHelper.getDailySalesData(date, shift);
                             Log.d(TAG, "list size: " + list.size());
+                            MilkSaleEntryActivity.weightTotal = 0;
+                            MilkSaleEntryActivity.amountTotal = 0;
+                            MilkSaleEntryActivity.averageFat = 0;
+                            for(DailySalesObject model : list){
+                                MilkSaleEntryActivity.weightTotal += Double.valueOf(model.getWeight());
+                                MilkSaleEntryActivity.amountTotal += Double.valueOf(model.getAmount());
+                                MilkSaleEntryActivity.averageFat += Double.valueOf(model.getRate());
+                            }
+                            MilkSaleEntryActivity.totalAmount.setText(String.valueOf(truncate(MilkSaleEntryActivity.amountTotal)) + "Rs");
+                            MilkSaleEntryActivity.totalWeight.setText(String.valueOf(truncate(MilkSaleEntryActivity.weightTotal)) + "Ltr");
+                            MilkSaleEntryActivity.fatAverage.setText(String.valueOf(truncate(MilkSaleEntryActivity.averageFat/list.size())) + "%");
                             MilkSaleAdapter adapter = new MilkSaleAdapter(list, context);
                             MilkSaleEntryActivity.recyclerView.setAdapter(adapter);
                             new BackupHandler(context);

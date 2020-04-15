@@ -4,10 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,16 +32,8 @@ public class BackupHandler {
 
     Context context;
     DbHelper dbHelper;
-    ProgressDialog pd;
 
     public BackupHandler(Context context){
-
-        pd = new ProgressDialog(context);
-        pd.setTitle("Updating");
-        pd.setMessage("Please Wait...");
-        pd.setCancelable(false);
-        pd.show();
-
         this.context = context;
         dbHelper = new DbHelper(context);
 
@@ -51,7 +43,6 @@ public class BackupHandler {
         }
         else{
             toast(context, "Please connect to the internet");
-            pd.dismiss();
         }
 
     }
@@ -209,7 +200,7 @@ public class BackupHandler {
             });
         }
         else{
-            toast(context, "Seller data is 0");
+            //toast(context, "Seller data is 0");
         }
 
         if(allBuyers.getCount() != 0){
@@ -248,7 +239,7 @@ public class BackupHandler {
             });
         }
         else{
-            toast(context, "Buyer data is 0");
+            //toast(context, "Buyer data is 0");
             backupMilksaleData();
         }
     }
@@ -413,7 +404,12 @@ public class BackupHandler {
             });
         }
         else{
-            pd.dismiss();
+            try{
+
+            }
+            catch (Exception e){
+
+            }
             //toast(context, "Data uploaded successfully");
         }
 
@@ -441,12 +437,6 @@ public class BackupHandler {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
                             toast(context, "Data uploaded successfully");
-                            try{
-                                pd.dismiss();
-                            }
-                            catch (Exception e){
-
-                            }
                         }
                         else{
                             toast(context, "Unable to backup");
@@ -459,7 +449,11 @@ public class BackupHandler {
             }
         }
         else{
-            pd.dismiss();
+            try{
+            }
+            catch (Exception e){
+
+            }
         }
     }
 

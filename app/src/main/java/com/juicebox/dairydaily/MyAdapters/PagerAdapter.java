@@ -1,12 +1,16 @@
 package com.juicebox.dairydaily.MyAdapters;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.juicebox.dairydaily.CowChart.CowTab1;
+import com.juicebox.dairydaily.CowChart.CowTab10;
 import com.juicebox.dairydaily.CowChart.CowTab11;
+import com.juicebox.dairydaily.CowChart.CowTab12;
 import com.juicebox.dairydaily.CowChart.CowTab13;
+import com.juicebox.dairydaily.CowChart.CowTab14;
+import com.juicebox.dairydaily.CowChart.CowTab15;
 import com.juicebox.dairydaily.CowChart.CowTab16;
 import com.juicebox.dairydaily.CowChart.CowTab17;
 import com.juicebox.dairydaily.CowChart.CowTab18;
@@ -15,15 +19,11 @@ import com.juicebox.dairydaily.CowChart.CowTab2;
 import com.juicebox.dairydaily.CowChart.CowTab20;
 import com.juicebox.dairydaily.CowChart.CowTab3;
 import com.juicebox.dairydaily.CowChart.CowTab4;
+import com.juicebox.dairydaily.CowChart.CowTab5;
 import com.juicebox.dairydaily.CowChart.CowTab6;
+import com.juicebox.dairydaily.CowChart.CowTab7;
 import com.juicebox.dairydaily.CowChart.CowTab8;
 import com.juicebox.dairydaily.CowChart.CowTab9;
-import com.juicebox.dairydaily.CowChart.CowTab10;
-import com.juicebox.dairydaily.CowChart.CowTab12;
-import com.juicebox.dairydaily.CowChart.CowTab14;
-import com.juicebox.dairydaily.CowChart.CowTab15;
-import com.juicebox.dairydaily.CowChart.CowTab5;
-import com.juicebox.dairydaily.CowChart.CowTab7;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
 

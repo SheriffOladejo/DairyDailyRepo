@@ -2,6 +2,7 @@ package com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,31 +10,33 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -44,30 +47,23 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.juicebox.dairydaily.Models.BuyerRegisterModel;
-import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.Models.ReceiveCashModel;
-import com.juicebox.dairydaily.Models.ReportByDateModels;
-import com.juicebox.dairydaily.MyAdapters.BuyerRegisterAdapter;
 import com.juicebox.dairydaily.MyAdapters.ReceiveCashAdapter;
-import com.juicebox.dairydaily.MyAdapters.ReportByDateAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
-import com.juicebox.dairydaily.Others.LoadingBar;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.ReceiveCashDialog;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity;
-import com.juicebox.dairydaily.UI.UsersListActivity;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -76,18 +72,13 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import io.paperdb.Paper;
 
-import static com.juicebox.dairydaily.Others.UtilityMethods.getDateRange;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getEndDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getFirstname;
-import static com.juicebox.dairydaily.Others.UtilityMethods.getMonth;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
@@ -97,8 +88,6 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
     private static final int PERMISSION_REQUEST_CODE = 1;
     File pdfFile;
     TextView nameView;
-    ImageView start_date_image;
-    ImageView end_date_image;
     TextView start_date_text_view, end_date_text_view;
 
     private static final String TAG = "ReceiveCashActivity";
@@ -118,6 +107,62 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         creditTotal = 0;
         debitTotal = 0;
         remain = 0;
+    }
+
+    private void showCalendarDialog1() {
+        Dialog dialog = new Dialog(ReceiveCashActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                    else{
+                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                }
+                else{
+                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    start_date_text_view.setText(startDate);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showCalendarDialog2() {
+        Dialog dialog = new Dialog(ReceiveCashActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        endDate = year+ "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                    else{
+                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                }
+                else{
+                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    end_date_text_view.setText(endDate);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     ProgressDialog loadingBar;
@@ -141,6 +186,7 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
     public static TextView totalCredit;
     public static TextView totalDebit;
     public static TextView remaining;
+    RelativeLayout cal1, cal2;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -156,6 +202,8 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         loadingBar = new ProgressDialog(this);
 
         drawerLayout = findViewById(R.id.drawerlayout);
+        cal1 = findViewById(R.id.cal1);
+        cal2 = findViewById(R.id.cal2);
         navigationView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
@@ -167,8 +215,6 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
         idInt = getIntent().getIntExtra("id", 0);
         name = getIntent().getStringExtra("name");
 
-        start_date_image = findViewById(R.id.start_date_image);
-        end_date_image = findViewById(R.id.end_date_image_view);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
         go = findViewById(R.id.go);
@@ -260,72 +306,22 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
                 }
         );
 
-        final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
         startDate = getStartDate();
         endDate = getEndDate();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
 
-        start_date_image.setOnClickListener(new View.OnClickListener() {
+        cal1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDatePickerDialog.show();
+                showCalendarDialog1();
             }
         });
-        end_date_image.setOnClickListener(new View.OnClickListener() {
+        cal2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endDatePickerDialog.show();
-            }
-        });
-
-        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                    else{
-                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                }
-                else{
-                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    start_date_text_view.setText(startDate);
-                }
-            }
-        });
-
-        findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingBar.setTitle("Wait...");
-                loadingBar.show();
-                createPdfWrapper();
-            }
-        });
-
-        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        endDate = year+ "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                    else{
-                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                }
-                else{
-                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    end_date_text_view.setText(endDate);
-                }
+                showCalendarDialog2();
             }
         });
 
@@ -575,15 +571,14 @@ public class ReceiveCashActivity extends AppCompatActivity implements DatePicker
                 String line = "------------------------------";
                 Date dateIntermediate = new Date();
                 String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-                String toPrint ="\nID| " +idInt + "   " + dbHelper.getBuyerName(idInt) + "\n"+date + "\n"+ startDate + " To " + endDate + "\n   Date   |"  + "Title|" + "Debit|" + "Credit|\n" +line + "\n";
+                String toPrint ="\nID |" +idInt + "   " + dbHelper.getBuyerName(idInt) + "\n"+date + "\n"+ startDate + " To " + endDate + "\n   Date   |"  + "Title|" + "Debit |" + "Credit|\n" +line + "\n";
 
                 for(ReceiveCashModel object : list){
-                    int idInt = object.getId();
-                    String title = getFirstname(object.getTitle());
-                    String credit = object.getCredit();
-                    String debit = object.getDebit();
+                    String title = StringUtils.rightPad(getFirstname(StringUtils.truncate(object.getTitle(), 5)), 5, "");
+                    String credit = StringUtils.rightPad(StringUtils.truncate(object.getCredit(),6), 6, "");
+                    String debit = StringUtils.rightPad(StringUtils.truncate(object.getDebit(),6), 6, "");
                     String datee = object.getDate();
-                    toPrint += datee + "|"+title + " | " + truncate(Double.valueOf(credit)) + "|" + truncate(Double.valueOf(debit)) + "|\n";
+                    toPrint += datee + "|"+title + "|" + StringUtils.rightPad(truncate(Double.valueOf(debit)), 6, "") + "|" + StringUtils.rightPad(truncate(Double.valueOf(credit)), 6, "") + "|\n";
                 }
                 toPrint += line + "\n";
                 toPrint += "TOTAL CREDIT: "+ truncate(creditTotal) + "Rs\n";

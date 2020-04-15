@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -81,7 +82,15 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                 String titleString = title.getText().toString();
                 String amountString = amount.getText().toString();
                 Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                String date;
+                try{
+                    DateFormat df = new DateFormat();
+                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                }
+                catch(Exception e){
+                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                }
+
 
                 if(titleString.isEmpty() || amountString.isEmpty()){
                     toast(context, "Fields should be filled");

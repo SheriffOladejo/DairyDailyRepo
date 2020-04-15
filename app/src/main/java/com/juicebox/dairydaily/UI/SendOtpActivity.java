@@ -1,51 +1,35 @@
 package com.juicebox.dairydaily.UI;
 
-import android.Manifest;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.juicebox.dairydaily.CowChart.CowSNF;
-import com.juicebox.dairydaily.Others.DbHelper;
-import com.juicebox.dairydaily.Others.Prevalent;
-import com.juicebox.dairydaily.R;
-import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.juicebox.dairydaily.Others.DbHelper;
+import com.juicebox.dairydaily.Others.Prevalent;
+import com.juicebox.dairydaily.R;
+import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import io.paperdb.Paper;
 
 import static com.juicebox.dairydaily.Others.UtilityMethods.hideKeyboard;
+import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class SendOtpActivity extends AppCompatActivity {
@@ -66,6 +51,7 @@ public class SendOtpActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     ProgressDialog progressDialog;
     TextView countDownTimer;
+    ProgressDialog progressDialog1;
 
     String firstname;
     String lastname;
@@ -150,10 +136,7 @@ public class SendOtpActivity extends AppCompatActivity {
                 // This callback is invoked if an invalid request for verification is made,
                 // for instance if the the phone number format is not valid.
 
-                if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                    Log.d(TAG, "onVerificationFailed: " + "Ran out of quota");
-                    useSnackBar("Ran out of quota", linearLayout);
-                } else if (e instanceof FirebaseTooManyRequestsException) {
+                if (e instanceof FirebaseTooManyRequestsException) {
                     // An Error 419 means too many requests have been made and you ahve to upgrade plan.
                     Log.d(TAG, "onVerificationFailed: " + "Error 419");
                     useSnackBar("Error 419", linearLayout);
@@ -198,19 +181,26 @@ public class SendOtpActivity extends AppCompatActivity {
                 otpCode = otp.getText().toString();
                 if(otpCode.isEmpty())
                     otp.setError("OTP is required");
-                ProgressDialog progressDialog = new ProgressDialog(SendOtpActivity.this);
-                progressDialog.setTitle("Verifying");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-                sendVerificationCode(otpCode);
+                else{
+                    progressDialog1 = new ProgressDialog(SendOtpActivity.this);
+                    progressDialog1.setTitle("Verifying");
+                    progressDialog1.setCancelable(false);
+                    progressDialog1.show();
+                    sendVerificationCode(otpCode);
+                }
             }
         });
     }
 
     // Primary method that sends the verifies the code sent to user.
     private void sendVerificationCode(String number){
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, number);
-        signInWithPhoneAuthCredential(credential);
+        try{
+            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, number);
+            signInWithPhoneAuthCredential(credential);
+        }
+        catch(Exception e){
+            toast(SendOtpActivity.this, "Invalid OTP");
+        }
     }
 
     // Method that signs user in with verification code.
@@ -228,10 +218,7 @@ public class SendOtpActivity extends AppCompatActivity {
                             // Sign in failed, display a message and update the UI
                             //Log.w(TAG, "signInWithCredential:failure", task.getException());
                             useSnackBar("Operation Failed", linearLayout);
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                // The verification code entered was invalid
-                                useSnackBar("Invalid verification code", linearLayout);
-                            }
+                            progressDialog1.dismiss();
                         }
                     }
                 });

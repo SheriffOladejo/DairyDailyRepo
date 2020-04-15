@@ -2,44 +2,42 @@ package com.juicebox.dairydaily.UI.Dashboard.ViewReport;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelUuid;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -50,60 +48,41 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.juicebox.dairydaily.Models.BuyerRegisterModel;
-import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.Models.PaymentRegisterModel;
-import com.juicebox.dairydaily.Models.ReportByDateModels;
-import com.juicebox.dairydaily.MyAdapters.BuyerRegisterAdapter;
 import com.juicebox.dairydaily.MyAdapters.PaymentRegisterAdapter;
-import com.juicebox.dairydaily.MyAdapters.ShiftReportAdapter;
 import com.juicebox.dairydaily.Others.BackupHandler;
 import com.juicebox.dairydaily.Others.DbHelper;
 import com.juicebox.dairydaily.Others.Logout;
 import com.juicebox.dairydaily.Others.Prevalent;
-import com.juicebox.dairydaily.Others.SelectPrinterDialog;
-import com.juicebox.dairydaily.Others.SpinnerItem;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.BluetoothConnectionService;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.BuyMilk.MilkBuyEntryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.juicebox.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
-import com.juicebox.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
-import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import io.paperdb.Paper;
 
-import static com.juicebox.dairydaily.Others.UtilityMethods.getDateRange;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getEndDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getFirstname;
-import static com.juicebox.dairydaily.Others.UtilityMethods.getMonth;
 import static com.juicebox.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.juicebox.dairydaily.Others.UtilityMethods.toast;
 import static com.juicebox.dairydaily.Others.UtilityMethods.truncate;
-import static com.juicebox.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class PaymentRegisterActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
 
@@ -111,14 +90,12 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
     File pdfFile;
     private final int REQUEST_READ_PHONE_STATE = 1;
 
-    ImageView start_date_image;
-    ImageView end_date_image;
     TextView start_date_text_view, end_date_text_view;
     private static BluetoothConnectionService bluetoothConnectionService;
     RadioButton start_morning_radio, start_evening_radio, end_morning_radio, end_evening_radio;
     String startDate, endDate;
     String startShift = "", endShift="";
-    ArrayList<PaymentRegisterModel> list;
+    ArrayList<PaymentRegisterModel> list = new ArrayList<>();
     public static ArrayList<PaymentRegisterModel> selectedUsers = new ArrayList<>();
 
     DrawerLayout drawerLayout;
@@ -139,8 +116,7 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
 
     Button go;
 
-    DatePickerDialog startDatePickerDialog;
-    DatePickerDialog endDatePickerDialog;
+    RelativeLayout cal1, cal2;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -164,10 +140,10 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
 
         initDashboard();
 
-        start_date_image = findViewById(R.id.start_date_image_view);
         scrollview = findViewById(R.id.constraintlayout);
         print = findViewById(R.id.print);
-        end_date_image = findViewById(R.id.end_date_image_view);
+        cal1 = findViewById(R.id.cal1);
+        cal2 = findViewById(R.id.cal2);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
         start_morning_radio = findViewById(R.id.start_morning_radio);
@@ -213,27 +189,39 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
             public void onClick(View v) {
 
                 if(!list.isEmpty()){
-
+                    String line = "----------------------------";
                     Date dateIntermediate = new Date();
-                    String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                    String date;
+                    try{
+                        DateFormat df = new DateFormat();
+                        date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                    }
+                    catch(Exception e){
+                        date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                    }
                     String toPrint = "\nDATE | " + date + "\n";
-                    toPrint += startDate + " To " + endDate + "\nID| " + "  NAME  |" + "WEIGHT|" + "AMOUNT\n";
-
+                    toPrint += startDate + " To " + endDate + "\nID | " + "  NAME  |" + "WEIGHT|" + "AMOUNT\n" + line + "\n";
+                    ArrayList<PaymentRegisterModel> toRemove = new ArrayList<>();
                     weightTotal = 0;
                     amountTotal = 0;
                     for(PaymentRegisterModel object : list){
-                        int id = object.getId();
-                        String name = getFirstname(object.getName());
                         String amount = object.getAmount();
-                        String weight = object.getWeight();
                         if(amount.equals("0"))
-                            list.remove(object);
+                            toRemove.add(object);
+                    }
+                    list.removeAll(toRemove);
+                    for(PaymentRegisterModel object : list){
+                        int id = object.getId();
+                        String name = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getName()), 9), 9, "");
+                        String amount = StringUtils.rightPad(StringUtils.truncate(object.getAmount(),6), 6, "");
+                        String weight = StringUtils.rightPad(object.getWeight(), 6, "");
                         weightTotal += Double.valueOf(object.getWeight());
                         amountTotal += Double.valueOf(object.getAmount());
-                        toPrint += id + "|" +name + " | " + weight + "| " + amount + "| \n";
+                        toPrint += StringUtils.rightPad(""+id, 3, "") + "|" +name + "|" + weight + "|" + amount + "| \n";
                     }
-                    toPrint += "TOTAL AMOUNT: " + truncate(amountTotal) + "Rs";
-                    toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr\n\n   DAIRYDAILY APP";
+                    toPrint += line + "\nTOTAL AMOUNT: " + truncate(amountTotal) + "Rs";
+                    toPrint += "\nTOTAL WEIGHT: " + weightTotal +  "Ltr\n" + line + "\n";
+                    toPrint += "\n        DAIRYDAILY APP";
                     Log.d(TAG, "toPrint: " + toPrint);
 
                     byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
@@ -309,29 +297,34 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
             }
         });
 
-        final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
         startDate = getStartDate();
         endDate = getEndDate();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
 
-        start_date_image.setOnClickListener(new View.OnClickListener() {
+        cal1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDatePickerDialog.show();
+                showCalendarDialog1();
             }
         });
-        end_date_image.setOnClickListener(new View.OnClickListener() {
+        cal2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endDatePickerDialog.show();
+                showCalendarDialog2();
             }
         });
+    }
 
-        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+    private void showCalendarDialog1() {
+        Dialog dialog = new Dialog(PaymentRegisterActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 if(String.valueOf(month).length() == 1){
                     if(String.valueOf(dayOfMonth).length() == 1){
                         startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
@@ -346,12 +339,20 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
                     startDate = year + "-" + (month+1) + "-" + dayOfMonth;
                     start_date_text_view.setText(startDate);
                 }
+                dialog.dismiss();
             }
         });
+        dialog.show();
+    }
 
-        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+    private void showCalendarDialog2() {
+        Dialog dialog = new Dialog(PaymentRegisterActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 if(String.valueOf(month).length() == 1){
                     if(String.valueOf(dayOfMonth).length() == 1){
                         endDate = year+ "-0" + (month+1) + "-" + "0"+dayOfMonth;
@@ -366,8 +367,10 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
                     endDate = year + "-" + (month+1) + "-" + dayOfMonth;
                     end_date_text_view.setText(endDate);
                 }
+                dialog.dismiss();
             }
         });
+        dialog.show();
     }
 
     private void createPdfWrapper() {
@@ -519,7 +522,14 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 // Send user's phone number for verification
                 Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+                String date;
+                try{
+                    DateFormat df = new DateFormat();
+                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                }
+                catch(Exception e){
+                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                }
                 Paper.book().write(Prevalent.last_update, date);
                 new BackupHandler(PaymentRegisterActivity.this);
             }
@@ -614,7 +624,14 @@ public class PaymentRegisterActivity extends AppCompatActivity implements DatePi
 
         int id = item.getItemId();
         Date dateIntermediate = new Date();
-        String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+        String date;
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+        }
 
         if(selectedUsers.size() >0 ){
             String toPrint = "DATE | " + date + "\n";

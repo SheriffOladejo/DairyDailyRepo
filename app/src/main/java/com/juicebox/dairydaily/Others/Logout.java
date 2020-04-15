@@ -4,12 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
@@ -29,6 +31,7 @@ public class Logout extends AppCompatActivity {
     public Logout(Context context){
         this.context = context;
         helper = new DbHelper(context);
+        FirebaseAuth.getInstance().signOut();
         logout();
     }
 
@@ -87,7 +90,6 @@ public class Logout extends AppCompatActivity {
                         }
                     }
                 });
-
             }
         }.start();
     }

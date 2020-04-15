@@ -1,10 +1,9 @@
 package com.juicebox.dairydaily.UI.Dashboard.ViewReport;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
-import com.juicebox.dairydaily.R;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Experiment extends AppCompatActivity {
     @Override

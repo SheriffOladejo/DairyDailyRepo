@@ -2,26 +2,33 @@ package com.juicebox.dairydaily.UI.Dashboard.DrawerLayout;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.juicebox.dairydaily.Models.DailyBuyObject;
 import com.juicebox.dairydaily.Models.DailySalesObject;
 import com.juicebox.dairydaily.MyAdapters.MilkBuyAdapter;
@@ -33,6 +40,7 @@ import com.juicebox.dairydaily.Others.Prevalent;
 import com.juicebox.dairydaily.Others.WarningDialog;
 import com.juicebox.dairydaily.R;
 import com.juicebox.dairydaily.UI.Dashboard.DashboardActivity;
+import com.juicebox.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,13 +57,12 @@ public class DeleteHistory extends AppCompatActivity {
     ArrayList<DailyBuyObject> buyObjects;
     ArrayList<DailySalesObject> salesObjects;
 
-    ImageView start_date_image;
-    ImageView end_date_image;
     TextView start_date_text_view, end_date_text_view;
     String startDate, endDate;
     ConstraintLayout scrollview;
     private DbHelper dbHelper;
     RecyclerView sales, buys;
+    RelativeLayout cal1, cal2;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
@@ -72,10 +79,8 @@ public class DeleteHistory extends AppCompatActivity {
 
         // Initialize widgets
         initDashboard();
-        start_date_image = findViewById(R.id.start_date_image_view);
         scrollview = findViewById(R.id.constraintlayout);
         navigationView = findViewById(R.id.nav_view);
-        end_date_image = findViewById(R.id.end_date_image_view);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
         sales = findViewById(R.id.recyclerview);
@@ -89,66 +94,27 @@ public class DeleteHistory extends AppCompatActivity {
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
         startDate = getStartDate();
         endDate = getEndDate();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
+        cal1 = findViewById(R.id.cal1);
+        cal2 =findViewById(R.id.cal2);
 
-        start_date_image.setOnClickListener(new View.OnClickListener() {
+        cal1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDatePickerDialog.show();
+                showCalendarDialog1();
             }
         });
-        end_date_image.setOnClickListener(new View.OnClickListener() {
+        cal2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endDatePickerDialog.show();
+                showCalendarDialog2();
             }
         });
 
-        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                    else{
-                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        start_date_text_view.setText(startDate);
-                    }
-                }
-                else{
-                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    start_date_text_view.setText(startDate);
-
-                }
-            }
-        });
-
-        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                if(String.valueOf(month).length() == 1){
-                    if(String.valueOf(dayOfMonth).length() == 1){
-                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                    else{
-                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-                        end_date_text_view.setText(endDate);
-                    }
-                }
-                else{
-                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-                    end_date_text_view.setText(endDate);
-                }
-            }
-        });
         // Hook up the "Go" button
         findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,6 +160,63 @@ public class DeleteHistory extends AppCompatActivity {
         });
     }
 
+    private void showCalendarDialog1() {
+        Dialog dialog = new Dialog(DeleteHistory.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                    else{
+                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        start_date_text_view.setText(startDate);
+                    }
+                }
+                else{
+                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    start_date_text_view.setText(startDate);
+
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showCalendarDialog2() {
+        Dialog dialog = new Dialog(DeleteHistory.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.calendar_view_dialog);
+        CalendarView cal = dialog.findViewById(R.id.calendar_view);
+        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                if(String.valueOf(month).length() == 1){
+                    if(String.valueOf(dayOfMonth).length() == 1){
+                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                    else{
+                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
+                        end_date_text_view.setText(endDate);
+                    }
+                }
+                else{
+                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
+                    end_date_text_view.setText(endDate);
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
     void initDashboard(){
         findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,7 +255,15 @@ public class DeleteHistory extends AppCompatActivity {
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 // Send user's phone number for verification
                 Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
+                String date;
+                try{
+                    DateFormat df = new DateFormat();
+                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                }
+                catch(Exception e){
+                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                }
+
                 Paper.book().write(Prevalent.last_update, date);
                 new BackupHandler(DeleteHistory.this);
             }
