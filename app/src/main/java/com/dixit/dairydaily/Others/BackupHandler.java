@@ -30,16 +30,11 @@ import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 public class BackupHandler {
 
     Context context;
-    ProgressDialog progressDialog;
     DbHelper dbHelper;
 
     public BackupHandler(Context context){
         this.context = context;
         dbHelper = new DbHelper(context);
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setCancelable(true);
-        progressDialog.setMessage("Updating");
-        progressDialog.show();
 
         checkInternetConnect();
         if(isInternetConnected) {
@@ -234,10 +229,6 @@ public class BackupHandler {
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
                         backupMilksaleData();
-                        try{
-                            progressDialog.dismiss();
-                        }
-                        catch(Exception e){}
                         toast(context, "Data uploaded successfully");
 
                     }
@@ -445,10 +436,6 @@ public class BackupHandler {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-                            try{
-                                progressDialog.dismiss();
-                            }
-                            catch (Exception e){}
                             toast(context, "Data uploaded successfully");
                         }
                         else{
