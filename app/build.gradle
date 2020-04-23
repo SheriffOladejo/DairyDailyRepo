@@ -17,7 +17,7 @@ android {
     }
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.juicebox.dairydaily"
+        applicationId "com.dixit.dairydaily"
         minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
