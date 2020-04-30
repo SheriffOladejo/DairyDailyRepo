@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI.Dashboard.ViewReport;
+package com.dixit.dairydaily.UI.Dashboard.ViewSellerReport;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
@@ -20,8 +20,6 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -29,14 +27,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -50,18 +47,10 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.dixit.dairydaily.Models.CustomerReportModel;
 import com.dixit.dairydaily.MyAdapters.CustomerReportAdapter;
-import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
-import com.dixit.dairydaily.Others.Logout;
 import com.dixit.dairydaily.Others.Prevalent;
-import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 import com.dixit.dairydaily.UI.UsersListActivity;
 
 import org.apache.commons.lang3.StringUtils;
@@ -85,7 +74,7 @@ import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class CustomerReportActivity  extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
+public class CustomerReportActivity extends InitDrawerBoard implements DatePickerDialog.OnDateSetListener{
 
     private static final String TAG = "CustomerReportActivity";
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -203,6 +192,10 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
                     toPrint += startDate + " TO " + endDate + "\n"+line +  "\n DATE | " + "FAT/SNF |" +"WEIGHT|" + "AMOUNT\n";
                     toPrint += line + "\n";
 
+                    totalAmount = 0;
+                    totalWeight = 0;
+                    averageFat = 0;
+                    averageSnf = 0;
 
                     for(CustomerReportModel object : list){
                         String date = object.getDate();
@@ -250,7 +243,7 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
         });
         startDate = getStartDate();
         endDate = getEndDate();
-        initDashboard();
+        initDrawer();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
@@ -292,6 +285,7 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
                     }
                     else{
                         list = dbHelper.getCustomerReport(idInt, startDate, endDate);
+                        Collections.reverse(list);
                         CustomerReportAdapter adapter = new CustomerReportAdapter(CustomerReportActivity.this, list);
                         recyclerView.setAdapter(adapter);
                         for(CustomerReportModel model : list){
@@ -507,7 +501,9 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
 
         document.add(table1);
 
-        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
+        toast(CustomerReportActivity.this, "PDF saved to " + docFolder.getPath() + "/" +datee + ".pdf");
+        String link = "http://play.google.com/store/apps/details?id=" + getPackageName();
+        document.add(new Paragraph("Download DairyDaily app from google playstore:\n" + link ,f));
         document.close();
         previewPdf();
     }
@@ -526,138 +522,6 @@ public class CustomerReportActivity  extends AppCompatActivity implements DatePi
             newIntent.setDataAndType(uri, "application/pdf");
             startActivity(newIntent);
         }
-    }
-
-    void initDashboard(){
-        findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CustomerReportActivity.this, ProfileActivity.class));
-            }
-        });
-        findViewById(R.id.dashboard).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CustomerReportActivity.this, DashboardActivity.class));
-                finish();
-            }
-        });
-        findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CustomerReportActivity.this, ViewAllEntryActivity.class));
-            }
-        });
-        findViewById(R.id.milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CustomerReportActivity.this, MilkHistoryActivity.class));
-            }
-        });
-        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Logout(CustomerReportActivity.this);
-            }
-        });
-        findViewById(R.id.recover_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new WarningDialog(CustomerReportActivity.this).show();
-            }
-        });
-        findViewById(R.id.backup_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityCompat.requestPermissions(CustomerReportActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                // Send user's phone number for verification
-                Date dateIntermediate = new Date();
-                String date;
-                try{
-                    DateFormat df = new DateFormat();
-                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
-                }
-                catch(Exception e){
-                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
-                }
-
-                Paper.book().write(Prevalent.last_update, date);
-                new BackupHandler(CustomerReportActivity.this);
-            }
-        });
-
-        LinearLayout backup, recover, update_rate_charts, erase_milk_history;
-        ImageView arrow = findViewById(R.id.arrow);
-        final boolean[] arrowClicked = {false};
-        backup = findViewById(R.id.backup_data);
-        erase_milk_history = findViewById(R.id.erase_milk_history);
-        update_rate_charts = findViewById(R.id.update_rate_charts);
-        recover = findViewById(R.id.recover_data);
-        update_rate_charts.setVisibility(View.GONE);
-        erase_milk_history.setVisibility(View.GONE);
-        backup.setVisibility(View.GONE);
-        recover.setVisibility(View.GONE);
-        findViewById(R.id.erase_milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CustomerReportActivity.this, DeleteHistory.class));
-            }
-        });
-        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        arrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CustomerReportActivity.this, UpgradeToPremium.class));
-            }
-        });
-        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     @Override

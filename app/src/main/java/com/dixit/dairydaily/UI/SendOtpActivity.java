@@ -63,6 +63,7 @@ public class SendOtpActivity extends AppCompatActivity {
     String email;
     String city;
     String state;
+    String date_created;
 
     DbHelper helper;
 
@@ -82,6 +83,7 @@ public class SendOtpActivity extends AppCompatActivity {
         email = getIntent().getStringExtra("Email");
         city = getIntent().getStringExtra("City");
         state = getIntent().getStringExtra("State");
+        date_created = getIntent().getStringExtra("Date Created");
         country_code += phoneNumber;
         phoneNumber = country_code;
 
@@ -147,7 +149,7 @@ public class SendOtpActivity extends AppCompatActivity {
                     useSnackBar("Error 419", linearLayout);
                 }
                 Log.d(TAG, "onVerificationFailed: " + e.getMessage());
-                useSnackBar("Unable to Sign Up. Invalid Phone Number", linearLayout);
+                toast(SendOtpActivity.this, e.getMessage());
                 progressDialog.dismiss();
                 startActivity(new Intent(SendOtpActivity.this, LoginActivity.class));
                 finish();
@@ -249,6 +251,7 @@ public class SendOtpActivity extends AppCompatActivity {
         details.put("City", city);
         details.put("State", state);
         details.put("Address", address);
+        details.put("Date Created", date_created);
         details.put("Expiry Date", String.valueOf(c.getTime().getTime()));
 
         Paper.book().write(Prevalent.offline_password, offline_password);
@@ -279,7 +282,7 @@ public class SendOtpActivity extends AppCompatActivity {
                 }
                 else{
                     progressDialog.dismiss();
-                    useSnackBar("Sign up failed", linearLayout);
+                    toast(SendOtpActivity.this, "Something went wrong, contact admin");
                     startActivity(new Intent(SendOtpActivity.this, LoginActivity.class));
                     finish();
                 }

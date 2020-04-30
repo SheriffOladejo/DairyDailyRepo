@@ -61,7 +61,7 @@ public class UsersListActivity extends AppCompatActivity {
             populateSellerView();
         else if(from.equals("MilkSaleEntryActivity"))
             populateBuyerView();
-        else if(from.equals("ViewReport"))
+        else if(from.equals("ViewSellerReport"))
             populateBuyerView();
         else if(from.equals("CustomerReportActivity"))
             populateSellerView();
@@ -169,7 +169,7 @@ public class UsersListActivity extends AppCompatActivity {
 //            startActivity(intent);
             finish();
         }
-        else if(from.equals("ViewReport")){
+        else if(from.equals("ViewSellerReport")){
 //            Intent intent = new Intent(UsersListActivity.this, ViewReportByDateActivity.class);
 //            intent.putExtra("Shift", shift);
 //            intent.putExtra("Date", date);

@@ -67,7 +67,6 @@ public class ViewBuyerReportActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ViewBuyerReportActivity.this, DashboardActivity.class));
         finish();
     }
 }

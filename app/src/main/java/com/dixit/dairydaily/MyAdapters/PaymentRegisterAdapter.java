@@ -16,7 +16,7 @@ import com.dixit.dairydaily.R;
 import java.util.ArrayList;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
-import static com.dixit.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity.selectedUsers;
+import static com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.PaymentRegisterActivity.selectedUsers;
 
 public class PaymentRegisterAdapter extends RecyclerView.Adapter<PaymentRegisterAdapter.ViewHolder> {
     Context context;

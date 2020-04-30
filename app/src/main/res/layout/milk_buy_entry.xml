@@ -141,6 +141,7 @@
                         android:background="@drawable/rectangle_border"
                         android:textColorHint="@android:color/white"
                         android:hint="Rs/Ltr"
+                        android:inputType="number"
                         android:textAlignment="center"
                         android:textColor="#ffffff"
                         android:textSize="18sp" />
@@ -290,6 +291,7 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/rectangle_border"
         android:backgroundTint="@color/colorAccent"
+        android:shadowColor="#00575252"
         android:text="Save"
         android:textAllCaps="false"
         android:textColor="#ffffff"

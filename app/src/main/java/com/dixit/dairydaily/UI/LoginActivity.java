@@ -36,6 +36,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -83,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
     AutoCompleteTextView actCity;
     public static String expiry = "";
 
-    private static int logged_in = 0;
+    public static boolean logged_in = false;
 
     private int duration;
     private ScrollView login_view;
@@ -153,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
         switch(requestCode){
             case 1:
                 if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
-                    toast(LoginActivity.this, "Permission granted");
+                    //toast(LoginActivity.this, "Permission granted");
                 }
                 else{
                     toast(LoginActivity.this, "Permission Denied");
@@ -257,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
                     verifyLoginInput();
                 }
                 else if(updatePassword && !control){
-                    progressDialog.setTitle("Updating Password...");
+                    progressDialog.setMessage("Updating Password...");
                     progressDialog.setCancelable(false);
                     progressDialog.show();
 
@@ -361,7 +362,6 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
-    // Method that verifies user input(login)
     private void verifyLoginInput(){
         hideKeyboard(LoginActivity.this);
 
@@ -377,24 +377,9 @@ public class LoginActivity extends AppCompatActivity {
             useSnackBar("All fields are required", frameLayout);
         }
         else{
-            progressDialog.setTitle("Logging in...");
+            progressDialog.setMessage("Logging in...");
             progressDialog.setCancelable(false);
             progressDialog.show();
-
-            ref1 = FirebaseStorage.getInstance().getReference().child("Rate Chart").child("Rate File");
-            ref1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful()){
-                        url = task.getResult().toString();
-                        //Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
-                        DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
-                    }
-                    else{
-                        Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
 
             // We first want to check if the phone number exists and if the password matches.
             Log.d(TAG, "verifyLogin: before");
@@ -404,14 +389,14 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
-                        if(logged_in != 1){
+                        if(!logged_in){
                             String password = dataSnapshot.child("Password").getValue().toString();
                             if(password.equals(login_password)){
-                                Log.d(TAG, "verifyLogin: password equal");
+
                                 if(remember_me){
                                     Paper.book().write(Prevalent.remember_me, "True");
                                 }
-                                Log.d(TAG, "verifyLogin: started");
+
                                 String firstname = dataSnapshot.child("Firstname").getValue().toString();
                                 String lastname = dataSnapshot.child("Lastname").getValue().toString();
                                 String phone_number = dataSnapshot.child("Phone Number").getValue().toString();
@@ -421,7 +406,6 @@ public class LoginActivity extends AppCompatActivity {
                                 String state = dataSnapshot.child("State").getValue().toString();
                                 String offline_password = dataSnapshot.child("Offline Password").getValue().toString();
                                 String expiry_date = dataSnapshot.child("Expiry Date").getValue().toString();
-                                Log.d(TAG, "expiry" + expiry_date);
                                 String last_backup;
                                 String default_device;
                                 try{
@@ -432,7 +416,7 @@ public class LoginActivity extends AppCompatActivity {
                                     last_backup = "";
                                     default_device = "";
                                 }
-                                Log.d(TAG, "verifyLogin: " + offline_password);
+
                                 Paper.book().write(Prevalent.offline_password, offline_password);
                                 Paper.book().write(Prevalent.name, firstname + " " + lastname);
                                 Paper.book().write(Prevalent.has_account, "True");
@@ -441,35 +425,26 @@ public class LoginActivity extends AppCompatActivity {
                                 Paper.book().write(Prevalent.email, email);
                                 Paper.book().write(Prevalent.address, address);
                                 Paper.book().write(Prevalent.selected_device, default_device);
-                                helper.setExpiryDate(expiry_date);
+                                Paper.book().write(Prevalent.expiry_date, expiry_date);
                                 Paper.book().write(Prevalent.last_update, last_backup);
                                 Paper.book().write(Prevalent.state,state);
+                                helper.setExpiryDate(expiry_date);
                                 new DataRetrievalHandler(LoginActivity.this);
-                                Log.d(TAG, "verifyLogin: " + Paper.book().read(Prevalent.phone_number));
-                                try{
-                                    progressDialog.dismiss();
-                                }
-                                catch(Exception e){}
-                                logged_in = 1;
-                                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
+                                ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                    public void onComplete(@NonNull Task<Uri> task) {
                                         if(task.isSuccessful()){
-                                            startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
-                                            finish();
+                                            String url = task.getResult().toString();
+                                            Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                                            DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
                                         }
                                         else{
-                                            toast(LoginActivity.this, "Something went wrong");
-                                            try {
-                                                progressDialog.dismiss();
-                                            }
-                                            catch(Exception e){
-
-                                            }
+                                            Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
                                         }
                                     }
                                 });
-
                             }
                             else{
                                 try{
@@ -499,7 +474,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // Method that verifies sign up input
     private void verifySignupInput(){
 
         hideKeyboard(LoginActivity.this);
@@ -561,7 +535,7 @@ public class LoginActivity extends AppCompatActivity {
             else {
                 if(sign_up_password.equals(confirm_password)){
 
-                    progressDialog.setTitle("Please Wait...");
+                    progressDialog.setMessage("Please Wait...");
                     progressDialog.setCancelable(false);
                     progressDialog.show();
                     ref1 = FirebaseStorage.getInstance().getReference().child("Rate Chart").child("Rate File");
@@ -603,65 +577,9 @@ public class LoginActivity extends AppCompatActivity {
                                             intent.putExtra("Email", email);
                                             intent.putExtra("City", city);
                                             intent.putExtra("State", state);
+                                            intent.putExtra("Date Created", System.currentTimeMillis()+"");
                                             startActivity(intent);
                                             finish();
-//                                            mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                                @Override
-//                                                public void onComplete(@NonNull Task<Void> task) {
-//                                                    if(task.isSuccessful()){
-//                                                        progressDialog.dismiss();
-//                                                        Log.d(TAG, "createUserEmail: verification sent");
-//                                                        //DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
-//                                                        useSnackBar("A verification link has been sent to your email.", frameLayout);
-//                                                    }
-//                                                    else{
-//                                                        progressDialog.dismiss();
-//                                                        useSnackBar("Unable to verify email", frameLayout);
-//                                                    }
-//                                                }
-//                                            });
-                                        }
-                                        else{
-//                                            mAuth.signInWithEmailAndPassword(email, sign_up_password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                                                @Override
-//                                                public void onComplete(@NonNull Task<AuthResult> task) {
-//                                                    if(task.isSuccessful()){
-//                                                        if(mAuth.getCurrentUser().isEmailVerified()){
-//                                                            Log.d(TAG,  "Email: " + mAuth.getCurrentUser().getEmail());
-//                                                            //Log.d(TAG, "Has account", Paper.book().read(Prevalent.has_account));
-//                                                            if(Paper.book().read(Prevalent.has_account)!= null && Paper.book().read(Prevalent.has_account).equals("True")){
-//                                                                new DataRetrievalHandler(LoginActivity.this);
-//                                                                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
-//                                                                finish();
-//                                                            }
-//                                                            else{
-//                                                                Intent intent = new Intent(LoginActivity.this, SendOtpActivity.class);
-//                                                                intent.putExtra("phoneNumber", sign_up_phone_number);
-//                                                                intent.putExtra("Firstname", firstname_string);
-//                                                                intent.putExtra("Lastname", lastname_string);
-//                                                                intent.putExtra("Password", sign_up_password);
-//                                                                intent.putExtra("Address", street_address);
-//                                                                intent.putExtra("Country Code", country_code_sign_up);
-//                                                                intent.putExtra("Offline Password", offlinePassword);
-//                                                                intent.putExtra("Email", email);
-//                                                                intent.putExtra("City", city);
-//                                                                intent.putExtra("State", state);
-//                                                                startActivity(intent);
-//                                                                finish();
-//                                                                // Remember to add state and city values too
-//                                                            }
-//                                                        }
-//                                                        else{
-//                                                            progressDialog.dismiss();
-//                                                            useSnackBar("Please verify your email", frameLayout);
-//                                                        }
-//                                                    }
-//                                                    else{
-//                                                        progressDialog.dismiss();
-//                                                        useSnackBar(task.getException().getMessage(), frameLayout);
-//                                                    }
-//                                                }
-//                                            });
                                         }
                                     }
                                 });
@@ -711,6 +629,13 @@ public class LoginActivity extends AppCompatActivity {
                 DbHelper helper = new DbHelper(LoginActivity.this);
                 helper.clearSNFTable();
                 helper.createSNFTable(Environment.getExternalStorageDirectory() + "/Download/Rate File.csv");
+                try{
+                    progressDialog.dismiss();
+                }
+                catch(Exception e){}
+                logged_in = true;
+                startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
+                finish();
             }
         }
     };
@@ -725,7 +650,7 @@ public class LoginActivity extends AppCompatActivity {
     private void retrieveEmail(){
         login_country_code.setVisibility(View.INVISIBLE);
         rememberMe.setVisibility(View.INVISIBLE);
-        progressDialog.setTitle("Please Wait...");
+        progressDialog.setMessage("Please Wait...");
         progressDialog.setCancelable(false);
         progressDialog.show();
         login_phone_number = loginPhoneNumber.getText().toString();

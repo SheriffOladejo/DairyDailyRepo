@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dixit.dairydaily.Models.ProductSaleModel;
@@ -62,6 +63,14 @@ public class ProductSaleAdapter extends RecyclerView.Adapter<ProductSaleAdapter.
             TextView productView = view.findViewById(R.id.product_name);
             TextView unitsView = view.findViewById(R.id.units);
             TextView amountView = view.findViewById(R.id.amount);
+            ImageView options = view.findViewById(R.id.options);
+
+            options.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
 
             srView.setText(sr);
             nameView.setText(String.valueOf(id) + "." + getFirstname(name));

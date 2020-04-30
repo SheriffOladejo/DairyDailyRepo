@@ -16,8 +16,8 @@ import com.dixit.dairydaily.R;
 import java.util.ArrayList;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
-import static com.dixit.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity.count;
-import static com.dixit.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity.phone_number;
+import static com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ShiftReportActivity.count;
+import static com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ShiftReportActivity.phone_number;
 
 public class ShiftReportAdapter extends RecyclerView.Adapter<ShiftReportAdapter.ViewHolder> {
 

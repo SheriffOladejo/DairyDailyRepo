@@ -57,6 +57,13 @@
             android:text="Amount"
             android:textSize="16sp"/>
 
+        <ImageView
+            android:id="@+id/options"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_more_vert"/>
+
+
     </LinearLayout>
 
     <View

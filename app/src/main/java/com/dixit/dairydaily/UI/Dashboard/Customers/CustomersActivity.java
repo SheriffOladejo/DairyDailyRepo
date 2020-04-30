@@ -211,7 +211,6 @@ public class CustomersActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(CustomersActivity.this, DashboardActivity.class));
         finish();
     }
 }

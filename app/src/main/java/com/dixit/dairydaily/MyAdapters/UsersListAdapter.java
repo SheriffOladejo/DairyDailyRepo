@@ -28,7 +28,7 @@ import com.dixit.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
 import com.dixit.dairydaily.UI.Dashboard.SellMilk.MilkSaleEntryActivity;
 import com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashActivity;
 import com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.ViewReportByDateActivity;
-import com.dixit.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity;
+import com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.CustomerReportActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +162,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
                         context.startActivity(new Intent(context, ReceiveCashActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
                         ((Activity)context).finish();
                     }
-                    else if(from.equals("ViewReport")){
+                    else if(from.equals("ViewSellerReport")){
                         context.startActivity(new Intent(context, ViewReportByDateActivity.class).putExtra("id", dbHelper.getBuyerId(name, phone_number)).putExtra("name", name));
                         ((Activity)context).finish();
                     }

@@ -229,8 +229,6 @@ public class BackupHandler {
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
                         backupMilksaleData();
-                        toast(context, "Data uploaded successfully");
-
                     }
                     else{
                         Toast.makeText(context, "Buyer data upload failed.", Toast.LENGTH_SHORT).show();

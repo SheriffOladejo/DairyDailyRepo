@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI.Dashboard.ViewReport;
+package com.dixit.dairydaily.UI.Dashboard.ViewSellerReport;
 
 import android.content.Intent;
 import android.os.Bundle;

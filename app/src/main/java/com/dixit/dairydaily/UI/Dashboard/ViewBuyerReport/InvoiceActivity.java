@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -68,7 +70,7 @@ import io.paperdb.Paper;
 import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 
-public class InvoiceActivity extends AppCompatActivity {
+public class InvoiceActivity extends InitDrawerBoard {
 
     private static final int PERMISSION_REQUEST_CODE = 1;
     double totalAmount = 0,totalWeight = 0;
@@ -108,7 +110,7 @@ public class InvoiceActivity extends AppCompatActivity {
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        initDashboard();
+        initDrawer();
 
         // Initialize widgets
         //start_date_image = findViewById(R.id.start_date_image_view);
@@ -192,81 +194,6 @@ public class InvoiceActivity extends AppCompatActivity {
         list = dbHelper.getReceiveCashList();
         adapter = new InvoiceAdapter(InvoiceActivity.this, list);
         recyclerView.setAdapter(adapter);
-
-
-        //final DatePickerDialog startDatePickerDialog = new DatePickerDialog(this), endDatePickerDialog = new DatePickerDialog(this);
-//        startDate = getStartDate();
-//        endDate = getEndDate();
-//
-//        start_date_text_view.setText(startDate);
-//        end_date_text_view.setText(endDate);
-//
-//        start_date_image.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startDatePickerDialog.show();
-//            }
-//        });
-//        end_date_image.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                endDatePickerDialog.show();
-//            }
-//        });
-//
-//        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-//            @Override
-//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-//                if(String.valueOf(month).length() == 1){
-//                    if(String.valueOf(dayOfMonth).length() == 1){
-//                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-//                        start_date_text_view.setText(startDate);
-//                    }
-//                    else{
-//                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-//                        start_date_text_view.setText(startDate);
-//                    }
-//                }
-//                else{
-//                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-//                    start_date_text_view.setText(startDate);
-//                }
-//            }
-//        });
-//
-//        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-//            @Override
-//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-//                if(String.valueOf(month).length() == 1){
-//                    if(String.valueOf(dayOfMonth).length() == 1){
-//                        endDate = year+ "-0" + (month+1) + "-" + "0"+dayOfMonth;
-//                        end_date_text_view.setText(endDate);
-//                    }
-//                    else{
-//                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-//                        end_date_text_view.setText(endDate);
-//                    }
-//                }
-//                else{
-//                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-//                    end_date_text_view.setText(endDate);
-//                }
-//            }
-//        });
-//        list = dbHelper.getInvoice("", "");
-//        InvoiceAdapter adapter = new InvoiceAdapter(InvoiceActivity.this, list);
-//        recyclerView.setAdapter(adapter);
-
-//        findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String startDate = start_date_text_view.getText().toString();
-//                String endDate = end_date_text_view.getText().toString();
-//                list = dbHelper.getInvoice(startDate, endDate);
-//                InvoiceAdapter adapter = new InvoiceAdapter(InvoiceActivity.this, list);
-//                recyclerView.setAdapter(adapter);
-//            }
-//        });
     }
 
     private void createPdfWrapper() {
@@ -286,7 +213,14 @@ public class InvoiceActivity extends AppCompatActivity {
             docFolder.mkdirs();
             Log.i(TAG, "Created a new directory for invoice");
         }
-        String date = new SimpleDateFormat("dd-MM-YYYY").format(new Date());
+        String date;
+        try{
+            DateFormat df = new DateFormat();
+            date = df.format("yyyy-MM-dd", new Date()).toString();
+        }
+        catch(Exception e){
+            date = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
+        }
         String pdfName = date + ".pdf";
 
         pdfFile = new File(docFolder.getAbsolutePath(), pdfName);
@@ -375,7 +309,9 @@ public class InvoiceActivity extends AppCompatActivity {
         document.add(table);
         document.add(table1);
 
-        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
+        String link = "http://play.google.com/store/apps/details?id=" + getPackageName();
+        document.add(new Paragraph("Download DairyDaily app from google playstore:\n" + link ,f));
+        toast(InvoiceActivity.this, "PDF saved to " + docFolder.getPath() + "/" +date + ".pdf");
         document.close();
         previewPdf();
     }
@@ -394,131 +330,6 @@ public class InvoiceActivity extends AppCompatActivity {
             newIntent.setDataAndType(uri, "application/pdf");
             startActivity(newIntent);
         }
-    }
-
-
-    void initDashboard(){
-        findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(InvoiceActivity.this, ProfileActivity.class));
-            }
-        });
-        findViewById(R.id.dashboard).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(InvoiceActivity.this, DashboardActivity.class));
-                finish();
-            }
-        });
-        findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(InvoiceActivity.this, ViewAllEntryActivity.class));
-            }
-        });
-        findViewById(R.id.milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(InvoiceActivity.this, MilkHistoryActivity.class));
-            }
-        });
-        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Logout(InvoiceActivity.this);
-            }
-        });
-        findViewById(R.id.recover_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new WarningDialog(InvoiceActivity.this).show();
-            }
-        });
-        findViewById(R.id.backup_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityCompat.requestPermissions(InvoiceActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                // Send user's phone number for verification
-                Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-                Paper.book().write(Prevalent.last_update, date);
-                new BackupHandler(InvoiceActivity.this);
-            }
-        });
-
-        LinearLayout backup, recover, update_rate_charts, erase_milk_history;
-        ImageView arrow = findViewById(R.id.arrow);
-        final boolean[] arrowClicked = {false};
-        backup = findViewById(R.id.backup_data);
-        erase_milk_history = findViewById(R.id.erase_milk_history);
-        update_rate_charts = findViewById(R.id.update_rate_charts);
-        recover = findViewById(R.id.recover_data);
-        update_rate_charts.setVisibility(View.GONE);
-        erase_milk_history.setVisibility(View.GONE);
-        backup.setVisibility(View.GONE);
-        recover.setVisibility(View.GONE);
-        findViewById(R.id.erase_milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(InvoiceActivity.this, DeleteHistory.class));
-            }
-        });
-        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        arrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(InvoiceActivity.this, UpgradeToPremium.class));
-            }
-        });
-        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     @Override

@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.R;
+import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.convertFirstLetter;
 import static com.dixit.dairydaily.Others.UtilityMethods.hideKeyboard;
@@ -126,7 +127,7 @@ public class AddCustomers extends AppCompatActivity {
                 dbHelper.updateSeller(passId, Integer.valueOf(idEditText.getText().toString()), firstnameEdittext.getText().toString() + " "
                                 + lastnameEdittext.getText().toString(),
                         phone_numberEdittext.getText().toString(), addressEdittext.getText().toString(),
-                        "Seller");
+                        "Seller", getIntent().getStringExtra("firstname")+" " +getIntent().getStringExtra("lastname"));
                 new BackupHandler(AddCustomers.this);
                 Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
                 startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
@@ -137,7 +138,7 @@ public class AddCustomers extends AppCompatActivity {
                 dbHelper.updateBuyer(passId, Integer.valueOf(idEditText.getText().toString()), firstnameEdittext.getText().toString() + " "
                                 + lastnameEdittext.getText().toString(),
                         phone_numberEdittext.getText().toString(), addressEdittext.getText().toString(),
-                        "Buyer");
+                        "Buyer", getIntent().getStringExtra("firstname")+" " +getIntent().getStringExtra("lastname"));
                 new BackupHandler(AddCustomers.this);
                 Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
                 startActivity(new Intent(AddCustomers.this, CustomersActivity.class));

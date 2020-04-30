@@ -45,6 +45,7 @@ public class RateChartAdapter extends RecyclerView.Adapter<RateChartAdapter.View
     public RateChartAdapter(Context context, List<RateChartModel> list){
         this.list = list;
         this.context = context;
+
     }
 
     public RateChartAdapter(Context context){
@@ -107,7 +108,6 @@ public class RateChartAdapter extends RecyclerView.Adapter<RateChartAdapter.View
                         String snf = list.get(0).getFat();
                         DbHelper dbHelper = new DbHelper(context);
                         dbHelper.updatetRateChart(rate, fat, snf);
-                        uploadRateFile();
                     }
                     catch(Exception e){
                         //toast(context, "Invalid values");
@@ -115,63 +115,6 @@ public class RateChartAdapter extends RecyclerView.Adapter<RateChartAdapter.View
                 }
             });
 
-        }
-
-        public void uploadRateFile(){
-            DbHelper helper = new DbHelper(context);
-            Cursor data = helper.getSNFTable();
-            String total = "";
-            while(data.moveToNext()){
-                String snf76 = data.getString(data.getColumnIndex("SNF76"));
-                String snf77 = data.getString(data.getColumnIndex("SNF77"));
-                String snf78 = data.getString(data.getColumnIndex("SNF78"));
-                String snf79 = data.getString(data.getColumnIndex("SNF79"));
-                String snf80 = data.getString(data.getColumnIndex("SNF80"));
-                String snf81 = data.getString(data.getColumnIndex("SNF81"));
-                String snf82 = data.getString(data.getColumnIndex("SNF82"));
-                String snf83 = data.getString(data.getColumnIndex("SNF83"));
-                String snf84 = data.getString(data.getColumnIndex("SNF84"));
-                String snf85 = data.getString(data.getColumnIndex("SNF85"));
-                String snf86 = data.getString(data.getColumnIndex("SNF86"));
-                String snf87 = data.getString(data.getColumnIndex("SNF87"));
-                String snf88 = data.getString(data.getColumnIndex("SNF88"));
-                String snf89 = data.getString(data.getColumnIndex("SNF89"));
-                String snf90 = data.getString(data.getColumnIndex("SNF90"));
-                String snf91 = data.getString(data.getColumnIndex("SNF91"));
-                String snf92 = data.getString(data.getColumnIndex("SNF92"));
-//                String snf93 = data.getString(data.getColumnIndex("SNF93"));
-//                String snf94 = data.getString(data.getColumnIndex("SNF94"));
-//                String snf95 = data.getString(data.getColumnIndex("SNF95"));
-                total += snf76 + "," + snf77+","+ snf78+","+ snf79+","+ snf80+","+ snf81+","+ snf82+","+ snf83+","+ snf84+","+ snf85+","
-                        + snf86+","+ snf87+","+ snf88+","+ snf89+","+ snf90+","+ snf91+","+ snf92+""+ "\n";
-
-            }
-            Log.d(TAG, "total" + total);
-            try{
-                File path = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
-                FileOutputStream fileOutputStream = new FileOutputStream(path);
-                fileOutputStream.write(total.getBytes());
-                String filename = "Rate File";
-
-                StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child(filename);
-                ref.putFile(Uri.fromFile(path)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if(task.isSuccessful()){
-                            //toast(context, "Rate chart updated");
-                            //path.delete();
-                        }
-                        else{
-                            //Toast.makeText(context, "Something went wrong while uploading the file." + task.getException(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-                fileOutputStream.close();
-            }
-            catch(Exception e){
-                toast(context, "Write failed");
-            }
-            isUploaded = true;
         }
 
         public void setData(String fat, String rate){

@@ -70,7 +70,7 @@ import static com.dixit.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.dixit.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
 
-public class MilkHistoryActivity extends AppCompatActivity {
+public class MilkHistoryActivity extends InitDrawerBoard {
 
     private static final int PERMISSION_REQUEST_CODE = 1;
     File pdfFile;
@@ -178,7 +178,7 @@ public class MilkHistoryActivity extends AppCompatActivity {
         amountTotal.setText(truncate(totalAmount)+"Rs");
         weightTotal.setText(truncate(totalWeight)+"Rs");
 
-        initDashboard();
+        initDrawer();
         // Hook up the "Go" button
         findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.O)
@@ -370,132 +370,6 @@ public class MilkHistoryActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-    }
-
-    void initDashboard(){
-        findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MilkHistoryActivity.this, ProfileActivity.class));
-            }
-        });
-        findViewById(R.id.dashboard).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MilkHistoryActivity.this, DashboardActivity.class));
-                finish();
-            }
-        });
-        findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MilkHistoryActivity.this, ViewAllEntryActivity.class));
-            }
-        });
-        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Logout(MilkHistoryActivity.this);
-            }
-        });
-        findViewById(R.id.recover_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new WarningDialog(MilkHistoryActivity.this).show();
-            }
-        });
-        findViewById(R.id.backup_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityCompat.requestPermissions(MilkHistoryActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                // Send user's phone number for verification
-                Date dateIntermediate = new Date();
-                String date;
-                try{
-                    DateFormat df = new DateFormat();
-                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
-                }
-                catch(Exception e){
-                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
-                }
-
-                Paper.book().write(Prevalent.last_update, date);
-                new BackupHandler(MilkHistoryActivity.this);
-            }
-        });
-
-        LinearLayout backup, recover, update_rate_charts, erase_milk_history;
-        ImageView arrow = findViewById(R.id.arrow);
-        final boolean[] arrowClicked = {false};
-        backup = findViewById(R.id.backup_data);
-        erase_milk_history = findViewById(R.id.erase_milk_history);
-        update_rate_charts = findViewById(R.id.update_rate_charts);
-        recover = findViewById(R.id.recover_data);
-        update_rate_charts.setVisibility(View.GONE);
-        erase_milk_history.setVisibility(View.GONE);
-        backup.setVisibility(View.GONE);
-        recover.setVisibility(View.GONE);
-        findViewById(R.id.erase_milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MilkHistoryActivity.this, DeleteHistory.class));
-            }
-        });
-        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        arrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MilkHistoryActivity.this, UpgradeToPremium.class));
-            }
-        });
-        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     @Override

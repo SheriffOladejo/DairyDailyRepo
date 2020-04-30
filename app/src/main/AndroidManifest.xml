@@ -58,29 +58,29 @@
             android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.DashboardActivity" />
         <activity android:name="com.dixit.dairydaily.UI.PasscodeViewClass" />
         <activity
-            android:name="com.dixit.dairydaily.UI.Dashboard.ViewReport.CustomerReportActivity"
-            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"
+            android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.CustomerReportActivity"
+            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name="com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"
+            android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity"
             android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.DashboardActivity" />
         <activity
-            android:name="com.dixit.dairydaily.UI.Dashboard.ViewReport.PaymentRegisterActivity"
-            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity"
+            android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.PaymentRegisterActivity"
+            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name="com.dixit.dairydaily.UI.Dashboard.ViewReport.DuplicateSlipActivity"
-            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity" />
+            android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.DuplicateSlipActivity"
+            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity" />
         <activity
-            android:name="com.dixit.dairydaily.UI.Dashboard.ViewReport.ShiftReportActivity"
-            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity" />
+            android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ShiftReportActivity"
+            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity" />
         <activity
             android:name="com.dixit.dairydaily.UI.Dashboard.Customers.AddCustomers"
             android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.Customers.CustomersActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name="com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.SetMilkRateActivity"
-            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity" />
+            android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity" />
         <activity
             android:name="com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity"
             android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.DashboardActivity" />
@@ -115,7 +115,7 @@
         <activity android:name="com.dixit.dairydaily.CowChart.CowSNF" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.Customers.CustomersActivity" />
         <activity android:name="com.dixit.dairydaily.RateChart.RateChartOptions"/>
-        <activity android:name="com.dixit.dairydaily.UI.Dashboard.ViewReport.Experiment" />
+        <activity android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.Experiment" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity" />
@@ -126,6 +126,8 @@
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.ReceiveCashList"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        <activity android:name=".UI.Dashboard.DrawerLayout.InitDrawerBoard"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
     </application>
 

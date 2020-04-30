@@ -66,6 +66,7 @@ import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -561,6 +562,62 @@ public class CowSNF extends AppCompatActivity implements
         }
     };
 
+    public void uploadRateFile(){
+        DbHelper helper = new DbHelper(CowSNF.this);
+        Cursor data = helper.getSNFTable();
+        String total = "";
+        while(data.moveToNext()){
+            String snf76 = data.getString(data.getColumnIndex("SNF76"));
+            String snf77 = data.getString(data.getColumnIndex("SNF77"));
+            String snf78 = data.getString(data.getColumnIndex("SNF78"));
+            String snf79 = data.getString(data.getColumnIndex("SNF79"));
+            String snf80 = data.getString(data.getColumnIndex("SNF80"));
+            String snf81 = data.getString(data.getColumnIndex("SNF81"));
+            String snf82 = data.getString(data.getColumnIndex("SNF82"));
+            String snf83 = data.getString(data.getColumnIndex("SNF83"));
+            String snf84 = data.getString(data.getColumnIndex("SNF84"));
+            String snf85 = data.getString(data.getColumnIndex("SNF85"));
+            String snf86 = data.getString(data.getColumnIndex("SNF86"));
+            String snf87 = data.getString(data.getColumnIndex("SNF87"));
+            String snf88 = data.getString(data.getColumnIndex("SNF88"));
+            String snf89 = data.getString(data.getColumnIndex("SNF89"));
+            String snf90 = data.getString(data.getColumnIndex("SNF90"));
+            String snf91 = data.getString(data.getColumnIndex("SNF91"));
+            String snf92 = data.getString(data.getColumnIndex("SNF92"));
+            String snf93 = data.getString(data.getColumnIndex("SNF93"));
+            String snf94 = data.getString(data.getColumnIndex("SNF94"));
+            String snf95 = data.getString(data.getColumnIndex("SNF95"));
+            total += snf76 + "," + snf77+","+ snf78+","+ snf79+","+ snf80+","+ snf81+","+ snf82+","+ snf83+","+ snf84+","+ snf85+","
+                    + snf86+","+ snf87+","+ snf88+","+ snf89+","+ snf90+","+ snf91+","+ snf92+","+snf93 + ","+snf94+","+snf95+""+ "\n";
+
+        }
+
+        try{
+            File path = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
+            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            fileOutputStream.write(total.getBytes());
+            String filename = "Rate File";
+            StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child(filename);
+            Log.d(TAG, "Uri: " + Uri.fromFile(path).toString());
+            ref.putFile(Uri.fromFile(path)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if(task.isSuccessful()){
+                        toast(CowSNF.this, "Rate chart updated");
+                        path.delete();
+                    }
+                    else{
+                        //Toast.makeText(context, "Something went wrong while uploading the file." + task.getException(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            fileOutputStream.close();
+        }
+        catch(Exception e){
+            toast(CowSNF.this, "Write failed");
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -760,8 +817,7 @@ public class CowSNF extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if(!RateChartAdapter.isUploaded)
-            toast(CowSNF.this, "Unable to upload chart");
+        uploadRateFile();
         startActivity(new Intent(CowSNF.this, RateChartOptions.class));
         finish();
     }

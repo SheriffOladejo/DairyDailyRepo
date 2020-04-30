@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,8 @@ public class Logout extends AppCompatActivity {
     Context context;
     DbHelper helper;
     private static final String TAG = "Logout";
+
+
     public Logout(Context context){
         this.context = context;
         helper = new DbHelper(context);
@@ -36,8 +39,7 @@ public class Logout extends AppCompatActivity {
 
     public void logout(){
         ProgressDialog pd = new ProgressDialog(context);
-        pd.setTitle("Logging Out");
-        pd.setMessage("Please Wait...");
+        pd.setMessage("Logging out...");
         pd.setCancelable(false);
         pd.show();
 
@@ -85,11 +87,11 @@ public class Logout extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             Paper.book().write(Prevalent.remember_me, "False");
-                            Log.d(TAG,"logout remember: " + Paper.book().read(Prevalent.remember_me));
                             Paper.book().write(Prevalent.has_account, "True");
-
                             pd.dismiss();
                             context.startActivity(new Intent(context, LoginActivity.class));
+                            LoginActivity.logged_in = false;
+                            DashboardActivity.updated = false;
                             finish();
                         }
                         else{

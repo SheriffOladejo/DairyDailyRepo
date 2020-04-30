@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI.Dashboard.ViewReport;
+package com.dixit.dairydaily.UI.Dashboard.ViewSellerReport;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.dixit.dairydaily.Models.ShiftReportModel;
 import com.dixit.dairydaily.Others.BackupHandler;
@@ -51,7 +52,7 @@ import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class DuplicateSlipActivity extends AppCompatActivity {
+public class DuplicateSlipActivity extends InitDrawerBoard {
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;

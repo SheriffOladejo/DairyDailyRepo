@@ -15,8 +15,7 @@
             android:id="@+id/date"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:textAlignment="viewStart"
-            android:paddingStart="20dp"
+            android:textAlignment="center"
             android:text="Date"
             android:textColor="@android:color/black"
             android:textSize="14sp"/>

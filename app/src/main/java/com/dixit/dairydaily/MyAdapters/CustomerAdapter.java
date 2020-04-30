@@ -125,7 +125,6 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
                             Toast.makeText(context, "Chat", Toast.LENGTH_SHORT).show();
                             break;
                         case 1:
-                            Toast.makeText(context, "Edit", Toast.LENGTH_SHORT).show();
                             int idToPass = list.get(getAdapterPosition()).getId();
                             String lastNameToPass = getLastname(list.get(getAdapterPosition()).getName());
                             String firstNameToPass = getFirstname(list.get(getAdapterPosition()).getName());

@@ -1162,9 +1162,9 @@ public class DbHelper extends SQLiteOpenHelper {
                             contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
                             contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
                             contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
-//                            contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
-//                            contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
-//                            contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
+                            contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
+                            contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
+                            contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
 
 
                             /*
@@ -1203,7 +1203,7 @@ public class DbHelper extends SQLiteOpenHelper {
             List<List<String>> lines = new ArrayList<>();
             List<String> fatList = new ArrayList<>();
 
-            for (double i = 3.0; i <= 5.0; i = i + 0.1) {
+            for (double i = 3.0; i <= 11.1; i = i + 0.1) {
                 Double truncatedValue = BigDecimal.valueOf(i).setScale(1, RoundingMode.HALF_UP).doubleValue();
                 String fat = String.valueOf(truncatedValue);
                 fatList.add(fat);
@@ -1219,46 +1219,55 @@ public class DbHelper extends SQLiteOpenHelper {
                         lines.add(Arrays.asList(values));
                     }
                     Log.d(TAG, "Lines: " + lines.toString());
+                    Log.d(TAG, "Size: " + lines.size());
                     fileInputStream.close();
+                    Log.d(TAG, "Size: " + lines.size());
 
                     for (int i = 0; i < lines.size(); i++) {
-                        Log.d(TAG, "Value: " + i);
-                        contentValues.put(fat_column, fatList.get(i));
-                        contentValues.put(SNFcolumns[0], String.valueOf(lines.get(i).get(0)));
-                        contentValues.put(SNFcolumns[1], String.valueOf(lines.get(i).get(1)));
-                        contentValues.put(SNFcolumns[2], String.valueOf(lines.get(i).get(2)));
-                        contentValues.put(SNFcolumns[3], String.valueOf(lines.get(i).get(3)));
-                        contentValues.put(SNFcolumns[4], String.valueOf(lines.get(i).get(4)));
-                        contentValues.put(SNFcolumns[5], String.valueOf(lines.get(i).get(5)));
-                        contentValues.put(SNFcolumns[6], String.valueOf(lines.get(i).get(6)));
-                        contentValues.put(SNFcolumns[7], String.valueOf(lines.get(i).get(7)));
-                        contentValues.put(SNFcolumns[8], String.valueOf(lines.get(i).get(8)));
-                        contentValues.put(SNFcolumns[9], String.valueOf(lines.get(i).get(9)));
-                        contentValues.put(SNFcolumns[10], String.valueOf(lines.get(i).get(10)));
-                        contentValues.put(SNFcolumns[11], String.valueOf(lines.get(i).get(11)));
-                        contentValues.put(SNFcolumns[12], String.valueOf(lines.get(i).get(12)));
-                        contentValues.put(SNFcolumns[13], String.valueOf(lines.get(i).get(13)));
-                        contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
-                        contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
-                        contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
-//                        contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
-//                        contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
-//                        contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
+                        try{
+                            Log.d(TAG, "Value: " + i);
+                            contentValues.put(fat_column, fatList.get(i));
+                            contentValues.put(SNFcolumns[0], String.valueOf(lines.get(i).get(0)));
+                            contentValues.put(SNFcolumns[1], String.valueOf(lines.get(i).get(1)));
+                            contentValues.put(SNFcolumns[2], String.valueOf(lines.get(i).get(2)));
+                            contentValues.put(SNFcolumns[3], String.valueOf(lines.get(i).get(3)));
+                            contentValues.put(SNFcolumns[4], String.valueOf(lines.get(i).get(4)));
+                            contentValues.put(SNFcolumns[5], String.valueOf(lines.get(i).get(5)));
+                            contentValues.put(SNFcolumns[6], String.valueOf(lines.get(i).get(6)));
+                            contentValues.put(SNFcolumns[7], String.valueOf(lines.get(i).get(7)));
+                            contentValues.put(SNFcolumns[8], String.valueOf(lines.get(i).get(8)));
+                            contentValues.put(SNFcolumns[9], String.valueOf(lines.get(i).get(9)));
+                            contentValues.put(SNFcolumns[10], String.valueOf(lines.get(i).get(10)));
+                            contentValues.put(SNFcolumns[11], String.valueOf(lines.get(i).get(11)));
+                            contentValues.put(SNFcolumns[12], String.valueOf(lines.get(i).get(12)));
+                            contentValues.put(SNFcolumns[13], String.valueOf(lines.get(i).get(13)));
+                            contentValues.put(SNFcolumns[14], String.valueOf(lines.get(i).get(14)));
+                            contentValues.put(SNFcolumns[15], String.valueOf(lines.get(i).get(15)));
+                            contentValues.put(SNFcolumns[16], String.valueOf(lines.get(i).get(16)));
+                            contentValues.put(SNFcolumns[17], String.valueOf(lines.get(i).get(17)));
+                            contentValues.put(SNFcolumns[18], String.valueOf(lines.get(i).get(18)));
+                            contentValues.put(SNFcolumns[19], String.valueOf(lines.get(i).get(19)));
 
 
-                        /*
-                         * Important Note to self
-                         * lines.get(i).get() represents number of columns in excel file
-                         * lines.size() represnets number of rows in excel file
-                         *
-                         * */
+                            /*
+                             * Important Note to self
+                             * lines.get(i).get() represents number of columns in excel file
+                             * lines.size() represnets number of rows in excel file
+                             *
+                             * */
 
 
-                        db.insert(SNF_table, null, contentValues);
-                        contentValues.clear();
+                            db.insert(SNF_table, null, contentValues);
+                            contentValues.clear();
+                        }
+                        catch(Exception e){
+                            Log.d(TAG, "Exception: " + e.getMessage());
+                            db.insert(SNF_table, null, contentValues);
+                            contentValues.clear();
+                        }
                     }
                 } catch (Exception e) {
-
+                    Log.d(TAG, "Exception: " + e.getMessage());
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -1563,11 +1572,13 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     // Updates buyer info
-    public void updateBuyer(int old_id, int new_id, String name, String phone_number, String address, String status){
+    public void updateBuyer(int old_id, int new_id, String name, String phone_number, String address, String status, String oldname){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + buyers_table + " SET " + BTCOL1 + " = '" + new_id + "'" +
                 ", " + BTCOL2 + " = '" + name + "', " + BTCOL3 + " = '" + phone_number + "', " +
                 BTCOL4 + " = '" + address + "', " + BTCOL5 + " = '" + status + "' WHERE " + BTCOL1 + " = '" + old_id +"'";
+        String query2 = "UPDATE " + milk_sale_table + " SET " + Sale_COL2 + " ='" + name + "' WHERE " + Sale_COL2 + " ='" + oldname + "'";
+        db.execSQL(query2);
         db.execSQL(query);
     }
 
@@ -1580,12 +1591,14 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     // Updates seller info
-    public void updateSeller(int old_id, int new_id, String name, String phone_number, String address, String status){
+    public void updateSeller(int old_id, int new_id, String name, String phone_number, String address, String status, String oldName){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE " + sellers_table + " SET " + STCOL1 + " = '" + new_id + "'" +
                 ", " + STCOL2 + " = '" + name + "', " + STCOL3 + " = '" + phone_number + "', " +
                 STCOL4 + " = '" + address + "', " + STCOL5 + " = '" + status + "' WHERE " + STCOL1 + " = '" + old_id +"'";
+        String query2 = "UPDATE " + milk_buy_table + " SET " + Buy_COL2 + " ='" + name + "' WHERE " + Buy_COL2 + " ='" + oldName + "'";
         db.execSQL(query);
+        db.execSQL(query2);
     }
 
     // Returns the name of a seller with id passed

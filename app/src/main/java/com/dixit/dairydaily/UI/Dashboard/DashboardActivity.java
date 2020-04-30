@@ -37,7 +37,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
@@ -46,6 +45,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -79,7 +79,7 @@ import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 import com.dixit.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity;
 import com.dixit.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 import com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity;
-import com.dixit.dairydaily.UI.Dashboard.ViewReport.ViewReportActivity;
+import com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -94,10 +94,11 @@ import java.util.UUID;
 
 import io.paperdb.Paper;
 
+import static android.content.Intent.ACTION_VIEW;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.useSnackBar;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends InitDrawerBoard {
 
     // Bluetooth variables
     public static BluetoothAdapter bluetoothAdapter;
@@ -107,6 +108,8 @@ public class DashboardActivity extends AppCompatActivity {
     public static Set<BluetoothDevice> pairedDevice;
     public static SelectPrinterDialog dialog;
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    public static boolean updated = false;
 
     private ImageView imageView1, imageView2, imageView3, imageView4;
     ViewFlipper viewFlipper;
@@ -159,6 +162,8 @@ public class DashboardActivity extends AppCompatActivity {
         //getSupportActionBar().setTitle("Dashboard");
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
+        initDrawer();
+
         helper = new DbHelper(this);
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Updating Rate Chart...");
@@ -193,7 +198,6 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                     notif_count.setVisibility(View.VISIBLE);
                     notif_count.setText(""+numberOfMessages);
-                    //89admin_messages.setTitle("Messages From Admin("+numberOfMessages+")");
                 }
             }
 
@@ -245,6 +249,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
+        Log.d(TAG, "expiryDate: " + expiryDate);
 
         if(Long.valueOf(expiryDate)<cal.getTime().getTime()){
             isExpired = true;
@@ -391,7 +396,8 @@ public class DashboardActivity extends AppCompatActivity {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //bluetoothConnectionService.write("8f6my".getBytes(Charset.defaultCharset()));
+                String link = "https://www.youtube.com/channel/UCVCQxEmcWR_aIPqgcl86rXA";
+                startActivity(new Intent(ACTION_VIEW, Uri.parse(link)));
             }
         });
 
@@ -426,13 +432,14 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         drawerLayout = findViewById(R.id.drawerlayout);
         navigationView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothAdapter.enable();
@@ -451,7 +458,10 @@ public class DashboardActivity extends AppCompatActivity {
         rate_chart.startAnimation(slide);
 
         view_report.animate().translationX(2f);
-        initDashboard();
+        //initDashboard();
+//        new InitDrawerBoard(this, this);
+//        super.onCreate(savedInstanceState);
+//        startActivity(new Intent(this, InitDrawerBoard.class));
 
         rate_chart.setOnClickListener(new View.OnClickListener() {
             @Override
