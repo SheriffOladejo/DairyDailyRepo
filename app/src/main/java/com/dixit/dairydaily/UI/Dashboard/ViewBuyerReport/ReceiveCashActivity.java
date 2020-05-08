@@ -230,7 +230,6 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
         nameView = findViewById(R.id.name);
 
         list = dbHelper.getReceiveCash(idInt, "", "");
-        Log.d("Sheriff", "receive cash: " + list.size());
         adapter = new ReceiveCashAdapter(ReceiveCashActivity.this, list);
         for(ReceiveCashModel model : list){
             creditTotal += Double.valueOf(model.getCredit());
@@ -369,7 +368,7 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
 
         OutputStream outputStream = new FileOutputStream(pdfFile);
         Document document = new Document(PageSize.A4);
-        PdfPTable table = new PdfPTable(new float[]{2,2,2,2});
+        PdfPTable table = new PdfPTable(new float[]{2,2,2,2,2});
         table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table.getDefaultCell().setFixedHeight(20);
         table.setTotalWidth(PageSize.A4.getWidth());
@@ -380,6 +379,7 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
         table.addCell("Title");
         table.addCell("Debit(Rs)");
         table.addCell("Credit(Rs)");
+        table.addCell("Shift");
 
         table.setHeaderRows(1);
         PdfPCell[] cells = table.getRow(0).getCells();
@@ -392,6 +392,7 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
             table.addCell(list.get(j).getTitle());
             table.addCell(list.get(j).getDebit());
             table.addCell(list.get(j).getCredit());
+            table.addCell(list.get(j).getShift());
         }
 
         PdfWriter.getInstance(document, outputStream);
@@ -417,9 +418,9 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
 
         table1.setWidthPercentage(100);
         table1.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table1.addCell("Balance: " + truncate(remain));
-        table1.addCell("Total Debit: " + truncate(debitTotal));
-        table1.addCell("Total Credit: " + truncate(creditTotal));
+        table1.addCell("Balance(Rs): " + truncate(remain));
+        table1.addCell("Total Debit(Rs): " + truncate(debitTotal));
+        table1.addCell("Total Credit(Rs): " + truncate(creditTotal));
         document.add(table1);
 
         String link = "http://play.google.com/store/apps/details?id=" + getPackageName();

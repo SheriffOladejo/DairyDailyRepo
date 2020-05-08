@@ -1,5 +1,6 @@
 package com.dixit.dairydaily.UI.Dashboard.DrawerLayout;
 
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -8,16 +9,23 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
+import com.dixit.dairydaily.Others.BackupHandler;
+import com.dixit.dairydaily.Others.DataRetrievalHandler;
 import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.Others.Logout;
 import com.dixit.dairydaily.Others.Prevalent;
@@ -35,7 +43,10 @@ import io.paperdb.Paper;
 public class InitDrawerBoard extends AppCompatActivity {
 
 
-    LinearLayout dashboard, profile, upgrade_to_premium, view_all_entry, milk_history, settings, logout, update_rate_charts, erase_milk_history;
+    LinearLayout dashboard, profile, upgrade_to_premium, view_all_entry,
+            milk_history, settings, logout, update_rate_charts, erase_milk_history,
+            retrieve_data, backup_data;
+    public static ProgressDialog rpd, bpd;
     ImageView arrow;
     boolean[] arrowClicked = {false};
     ProgressDialog progressDialog;
@@ -60,9 +71,12 @@ public class InitDrawerBoard extends AppCompatActivity {
         update_rate_charts = findViewById(R.id.update_rate_charts);
         erase_milk_history = findViewById(R.id.erase_milk_history);
         arrow = findViewById(R.id.arrow);
-
+        retrieve_data = findViewById(R.id.retrieve_data);
+        backup_data = findViewById(R.id.backup_data);
         update_rate_charts.setVisibility(View.GONE);
         erase_milk_history.setVisibility(View.GONE);
+        backup_data.setVisibility(View.GONE);
+        retrieve_data.setVisibility(View.GONE);
 
         registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
@@ -70,28 +84,51 @@ public class InitDrawerBoard extends AppCompatActivity {
         progressDialog.setMessage("Updating...");
         progressDialog.setCancelable(true);
 
+        retrieve_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog dialog = new Dialog(InitDrawerBoard.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.warning);
+                dialog.setCancelable(true);
+                TextView cancel = dialog.findViewById(R.id.cancel);
+                TextView continueText = dialog.findViewById(R.id.continues);
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                continueText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        rpd = new ProgressDialog(InitDrawerBoard.this);
+                        rpd.setMessage("Retrieving...");
+                        rpd.setCancelable(true);
+                        rpd.show();
+                        new DataRetrievalHandler(InitDrawerBoard.this);
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
+
+        backup_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bpd = new ProgressDialog(InitDrawerBoard.this);
+                bpd.setMessage("Backing Up...");
+                bpd.setCancelable(true);
+                bpd.show();
+                new BackupHandler(InitDrawerBoard.this);
+            }
+        });
+
         erase_milk_history.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(InitDrawerBoard.this, DeleteHistory.class));
-            }
-        });
-
-        arrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
             }
         });
 
@@ -136,6 +173,8 @@ public class InitDrawerBoard extends AppCompatActivity {
                 if(arrowClicked[0]){
                     erase_milk_history.setVisibility(View.GONE);
                     update_rate_charts.setVisibility(View.GONE);
+                    backup_data.setVisibility(View.GONE);
+                    retrieve_data.setVisibility(View.GONE);
                     arrowClicked[0] = false;
                     arrow.setImageResource(R.drawable.ic_drop_down);
                 }
@@ -143,6 +182,8 @@ public class InitDrawerBoard extends AppCompatActivity {
                     arrow.setImageResource(R.drawable.drop_down);
                     erase_milk_history.setVisibility(View.VISIBLE);
                     update_rate_charts.setVisibility(View.VISIBLE);
+                    backup_data.setVisibility(View.VISIBLE);
+                    retrieve_data.setVisibility(View.VISIBLE);
                     arrowClicked[0] = true;
                 }
             }

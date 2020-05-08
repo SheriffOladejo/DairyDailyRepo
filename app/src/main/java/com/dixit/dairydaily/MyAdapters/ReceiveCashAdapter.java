@@ -52,8 +52,9 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
         String title = list.get(i).getTitle();
         String credit = list.get(i).getCredit();
         String debit = list.get(i).getDebit();
+        String shift = list.get(i).getShift();
 
-        viewHolder.setData(date, title, credit, debit);
+        viewHolder.setData(date, title, credit, debit, shift);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
             view = itemView;
         }
 
-        void setData(String date, String title, String credit, String debit){
+        void setData(String date, String title, String credit, String debit, String shift){
             TextView dateView = view.findViewById(R.id.date);
             TextView titleView = view.findViewById(R.id.title);
             TextView creditView = view.findViewById(R.id.credit);
@@ -92,25 +93,29 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
 
                     switch(which){
                         case 0:
-                            new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit).show();
+                            new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit, shift).show();
                             dialog.dismiss();
                             break;
                         case 1:
                             helper.deleteReceiveCash(unique_id, "","");
-                            new BackupHandler(context);
-                            ReceiveCashActivity.list = helper.getReceiveCash(user_Id, ReceiveCashActivity.startDate, ReceiveCashActivity.endDate);
-                            ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
-                            ReceiveCashActivity.recyclerView.setAdapter(adapter);
+                            ReceiveCashActivity.list = helper.getReceiveCash(user_Id, "", "");
+                            ReceiveCashActivity. adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                            for(ReceiveCashModel model : list){
+                                ReceiveCashActivity.creditTotal += Double.valueOf(model.getCredit());
+                                ReceiveCashActivity.debitTotal += Double.valueOf(model.getDebit());
+                            }
+                            ReceiveCashActivity.remain = ReceiveCashActivity.creditTotal - ReceiveCashActivity.debitTotal;
+                            ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
+                            ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
+                            ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
+                            ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
                             dialog.dismiss();
-//                            context.startActivity(new Intent(context, ReceiveCashActivity.class));
-//                            dialog.dismiss();
                             break;
                         case 2:
                             String toPrint ="\n\n\n"+ date + "\n" + "ID " + user_Id + " " + helper.getBuyerName(user_Id) + "\n" +
                                     "TITLE   | " + title  +
                                     "\nCREDIT  | " + truncate(Double.valueOf(credit)) + "Rs\nDEBIT   | " + Double.valueOf(debit) + "Rs";
                             toPrint += "\n\n      DAIRYDAILY APP";
-                            Log.d(TAG, "toPrint: " + toPrint);
                             byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
 
                             if(DashboardActivity.bluetoothAdapter != null) {

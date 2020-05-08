@@ -18,6 +18,7 @@ import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
+import static com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard.rpd;
 
 public class DataRetrievalHandler {
 
@@ -50,7 +51,8 @@ public class DataRetrievalHandler {
                             String title = obj.getString("Title");
                             String credit = obj.getString("Credit");
                             String debit = obj.getString("Debit");
-                            dbHelper.addReceiveCash(id, date, credit, debit, title);
+                            String shift = obj.getString("Shift");
+                            dbHelper.addReceiveCash(id, date, credit, debit, title, shift);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -159,7 +161,7 @@ public class DataRetrievalHandler {
 
                     try {
                         String retrievedJsonString = dataSnapshot.child("All Buyers").getValue().toString();
-                        Log.d("BackupHandler", "retrieveBuyerData: " + retrievedJsonString);
+                        Log.d("DataRetrievalHandler", "This is also called");
                             dbHelper.clearBuyerTable();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
@@ -199,7 +201,7 @@ public class DataRetrievalHandler {
 
                     try {
                         String retrievedJsonString = dataSnapshot.child("Milk Buy Data").getValue().toString();
-                        Log.d("BackupHandler", "retrieveMilkBuyData: " + retrievedJsonString);
+                        Log.d("DataRetrievalHandler", "This is called");
                             dbHelper.clearMilkBuyTable();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
@@ -216,6 +218,14 @@ public class DataRetrievalHandler {
                             String fat = obj.getString("Fat");
                             String snf = obj.getString("SNF");
                             dbHelper.addBuyEntry(id, name, weight, amount, rate, shift, date, fat, snf, type);
+
+                        }
+                        toast(context, "Data recovered successfully");
+                        try{
+                            rpd.dismiss();
+                        }
+                        catch(Exception e){
+
                         }
 
                     } catch (Exception e) {
@@ -251,7 +261,8 @@ public class DataRetrievalHandler {
                             String product_name = obj.getString("Product Name");
                             String units = obj.getString("Units");
                             String amount = obj.getString("Amount");
-                            dbHelper.addProductSale(id, name, product_name, units, amount);
+                            String date = obj.getString("Date");
+                            dbHelper.addProductSale(id, name, product_name, units, amount, date);
                             Log.d("BackupHandler", "retrieveProductSaleData: " + retrievedJsonString);
                         }
 
@@ -361,11 +372,10 @@ public class DataRetrievalHandler {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    //toast(context, "Data recovered successfully");
                 }
                 else{
-                    if(!LoginActivity.isWorkingOffline)
-                        toast(context, "Data recovered successfully");
+
+                        //toast(context, "Data recovered successfully");
                 }
             }
 

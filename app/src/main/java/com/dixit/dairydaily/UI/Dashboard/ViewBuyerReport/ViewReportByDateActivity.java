@@ -231,6 +231,12 @@ public class ViewReportByDateActivity extends InitDrawerBoard implements DatePic
                     amountTotal = 0;
                     weightTotal = 0;
                     averageFat = 0;
+                    ArrayList<ReportByDateModels> toRemove = new ArrayList<>();
+                    for(ReportByDateModels obj:list){
+                        if(obj.getAmount().equals("0"))
+                            toRemove.add(obj);
+                    }
+                    list.removeAll(toRemove);
                     for(ReportByDateModels object : list){
                         String dateString = object.getDate();
                         String rate = StringUtils.rightPad(truncate(Double.valueOf(object.getRate())), 6, "");
@@ -523,6 +529,13 @@ public class ViewReportByDateActivity extends InitDrawerBoard implements DatePic
         }
         String pdfName = date + ".pdf";
         pdfFile = new File(docFolder.getAbsolutePath(), pdfName);
+
+        ArrayList<ReportByDateModels> toRemove = new ArrayList<>();
+        for(ReportByDateModels obj:list){
+            if(obj.getAmount().equals("0"))
+                toRemove.add(obj);
+        }
+        list.removeAll(toRemove);
 
         OutputStream outputStream = new FileOutputStream(pdfFile);
         Document document = new Document(PageSize.A4);

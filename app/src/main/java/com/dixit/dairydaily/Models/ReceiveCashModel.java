@@ -5,16 +5,19 @@ public class ReceiveCashModel {
     private int id;
     private int unique_Id;
 
+    private String shift;
+
     public ReceiveCashModel() {
     }
 
-    public ReceiveCashModel(String date, String title, String credit, String debit, int id, int unique_Id) {
+    public ReceiveCashModel(String date, String title, String credit, String debit, int id, int unique_Id, String shift) {
         this.date = date;
         this.title = title;
         this.credit = credit;
         this.debit = debit;
         this.id = id;
         this.unique_Id = unique_Id;
+        this.shift = shift;
     }
 
     public String getDate() {
@@ -63,5 +66,13 @@ public class ReceiveCashModel {
 
     public void setUnique_Id(int unique_Id) {
         this.unique_Id = unique_Id;
+    }
+
+    public String getShift() {
+        return shift;
+    }
+
+    public void setShift(String shift) {
+        this.shift = shift;
     }
 }

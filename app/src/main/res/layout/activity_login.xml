@@ -205,21 +205,6 @@
                     android:layout_margin="10dp"
                     android:textSize="16sp"/>
 
-                <Button
-                    android:id="@+id/work_offline"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginBottom="30dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"
-                    android:text="Work Offline"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    android:background="@drawable/rectangle_border"
-                    android:backgroundTint="#373737"/>
-
             </LinearLayout>
 
         </ScrollView>

@@ -223,6 +223,33 @@ public class InvoiceActivity extends InitDrawerBoard {
         }
         String pdfName = date + ".pdf";
 
+        totalWeight = 0;
+        totalAmount = 0;
+        ArrayList<ReceiveCashListModel> toRemove = new ArrayList<>();
+        for(ReceiveCashListModel object : list){
+            String amount = object.getDue();
+            String weight = object.getWeight();
+            if(amount.equals("") || weight.equals("")){
+                toRemove.add(object);
+                Log.d(TAG, "Removed");
+            }
+        }
+        list.removeAll(toRemove);
+
+        for(ReceiveCashListModel object : list){
+            String id = StringUtils.rightPad(object.getId(), 3, "");
+            String name = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getName()), 9), 9, "");
+            String amount = object.getDue();
+            String weight = object.getWeight();
+            try{
+                totalAmount += Double.valueOf(amount);
+                totalWeight += Double.valueOf(weight);
+            }
+            catch(Exception e){
+
+            }
+        }
+
         pdfFile = new File(docFolder.getAbsolutePath(), pdfName);
 
         Paper.init(this);
@@ -256,30 +283,6 @@ public class InvoiceActivity extends InitDrawerBoard {
             table.addCell("Unpaid");
         }
 
-        totalWeight = 0;
-        totalAmount = 0;
-        ArrayList<ReceiveCashListModel> toRemove = new ArrayList<>();
-        for(ReceiveCashListModel object : list){
-            String amount = object.getDue();
-            String weight = object.getWeight();
-            if(amount.equals("0") || weight.equals("0")){
-                toRemove.add(object);
-            }
-        }
-        list.removeAll(toRemove);
-        for(ReceiveCashListModel object : list){
-            String id = StringUtils.rightPad(object.getId(), 3, "");
-            String name = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getName()), 9), 9, "");
-            String amount = object.getDue();
-            String weight = object.getWeight();
-            try{
-                totalAmount += Double.valueOf(amount);
-                totalWeight += Double.valueOf(weight);
-            }
-            catch(Exception e){
-
-            }
-        }
         PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2});
         table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table1.getDefaultCell().setFixedHeight(20);

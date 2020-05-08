@@ -92,8 +92,8 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
 
     public static String phone_number;
     public static int count = 0;
-    public static String totalWeight;
-    public static String totalAmount;
+    public static double totalWeight;
+    public static double totalAmount;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
@@ -246,47 +246,6 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
-
-//        startDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-//            @Override
-//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-//                if(String.valueOf(month).length() == 1){
-//                    if(String.valueOf(dayOfMonth).length() == 1){
-//                        startDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-//                        start_date_text_view.setText(startDate);
-//                    }
-//                    else{
-//                        startDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-//                        start_date_text_view.setText(startDate);
-//                    }
-//                }
-//                else{
-//                    startDate = year + "-" + (month+1) + "-" + dayOfMonth;
-//                    start_date_text_view.setText(startDate);
-//
-//                }
-//            }
-//        });
-//
-//        endDatePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-//            @Override
-//            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-//                if(String.valueOf(month).length() == 1){
-//                    if(String.valueOf(dayOfMonth).length() == 1){
-//                        endDate = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
-//                        end_date_text_view.setText(endDate);
-//                    }
-//                    else{
-//                        endDate = year + "-0" + (month+1) + "-" + dayOfMonth;
-//                        end_date_text_view.setText(endDate);
-//                    }
-//                }
-//                else{
-//                    endDate = year + "-" + (month+1) + "-" + dayOfMonth;
-//                    end_date_text_view.setText(endDate);
-//                }
-//            }
-//        });
         list = dbHelper.getBuyerRegister(startDate, endDate);
         BuyerRegisterAdapter adapter = new BuyerRegisterAdapter(BuyerRegisterActivity.this, list);
         recyclerView.setAdapter(adapter);
@@ -368,7 +327,7 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
         try {
             createPdf();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, "exception: " +e.getMessage());
         }
     }
 
@@ -391,6 +350,14 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
 
         Paper.init(this);
 
+        ArrayList<BuyerRegisterModel> toRemove = new ArrayList<>();
+        for(BuyerRegisterModel object : list){
+            String amount = object.getAmount();
+            if(amount.equals("0"))
+                toRemove.add(object);
+        }
+        list.removeAll(toRemove);
+
         OutputStream outputStream = new FileOutputStream(pdfFile);
         Document document = new Document(PageSize.A4);
         PdfPTable table = new PdfPTable(new float[]{2,2,2,2});
@@ -411,11 +378,15 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
         for(int i = 0; i<cells.length; i++){
             cells[i].setBackgroundColor(BaseColor.WHITE);
         }
+        totalAmount = 0;
+        totalWeight = 0;
         for(int j = 0; j <list.size(); j++){
             table.addCell(String.valueOf(list.get(j).getId()));
             table.addCell(list.get(j).getName());
             table.addCell(list.get(j).getWeight());
             table.addCell(list.get(j).getAmount());
+            totalAmount += Double.valueOf(list.get(j).getAmount());
+            totalWeight += Double.valueOf(list.get(j).getWeight());
         }
 
         PdfWriter.getInstance(document, outputStream);
@@ -433,6 +404,16 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
         range.setAlignment(Element.ALIGN_CENTER);
         document.add(range);
         document.add(table);
+
+        PdfPTable table1 = new PdfPTable(new float[]{2,2});
+        table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table1.getDefaultCell().setFixedHeight(20);
+        table1.setTotalWidth(PageSize.A4.getWidth());
+        table1.setWidthPercentage(100);
+        table1.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table1.addCell("Total Weight: " + truncate(Double.valueOf(totalWeight)));
+        table1.addCell("Total Amount: " + truncate(Double.valueOf(totalAmount)));
+        document.add(table1);
 
         String link = "http://play.google.com/store/apps/details?id=" + getPackageName();
         document.add(new Paragraph("Download DairyDaily app from google playstore:\n" + link ,f));

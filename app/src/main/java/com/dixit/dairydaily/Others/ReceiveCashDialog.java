@@ -34,6 +34,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
     DbHelper dbHelper;
     int id;
     int unique_id;
+    String shift;
 
     ProgressBar progressBar;
 
@@ -48,8 +49,9 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
         this.id = id;
     }
 
-    public ReceiveCashDialog(Context context,int unique_id, int id, String date, String title, String debit, String credit){
+    public ReceiveCashDialog(Context context,int unique_id, int id, String date, String title, String debit, String credit, String shift){
         super(context);
+        this.shift = shift;
         this.unique_id = unique_id;
         this.context = context;
         dbHelper = new DbHelper(this.context);
@@ -96,7 +98,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                 else{
                     if(wantToUpdate){
                         //Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
-                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString);
+                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString, shift);
                         new BackupHandler(context);
                         ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
                         ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
@@ -121,7 +123,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                     }
                     else{
                         Log.d("ReceiveCashDialog", "Trying to add new");
-                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString)){
+                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift)){
                             toast(context, "Operation failed");
                             dismiss();
                         }

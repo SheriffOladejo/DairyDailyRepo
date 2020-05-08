@@ -2,17 +2,18 @@ package com.dixit.dairydaily.Models;
 
 public class ProductSaleModel {
     private int id;
-    private String name, product_name, units, amount;
+    private String name, product_name, units, amount, date;
 
     public ProductSaleModel() {
     }
 
-    public ProductSaleModel(int id, String name, String product_name, String units, String amount) {
+    public ProductSaleModel(int id, String name, String product_name, String units, String amount, String date) {
         this.id = id;
         this.name = name;
         this.product_name = product_name;
         this.units = units;
         this.amount = amount;
+        this.date = date;
     }
 
     public int getId() {
@@ -53,5 +54,13 @@ public class ProductSaleModel {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

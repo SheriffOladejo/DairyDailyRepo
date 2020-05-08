@@ -212,19 +212,67 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/update"
+                    android:src="@drawable/ic_file_download"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="50dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Update Rate Charts"
+                    android:text="Download Rate Charts"
+                    android:layout_gravity="center_vertical"
                     android:textColor="@android:color/black"
                     android:layout_marginStart="5dp"/>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/erase_milk_history"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_delete_black_24dp"
+                    android:layout_marginStart="50dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Erase Milk History"
+                    android:textColor="@android:color/black"
+                    android:layout_marginStart="5dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/retrieve_data"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/update"
+                    android:layout_marginStart="50dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Retrieve Data"
+                    android:textColor="@android:color/black"
+                    android:layout_marginStart="5dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/backup_data"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_width="match_parent"
@@ -234,13 +282,15 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_delete_black_24dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/backup"
                     android:layout_marginStart="50dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Erase Milk History"
+                    android:layout_gravity="center_vertical"
+                    android:text="Backup Data"
                     android:textColor="@android:color/black"
                     android:layout_marginStart="5dp"/>
             </LinearLayout>
@@ -251,6 +301,7 @@
                 android:layout_marginEnd="30dp"
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider"/>
+
 
             <LinearLayout
                 android:layout_width="match_parent"

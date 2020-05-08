@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,23 +54,28 @@ import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 
 public class ProductSaleActivity extends AppCompatActivity {
 
-    TextView all_buyers;
+    public static TextView all_buyers;
     Spinner all_products;
     AddProductModel spinnerItem;
-    TextView amount;
-    EditText id, units, rate;
+    public static TextView amount;
+    public static EditText id, units, rate;
     Button save;
+
+    public static boolean want_to_update = false;
+
     String product;
+
+    public static ProductSaleAdapter productSaleAdapter;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
 
-    RecyclerView recyclerView;
+    public static RecyclerView recyclerView;
 
     DbHelper dbHelper = new DbHelper(this);
 
-    ArrayList<AddProductModel> list;
+    public static ArrayList<AddProductModel> list;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +109,7 @@ public class ProductSaleActivity extends AppCompatActivity {
         layoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        ProductSaleAdapter productSaleAdapter = new ProductSaleAdapter(this, dbHelper.getProductSale());
+        productSaleAdapter = new ProductSaleAdapter(this, dbHelper.getProductSale());
         recyclerView.setAdapter(productSaleAdapter);
 
         String name = getIntent().getStringExtra("name");
@@ -138,6 +144,8 @@ public class ProductSaleActivity extends AppCompatActivity {
                     rate.setText(rateString);
                     product = spinnerItem.getProduct_name();
                 }
+                else
+                    product = "";
             }
 
             @Override
@@ -206,12 +214,44 @@ public class ProductSaleActivity extends AppCompatActivity {
                 String name = all_buyers.getText().toString();
                 String unitsValue = units.getText().toString();
                 String amountValue = amount.getText().toString();
+                String date = "";
+                Date dateIntermediate = new Date();
+                try{
+                    DateFormat df = new DateFormat();
+                    date = df.format("yyyy-MM-dd", dateIntermediate).toString();
+                }
+                catch(Exception e){
+                    date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                }
 
-                if(!dbHelper.addProductSale(idInt, name, product, unitsValue, amountValue))
-                    toast(ProductSaleActivity.this, "Unable to add data");
-                else {
-                    startActivity(new Intent(ProductSaleActivity.this, ProductSaleActivity.class));
-                    finish();
+                if(want_to_update){
+                    if(!product.equals("")){
+                        dbHelper.updateProductSale(ProductSaleAdapter.id+"", name, product, unitsValue, amountValue);
+                        id.setText("");
+                        units.setText("");
+                        rate.setText("");
+                        amount.setText("Amount");
+                        all_buyers.setText("All Buyers");
+                        toast(ProductSaleActivity.this, "Updated");
+                        productSaleAdapter = new ProductSaleAdapter(ProductSaleActivity.this, dbHelper.getProductSale());
+                        recyclerView.setAdapter(productSaleAdapter);
+                        want_to_update = false;
+                    }
+                    else
+                        toast(ProductSaleActivity.this, "Select a product");
+                }
+                else{
+                    if(!product.equals("")){
+                        if(!dbHelper.addProductSale(idInt, name, product, unitsValue, amountValue, date))
+                            toast(ProductSaleActivity.this, "Unable to add data");
+                        else {
+                            startActivity(new Intent(ProductSaleActivity.this, ProductSaleActivity.class));
+                            finish();
+                        }
+                    }
+                    else{
+                        toast(ProductSaleActivity.this, "Select a product");
+                    }
                 }
             }
         });

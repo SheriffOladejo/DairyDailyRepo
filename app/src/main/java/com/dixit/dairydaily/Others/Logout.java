@@ -79,19 +79,19 @@ public class Logout extends AppCompatActivity {
                 }
                 details.put("Expiry Date", expiryDate);
                 Paper.book().write(Prevalent.expiry_date, expiryDate);
-                //Paper.book().destroy();
+                //
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
 
                 ref.updateChildren(details).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Paper.book().write(Prevalent.remember_me, "False");
-                            Paper.book().write(Prevalent.has_account, "True");
+                            Paper.book().write(Prevalent.remember_me, "false");
+                            Paper.book().write(Prevalent.has_account, "true");
                             pd.dismiss();
-                            context.startActivity(new Intent(context, LoginActivity.class));
-                            LoginActivity.logged_in = false;
                             DashboardActivity.updated = false;
+                            Paper.book().destroy();
+                            context.startActivity(new Intent(context, LoginActivity.class));
                             finish();
                         }
                         else{

@@ -110,12 +110,11 @@
             android:name="com.dixit.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity"
             android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.DashboardActivity" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DashboardActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+            android:theme="@style/Theme.Design.NoActionBar"/>
         <activity android:name="com.dixit.dairydaily.UI.UsersListActivity" />
         <activity android:name="com.dixit.dairydaily.CowChart.CowSNF" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.Customers.CustomersActivity" />
         <activity android:name="com.dixit.dairydaily.RateChart.RateChartOptions"/>
-        <activity android:name="com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.Experiment" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity" />

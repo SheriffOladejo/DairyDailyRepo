@@ -205,6 +205,7 @@ public class CustomersActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.add_customer){
             startActivity(new Intent(CustomersActivity.this, AddCustomers.class));
+            finish();
         }
         return true;
     }

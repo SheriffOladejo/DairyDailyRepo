@@ -25,13 +25,15 @@ import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 
 public class AddProductActivity extends InitDrawerBoard {
 
-    EditText product_name, rate;
+    public static EditText product_name, rate;
+    public static String id;
+    public static boolean want_to_update = false;
     Button save;
-    RecyclerView recyclerView;
-    AddProductAdapter adapter;
+    public static RecyclerView recyclerView;
+    public static AddProductAdapter adapter;
 
     DbHelper dbHelper = new DbHelper(this);
-    ArrayList list;
+    public static ArrayList list;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
@@ -78,6 +80,16 @@ public class AddProductActivity extends InitDrawerBoard {
                 if(productName.isEmpty() || Rate.isEmpty()){
                     toast(AddProductActivity.this, "Field should be filled");
                 }
+                if(want_to_update){
+                    dbHelper.updateProducts(id, productName, Rate);
+                    want_to_update = false;
+                    new BackupHandler(AddProductActivity.this);
+                    list = dbHelper.getProducts();
+                    adapter = new AddProductAdapter(AddProductActivity.this, list);
+                    recyclerView.setAdapter(adapter);
+                    product_name.setText("");
+                    rate.setText("");
+                }
                 else{
                     if(!dbHelper.addProduct(productName, Rate))
                         toast(AddProductActivity.this, "Unable to add product");
@@ -86,6 +98,8 @@ public class AddProductActivity extends InitDrawerBoard {
                         list = dbHelper.getProducts();
                         adapter = new AddProductAdapter(AddProductActivity.this, list);
                         recyclerView.setAdapter(adapter);
+                        product_name.setText("");
+                        rate.setText("");
                     }
                 }
             }

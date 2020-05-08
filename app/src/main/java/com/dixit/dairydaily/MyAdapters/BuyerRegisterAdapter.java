@@ -80,8 +80,8 @@ public class BuyerRegisterAdapter extends RecyclerView.Adapter<BuyerRegisterAdap
                 public void onClick(View v) {
                     BuyerRegisterActivity.phone_number = helper.getBuyerPhone_Number(list.get(getAdapterPosition()).getId());
                     BuyerRegisterActivity.count += 1;
-                    BuyerRegisterActivity.totalAmount = list.get(getAdapterPosition()).getAmount();
-                    BuyerRegisterActivity.totalWeight = list.get(getAdapterPosition()).getWeight();
+                    BuyerRegisterActivity.totalAmount = Double.valueOf(list.get(getAdapterPosition()).getAmount());
+                    BuyerRegisterActivity.totalWeight = Double.valueOf(list.get(getAdapterPosition()).getWeight());
                 }
             });
 

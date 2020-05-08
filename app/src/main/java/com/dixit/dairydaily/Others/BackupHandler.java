@@ -1,6 +1,5 @@
 package com.dixit.dairydaily.Others;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -26,6 +25,7 @@ import io.paperdb.Paper;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
+import static com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard.bpd;
 
 public class BackupHandler {
 
@@ -78,6 +78,7 @@ public class BackupHandler {
                     values.put("Credit", data.getString(data.getColumnIndex("Credit")));
                     values.put("Debit", data.getString(data.getColumnIndex("Debit")));
                     values.put("ID", data.getInt(data.getColumnIndex("ID")));
+                    values.put("Shift", data.getString(data.getColumnIndex("Shift")));
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
                     Log.d("BackupHandler", "backupReceiveCashData: onAdd" + jsonToUpload.toString());
@@ -171,11 +172,11 @@ public class BackupHandler {
                 Log.d("BackupHandler", "backupSellerData: " + key);
                 try{
                     JSONObject values = new JSONObject();
-                    values.put("Name", allSellers.getString(allBuyers.getColumnIndex("Name")));
-                    values.put("PhoneNumber", allSellers.getString(allBuyers.getColumnIndex("PhoneNumber")));
-                    values.put("Address", allSellers.getString(allBuyers.getColumnIndex("Address")));
-                    values.put("Status", allSellers.getString(allBuyers.getColumnIndex("Status")));
-                    values.put("ID", allSellers.getInt(allBuyers.getColumnIndex("ID")));
+                    values.put("Name", allSellers.getString(allSellers.getColumnIndex("Name")));
+                    values.put("PhoneNumber", allSellers.getString(allSellers.getColumnIndex("PhoneNumber")));
+                    values.put("Address", allSellers.getString(allSellers.getColumnIndex("Address")));
+                    values.put("Status", allSellers.getString(allSellers.getColumnIndex("Status")));
+                    values.put("ID", allSellers.getInt(allSellers.getColumnIndex("ID")));
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
                     Log.d("BackupHandler", "backupSellerData: onAdd" + jsonToUpload.toString());
@@ -355,6 +356,11 @@ public class BackupHandler {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
+                        toast(context, "Data uploaded successfully");
+                        try{
+                            bpd.dismiss();
+                        }
+                        catch(Exception e){}
                         backupProductSale();
                     }
                     else{
@@ -382,6 +388,7 @@ public class BackupHandler {
                     obj.put("Name", list.get(i).getName());
                     obj.put("Amount",list.get(i).getAmount());
                     obj.put("Units", list.get(i).getUnits());
+                    obj.put("Date", list.get(i).getDate());
                     jsonToUpload.put(String.valueOf(i), obj);
                     Log.d("BackupHandler", "backupProductSaleData: onAdd" + jsonToUpload.toString());
                 } catch (JSONException e) {
@@ -394,6 +401,7 @@ public class BackupHandler {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
+                        //toast(context, "Data uploaded successfully");
                         backupExpiryDate();
                     }
                     else{
@@ -434,7 +442,7 @@ public class BackupHandler {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-                            toast(context, "Data uploaded successfully");
+                            //toast(context, "Data uploaded successfully");
                         }
                         else{
                             toast(context, "Unable to backup");

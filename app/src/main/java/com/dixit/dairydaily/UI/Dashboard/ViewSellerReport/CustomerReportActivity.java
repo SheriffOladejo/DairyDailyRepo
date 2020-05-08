@@ -33,6 +33,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dixit.dairydaily.Models.ReceiveCashListModel;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
@@ -69,6 +70,7 @@ import java.util.List;
 import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.getEndDate;
+import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.dixit.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
@@ -177,6 +179,16 @@ public class CustomerReportActivity extends InitDrawerBoard implements DatePicke
             public void onClick(View v) {
 
                 if(list!=null){
+                    ArrayList<CustomerReportModel> toRemove = new ArrayList<>();
+                    for(CustomerReportModel object : list){
+                        String amount = object.getAmount();
+                        String weight = object.getWeight();
+                        if(amount.equals("0") || weight.equals("")){
+                            toRemove.add(object);
+                            Log.d(TAG, "Removed");
+                        }
+                    }
+                    list.removeAll(toRemove);
                     Collections.reverse(list);
                     String line = "--------------------------------";
                     Date dateIntermediate = new Date();
@@ -278,6 +290,8 @@ public class CustomerReportActivity extends InitDrawerBoard implements DatePicke
             public void onClick(View v) {
                 Log.d(TAG, "Start Date: " + startDate);
                 Log.d(TAG, "End Date: " + endDate);
+                totalAmount = 0;
+                totalWeight = 0;
                 try{
                     idInt = Integer.valueOf(id.getText().toString());
                     if(startDate.isEmpty() || endDate.isEmpty() || String.valueOf(idInt).isEmpty()){
@@ -430,6 +444,32 @@ public class CustomerReportActivity extends InitDrawerBoard implements DatePicke
         String pdfName = datee + ".pdf";
         pdfFile = new File(docFolder.getAbsolutePath(), pdfName);
 
+        totalWeight = 0;
+        totalAmount = 0;
+        ArrayList<CustomerReportModel> toRemove = new ArrayList<>();
+        for(CustomerReportModel object : list){
+            String amount = object.getAmount();
+            String weight = object.getWeight();
+            if(amount.equals("0") || weight.equals("")){
+                toRemove.add(object);
+                Log.d(TAG, "Removed");
+            }
+        }
+        list.removeAll(toRemove);
+
+        for(CustomerReportModel object : list){
+            String amount = object.getAmount();
+            String weight = object.getWeight();
+            try{
+                totalAmount += Double.valueOf(amount);
+                totalWeight += Double.valueOf(weight);
+            }
+            catch(Exception e){
+
+            }
+        }
+
+
         Paper.init(this);
 
         OutputStream outputStream = new FileOutputStream(pdfFile);
@@ -444,7 +484,7 @@ public class CustomerReportActivity extends InitDrawerBoard implements DatePicke
         table.addCell("Date");
         table.addCell("Session");
         table.addCell("Fat(%)");
-        table.addCell("SMF");
+        table.addCell("SNF");
         table.addCell("Weight(Ltr)");
         table.addCell("Amount(Rs)");
 
@@ -481,23 +521,16 @@ public class CustomerReportActivity extends InitDrawerBoard implements DatePicke
         Paragraph range = new Paragraph(startDate + " - " + endDate + "\n\n",f);
         range.setAlignment(Element.ALIGN_CENTER);
         document.add(range);
-        table.addCell("Average Fat: " + truncate(averageFat));
-        table.addCell("Average SNF: " + truncate(averageSnf));
-        table.addCell("Total Weight: " + truncate(totalWeight));
-        table.addCell("Total Amount: " + truncate(totalAmount));
         document.add(table);
 
         PdfPTable table1 = new PdfPTable(new float[]{2,2});
         table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table1.getDefaultCell().setFixedHeight(20);
         table1.setTotalWidth(PageSize.A4.getWidth());
-
         table1.setWidthPercentage(100);
         table1.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table1.addCell("Total Weight: " + truncate(totalWeight));
-        table1.addCell("Total Amount: " + truncate(totalAmount));
-
-        Log.d(TAG, "Total Weight: " + totalAmount);
+        table1.addCell("Total Weight(Ltr): " + truncate(totalWeight));
+        table1.addCell("Total Amount(Rs): " + truncate(totalAmount));
 
         document.add(table1);
 

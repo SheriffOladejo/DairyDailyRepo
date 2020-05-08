@@ -46,6 +46,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
+import com.dixit.dairydaily.UI.LoginActivity;
+import com.dixit.dairydaily.UI.PasscodeViewClass;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -148,9 +150,16 @@ public class DashboardActivity extends InitDrawerBoard {
     private static final String TAG = "DashboardActivity";
 
     public static String expiryDate;
+    private boolean suspended;
     String date;
 
     DbHelper helper;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -168,6 +177,32 @@ public class DashboardActivity extends InitDrawerBoard {
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Updating Rate Chart...");
         progressDialog.setCancelable(false);
+
+        DatabaseReference ref3 = FirebaseDatabase.getInstance().getReference().child("Users").child("" + Paper.book().read(Prevalent.phone_number)).child("Active");
+        ref3.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String active = dataSnapshot.getValue().toString();
+                    if(active.equals("false")){
+                        suspended = true;
+                        toast(DashboardActivity.this, "Your account has been suspended, contact the admin.");
+                        Paper.book().write(Prevalent.remember_me, "false");
+                        startActivity(new Intent(DashboardActivity.this, LoginActivity.class));
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        if(suspended) {
+
+        }
 
         //checkFilePermissions();
         if(ContextCompat.checkSelfPermission(DashboardActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
@@ -421,12 +456,12 @@ public class DashboardActivity extends InitDrawerBoard {
             @Override
             public void onClick(View v) {
                 Intent sendintent = new Intent("android.intent.action.MAIN");
-                String formattedPhoneNumber = "918449852828";
+                String phoneNumber = "918449852828";
                 sendintent.setAction(Intent.ACTION_SEND);
                 sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
                 sendintent.setType("text/plain");
                 sendintent.setPackage("com.whatsapp");
-                sendintent.putExtra("jid", formattedPhoneNumber+"@s.whatsapp.net");
+                sendintent.putExtra("jid", phoneNumber+"@s.whatsapp.net");
                 startActivity(sendintent);
             }
         });
@@ -495,7 +530,6 @@ public class DashboardActivity extends InitDrawerBoard {
         add_product.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toast(DashboardActivity.this, showReminder+"");
                 //startActivity(new Intent(DashboardActivity.this, AddProductActivity.class));
                 if(!isExpired){
                     if(showReminder){

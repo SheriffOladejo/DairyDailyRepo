@@ -181,6 +181,20 @@ public class SendOtpActivity extends AppCompatActivity {
                 SendOtpActivity.this,
                 mCallbacks);
 
+        findViewById(R.id.resend_otp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timer.start();
+                // Send user's phone number for verification
+                PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                        phoneNumber,
+                        45,
+                        TimeUnit.SECONDS,
+                        SendOtpActivity.this,
+                        mCallbacks);
+            }
+        });
+
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -255,7 +269,7 @@ public class SendOtpActivity extends AppCompatActivity {
         details.put("Expiry Date", String.valueOf(c.getTime().getTime()));
 
         Paper.book().write(Prevalent.offline_password, offline_password);
-        Paper.book().write(Prevalent.has_account, "True");
+        Paper.book().write(Prevalent.has_account, "true");
         Paper.book().write(Prevalent.name, firstname + " " + lastname);
         Paper.book().write(Prevalent.phone_number, phoneNumber);
         Paper.book().write(Prevalent.city, city);
@@ -277,7 +291,8 @@ public class SendOtpActivity extends AppCompatActivity {
                     c.setTime(new Date());
                     c.add(Calendar.DATE, 31);
                     helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
-                    startActivity(new Intent(SendOtpActivity.this, DashboardActivity.class));
+                    toast(SendOtpActivity.this, "Login with your details");
+                    startActivity(new Intent(SendOtpActivity.this, LoginActivity.class));
                     finish();
                 }
                 else{

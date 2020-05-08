@@ -13,13 +13,13 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/sr"
-            android:layout_width="30dp"
+            android:id="@+id/date"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:text="Sr"
+            android:text="12-12-1212"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/name"
@@ -28,46 +28,47 @@
             android:layout_height="wrap_content"
             android:text="Name"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/product_name"
-            android:layout_width="80dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:text="Product"
-            android:textSize="16sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/units"
-            android:layout_width="60dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:text="Units"
+            android:text="12"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/amount"
-            android:layout_width="65dp"
+            android:layout_width="50dp"
             android:textAlignment="center"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:text="Amount"
-            android:textSize="16sp"/>
+            android:textSize="12sp"/>
 
         <ImageView
             android:id="@+id/options"
             android:layout_width="20dp"
-            android:layout_height="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginBottom="5dp"
             android:src="@drawable/ic_more_vert"/>
 
 
     </LinearLayout>
 
     <View
-        android:layout_toEndOf="@id/linearLayout"
+        android:layout_below="@id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"

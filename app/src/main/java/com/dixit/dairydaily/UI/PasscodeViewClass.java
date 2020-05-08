@@ -6,15 +6,25 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.dixit.dairydaily.Others.DataRetrievalHandler;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hanks.passcodeview.PasscodeView;
 import com.dixit.dairydaily.Others.Prevalent;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 
+import javax.security.auth.callback.PasswordCallback;
+
 import io.paperdb.Paper;
 
+import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.useSnackBar;
 
 
@@ -30,11 +40,7 @@ public class PasscodeViewClass extends AppCompatActivity {
         setContentView(R.layout.activity_passcode_view);
 
         Paper.init(this);
-
-//        Calendar c = Calendar.getInstance();
-//        c.setTime(new Date());
-//        c.add(Calendar.DATE, 0);
-//        toast(this, String.valueOf(c.getTime().getTime()));
+        //new DataRetrievalHandler(PasscodeViewClass.this);
 
         String success = "";
         try{

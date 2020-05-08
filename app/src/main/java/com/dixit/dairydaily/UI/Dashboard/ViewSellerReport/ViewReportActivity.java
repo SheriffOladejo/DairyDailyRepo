@@ -37,7 +37,7 @@ public class ViewReportActivity extends AppCompatActivity {
         add_bonus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ViewReportActivity.this, Experiment.class));
+
             }
         });
         shift_report.setOnClickListener(new View.OnClickListener() {

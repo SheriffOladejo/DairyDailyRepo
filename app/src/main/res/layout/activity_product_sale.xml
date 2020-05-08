@@ -149,6 +149,7 @@
                 android:textColorHint="#373737"
                 android:textAlignment="center"
                 android:paddingStart="10dp"
+                android:inputType="number"
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="20dp"/>
 
@@ -215,12 +216,12 @@
             android:layout_centerInParent="true">
 
             <TextView
-                android:layout_width="30dp"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:text="Sr"
+                android:text="Date"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="80dp"
@@ -228,36 +229,35 @@
                 android:text="Name"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="Product"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:text="Product"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
                 android:text="Units"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             <TextView
-                android:layout_width="65dp"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:text="Amount"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="wrap_content" />
-
 
         </LinearLayout>
 

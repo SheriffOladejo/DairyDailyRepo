@@ -3,6 +3,7 @@ package com.dixit.dairydaily.UI;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -73,7 +74,6 @@ import static com.dixit.dairydaily.Others.UtilityMethods.useSnackBar;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
-    public static boolean isWorkingOffline = false;
 
     // Array lists for state and city autocompletetextviews
     ArrayList<String> listState=new ArrayList<String>();
@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
     AutoCompleteTextView actCity;
     public static String expiry = "";
 
-    public static boolean logged_in = false;
+    private boolean suspended = false;
 
     private int duration;
     private ScrollView login_view;
@@ -99,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     // login section variable declarations
-    String login_phone_number;
+    public static String login_phone_number;
     String login_password;
     boolean remember_me = false;
     boolean forgot = false;
@@ -119,6 +119,9 @@ public class LoginActivity extends AppCompatActivity {
     String email;
     String state;
     String city;
+
+    private static Activity activity;
+    private boolean new_user = true;
 
     // Sign up widgets
     EditText signupPhoneNumber;
@@ -142,7 +145,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText loginPassword;
     CheckBox rememberMe;
     Button login;
-    Button work_offline;
     EditText login_country_code;
     TextView forgot_password;
 
@@ -192,6 +194,8 @@ public class LoginActivity extends AppCompatActivity {
         login_signup = findViewById(R.id.login_signup);
         login_signup.setText("Sign Up");
 
+        activity = this;
+
         setSupportActionBar(toolbar);
 
         registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
@@ -206,8 +210,8 @@ public class LoginActivity extends AppCompatActivity {
         loginPhoneNumber.requestFocus();
         loginPassword = findViewById(R.id.login_password);
         rememberMe = findViewById(R.id.remember_me);
+        rememberMe.setChecked(true);
         login = findViewById(R.id.login_button);
-        work_offline = findViewById(R.id.work_offline);
         forgot_password = findViewById(R.id.forot_password);
 
         // sign up widgets
@@ -254,8 +258,18 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                login_phone_number = loginPhoneNumber.getText().toString();
+                login_password = loginPassword.getText().toString();
+                remember_me = rememberMe.isChecked();
+                login_country_code_string = login_country_code.getText().toString();
+                // concat number to country code provided
+                login_country_code_string += login_phone_number;
+                login_phone_number = login_country_code_string;
+
                 if(!forgot && control){
-                    verifyLoginInput();
+                    if(!isSuspended()){
+                        verifyLoginInput();
+                    }
                 }
                 else if(updatePassword && !control){
                     progressDialog.setMessage("Updating Password...");
@@ -306,25 +320,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        work_offline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try{
-                    Log.d(TAG, "workOffline: " + Paper.book().read(Prevalent.has_account));
-                    if(Paper.book().read(Prevalent.has_account).equals("True")){
-                        isWorkingOffline = true;
-                        startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
-                    }
-                    else{
-                        useSnackBar("Please login.", frameLayout);
-                    }
-                }
-                catch(Exception e){
-
-                }
-            }
-        });
-
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -348,10 +343,8 @@ public class LoginActivity extends AppCompatActivity {
         callAll();
 
         String remember = Paper.book().read(Prevalent.remember_me);
-        Log.d(TAG,"remember: " + remember);
-        Log.d(TAG,"name: " + Paper.book().read(Prevalent.name));
         if(remember != null){
-            if(remember.equals("True")){
+            if(remember.equals("true")){
                 startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
                 finish();
             }
@@ -362,16 +355,38 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    private boolean isSuspended(){
+        final DatabaseReference[] checkActiveState = {FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number).child("Active")};
+        checkActiveState[0].addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String active = dataSnapshot.getValue().toString();
+                    if(active.equals("false")){
+                        suspended = true;
+                        progressDialog.dismiss();
+                        checkActiveState[0] = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        if(suspended){
+            toast(LoginActivity.this, "Your account has been suspended, contact the admin.");
+            startActivity(new Intent(activity, LoginActivity.class));
+            finish();
+        }
+        return suspended;
+    }
+
     private void verifyLoginInput(){
         hideKeyboard(LoginActivity.this);
-
-        login_phone_number = loginPhoneNumber.getText().toString();
-        login_password = loginPassword.getText().toString();
-        remember_me = rememberMe.isChecked();
-        login_country_code_string = login_country_code.getText().toString();
-        // concat number to country code provided
-        login_country_code_string += login_phone_number;
-        login_phone_number = login_country_code_string;
+        Paper.book().write(Prevalent.phone_number, login_phone_number);
+        new DataRetrievalHandler(LoginActivity.this);
 
         if(login_phone_number.isEmpty() || login_password.isEmpty() || login_country_code_string.isEmpty()){
             useSnackBar("All fields are required", frameLayout);
@@ -382,19 +397,18 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog.show();
 
             // We first want to check if the phone number exists and if the password matches.
-            Log.d(TAG, "verifyLogin: before");
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
-            Log.d(TAG, "verifyLogin: after");
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
-                        if(!logged_in){
+                        //toast(LoginActivity.this, logged_in + " " + suspended);
+                        if(!suspended){
                             String password = dataSnapshot.child("Password").getValue().toString();
                             if(password.equals(login_password)){
 
                                 if(remember_me){
-                                    Paper.book().write(Prevalent.remember_me, "True");
+                                    Paper.book().write(Prevalent.remember_me, "true");
                                 }
 
                                 String firstname = dataSnapshot.child("Firstname").getValue().toString();
@@ -419,7 +433,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 Paper.book().write(Prevalent.offline_password, offline_password);
                                 Paper.book().write(Prevalent.name, firstname + " " + lastname);
-                                Paper.book().write(Prevalent.has_account, "True");
+                                Paper.book().write(Prevalent.has_account, "true");
                                 Paper.book().write(Prevalent.phone_number, phone_number);
                                 Paper.book().write(Prevalent.city, city);
                                 Paper.book().write(Prevalent.email, email);
@@ -429,7 +443,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Paper.book().write(Prevalent.last_update, last_backup);
                                 Paper.book().write(Prevalent.state,state);
                                 helper.setExpiryDate(expiry_date);
-                                new DataRetrievalHandler(LoginActivity.this);
+
                                 StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
                                 ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                                     @Override
@@ -440,8 +454,21 @@ public class LoginActivity extends AppCompatActivity {
                                             DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
                                         }
                                         else{
-                                            Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
-                                            progressDialog.dismiss();
+                                            //Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                                            ref1 = FirebaseStorage.getInstance().getReference().child("Rate Chart").child("Rate File");
+                                            ref1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Uri> task) {
+                                                    if(task.isSuccessful()){
+                                                        url = task.getResult().toString();
+                                                        //Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                                                        DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
+                                                    }
+                                                    else{
+                                                        //Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 });
@@ -457,6 +484,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         else{
                             progressDialog.dismiss();
+                            toast(LoginActivity.this, "Your account has been suspended. Contact the admin");
                         }
                     }
                     else{
@@ -472,9 +500,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
+
     }
 
     private void verifySignupInput(){
+        progressDialog.setMessage("Please Wait");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
         hideKeyboard(LoginActivity.this);
         firstname_string = firstname.getText().toString();
@@ -534,25 +566,6 @@ public class LoginActivity extends AppCompatActivity {
                 // Remember to add else if for state and city
             else {
                 if(sign_up_password.equals(confirm_password)){
-
-                    progressDialog.setMessage("Please Wait...");
-                    progressDialog.setCancelable(false);
-                    progressDialog.show();
-                    ref1 = FirebaseStorage.getInstance().getReference().child("Rate Chart").child("Rate File");
-                    ref1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if(task.isSuccessful()){
-                                url = task.getResult().toString();
-                                //Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
-                                DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
-                            }
-                            else{
-                                Toast.makeText(LoginActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(sign_up_phone_number);
                     ref.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -633,7 +646,6 @@ public class LoginActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 catch(Exception e){}
-                logged_in = true;
                 startActivity(new Intent(LoginActivity.this, PasscodeViewClass.class));
                 finish();
             }
