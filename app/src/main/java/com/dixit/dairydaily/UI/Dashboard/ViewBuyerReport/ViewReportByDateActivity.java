@@ -20,8 +20,6 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,9 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,19 +49,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.dixit.dairydaily.Models.ReportByDateModels;
 import com.dixit.dairydaily.MyAdapters.ReportByDateAdapter;
-import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
-import com.dixit.dairydaily.Others.Logout;
 import com.dixit.dairydaily.Others.Prevalent;
-import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.dixit.dairydaily.UI.UsersListActivity;
+import com.dixit.dairydaily.UI.Dashboard.UsersListActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -240,14 +228,14 @@ public class ViewReportByDateActivity extends InitDrawerBoard implements DatePic
                     for(ReportByDateModels object : list){
                         String dateString = object.getDate();
                         String rate = StringUtils.rightPad(truncate(Double.valueOf(object.getRate())), 6, "");
-                        String amount = StringUtils.rightPad(StringUtils.truncate(object.getAmount(),6), 6, "");
+                        String amount = StringUtils.rightPad(StringUtils.truncate(object.getAmount(),5), 5, "");
                         String shift = object.getShift();
                         shift = shift.equals("Morning") ? "M" : "E";
                         String weight = StringUtils.rightPad(truncate(Double.valueOf(object.getWeight())), 6, "");
                         amountTotal += Double.valueOf(object.getAmount());
                         weightTotal += Double.valueOf(object.getWeight());
                         averageFat +=Double.valueOf(object.getRate());
-                        toPrint += dateString.substring(8,10) +" - " + shift + "|" +"" + rate + "|" + ""+ weight + "|" +""+ amount + "\n";
+                        toPrint += dateString.substring(8,10) +" - " + shift + "|" +"" + rate + "|" + ""+ weight + "|" +""+ amount +"|" + "\n";
                     }
                     averageFat /= list.size();
                     toPrint += line + "\n";

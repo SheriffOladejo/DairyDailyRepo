@@ -101,12 +101,14 @@ public class ProductSaleAdapter extends RecyclerView.Adapter<ProductSaleAdapter.
                             ProductSaleActivity.amount.setText(amount);
                             ProductSaleActivity.want_to_update = true;
                             dialog.dismiss();
+                            new BackupHandler(context);
                             break;
                         case 1:
                             helper.deleteProductSale(id);
                             ProductSaleActivity.productSaleAdapter = new ProductSaleAdapter(context, helper.getProductSale());
                             ProductSaleActivity.recyclerView.setAdapter(ProductSaleActivity.productSaleAdapter);
                             dialog.dismiss();
+                            new BackupHandler(context);
                             break;
                         case 2:
                             String date;

@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI;
+package com.dixit.dairydaily.UI.Login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -28,7 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.Others.Prevalent;
 import com.dixit.dairydaily.R;
-import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 
 import java.util.Calendar;
 import java.util.Date;

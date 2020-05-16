@@ -104,7 +104,7 @@ public class InitDrawerBoard extends AppCompatActivity {
                     public void onClick(View v) {
                         rpd = new ProgressDialog(InitDrawerBoard.this);
                         rpd.setMessage("Retrieving...");
-                        rpd.setCancelable(true);
+                        rpd.setCancelable(false);
                         rpd.show();
                         new DataRetrievalHandler(InitDrawerBoard.this);
                         dialog.dismiss();

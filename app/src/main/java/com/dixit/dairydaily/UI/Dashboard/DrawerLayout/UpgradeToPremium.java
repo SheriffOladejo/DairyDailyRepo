@@ -16,13 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.Others.Prevalent;
 import com.dixit.dairydaily.R;
-import com.dixit.dairydaily.UI.Dashboard.CheckSum;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.paperdb.Paper;
+
+import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 
 public class UpgradeToPremium extends AppCompatActivity {
 
@@ -60,9 +61,9 @@ public class UpgradeToPremium extends AppCompatActivity {
         price1 = findViewById(R.id.price1);
         price2 = findViewById(R.id.price2);
 
-        price.setText(""+Prevalent.starter);
-        price1.setText(""+Prevalent.spark);
-        price2.setText(""+Prevalent.enterprise);
+        price.setText(""+Paper.book().read(Prevalent.starter));
+        price1.setText(""+Paper.book().read(Prevalent.spark));
+        price2.setText(""+Paper.book().read(Prevalent.enterprise));
 
         helper = new DbHelper(this);
 
@@ -88,52 +89,31 @@ public class UpgradeToPremium extends AppCompatActivity {
         findViewById(R.id.priceButton1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(DashboardActivity.can_pay){
-                    if(!isInternetConnected)
-                        Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
-                    else{
-                        Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
-                        intent.putExtra("orderId", orderId);
-                        intent.putExtra("customerId", customerId);
-                        intent.putExtra("price", ""+Prevalent.starter);
-                        startActivity(intent);
-                    }
-                }
-
+                Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("customerId", customerId);
+                intent.putExtra("price", ""+Paper.book().read(Prevalent.starter));
+                startActivity(intent);
             }
         });
         findViewById(R.id.priceButton2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(DashboardActivity.can_pay){
-                    if(!isInternetConnected)
-                        Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
-                    else{
-                        Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
-                        intent.putExtra("orderId", orderId);
-                        intent.putExtra("customerId", customerId);
-                        intent.putExtra("price", ""+Prevalent.spark);
-                        startActivity(intent);
-                    }
-                }
-
+                Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("customerId", customerId);
+                intent.putExtra("price", ""+Paper.book().read(Prevalent.spark));
+                startActivity(intent);
             }
         });
         findViewById(R.id.priceButton3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(DashboardActivity.can_pay){
-                    if(!isInternetConnected)
-                        Toast.makeText(UpgradeToPremium.this, "Connect to the internet", Toast.LENGTH_SHORT).show();
-                    else{
-                        Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
-                        intent.putExtra("orderId", orderId);
-                        intent.putExtra("customerId", customerId);
-                        intent.putExtra("price", ""+Prevalent.enterprise);
-                        startActivity(intent);
-                    }
-                }
-
+                Intent intent = new Intent(UpgradeToPremium.this, CheckSum.class);
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("customerId", customerId);
+                intent.putExtra("price", ""+Paper.book().read(Prevalent.enterprise));
+                startActivity(intent);
             }
         });
     }

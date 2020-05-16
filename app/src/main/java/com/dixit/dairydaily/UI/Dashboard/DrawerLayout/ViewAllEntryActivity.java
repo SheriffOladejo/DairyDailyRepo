@@ -20,16 +20,13 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,14 +45,13 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.dixit.dairydaily.Models.ViewAllEntryModel;
 import com.dixit.dairydaily.MyAdapters.ViewAllEntryAdapter;
-import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
-import com.dixit.dairydaily.Others.Logout;
 import com.dixit.dairydaily.Others.Prevalent;
-import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.UsersListActivity;
+import com.dixit.dairydaily.UI.Dashboard.UsersListActivity;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -155,26 +151,31 @@ public class ViewAllEntryActivity extends InitDrawerBoard {
                     String line = "--------------------------------";
                     String toPrint = "\nID | " + idInt + " \nNAME | " + all_sellers.getText().toString() + "\n";
                     toPrint += startDate + " TO " + endDate + "\n" + line +
-                            "\n DATE |"  + "WEIGHT| " +" FAT/SNF |" + "AMOUNT"+"\n" + line + "\n";
+                            "\n DATE  |"  + "WEIGHT|" +" FAT-SNF |" + "AMOUNT|"+"\n" + line + "\n";
 
                     for(ViewAllEntryModel object : list){
                         String session = object.getSession();
                         session = session.equals("Morning") ? "M" : "E";
                         String rate = truncate(Double.valueOf(object.getRate()));
                         String bonus = object.getBonus();
-                        String date = object.getDate();
-                        date = date.substring(8,10);
-                        String fat = truncate(Double.valueOf(object.getFat()));
-                        String amount = truncate(Double.valueOf(object.getAmount()));
-                        String snf = truncate(Double.valueOf(object.getSnf()));
-                        String weight = truncate(Double.valueOf(object.getWeight()));
-                        toPrint += date + " - " + session + "| " + weight + "|" + fat+"-"+snf + "|" + amount +"\n";
+                        String datee = object.getDate();
+                        String date;
+                        date = datee.substring(8,10);
+                        String month = datee.substring(5,7);
+                        date=month+"/"+date;
+                        String fat = object.getFat();
+                        String amount = StringUtils.rightPad(truncate(Double.valueOf(object.getAmount())), 6, "");
+                        String snf = object.getSnf();
+                        String weight = StringUtils.rightPad(truncate(Double.valueOf(object.getWeight())), 6, "");
+                        String fatsnf = StringUtils.rightPad((fat +"-" +snf), 9, "");
+
+                        toPrint += date + "-" + session + "|" + weight + "|" + fatsnf + "|" + amount +"|\n";
                     }
                     toPrint += line + "\n";
                     toPrint += "TOTAL AMOUNT: " + amountTotal.getText().toString();
                     toPrint += "\nTOTAL WEIGHT: " + weightTotal.getText().toString();
                     toPrint += "\n" + line;
-                    toPrint += "\n\n   DAIRYDAILY APP";
+                    toPrint += "\n\n   DAIRYDAILY APP\n\n";
                     Log.d(TAG, "toPrint: " + toPrint);
 
                     byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
@@ -454,7 +455,7 @@ public class ViewAllEntryActivity extends InitDrawerBoard {
         document.add(range);
         document.add(table);
 
-        PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2,2,2});
+        PdfPTable table1 = new PdfPTable(new float[]{2,2});
         table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table1.getDefaultCell().setFixedHeight(20);
         table1.setTotalWidth(PageSize.A4.getWidth());

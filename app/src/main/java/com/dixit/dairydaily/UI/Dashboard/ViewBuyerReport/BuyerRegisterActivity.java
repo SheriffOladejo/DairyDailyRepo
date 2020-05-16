@@ -95,6 +95,8 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
     public static double totalWeight;
     public static double totalAmount;
 
+    BuyerRegisterAdapter adapter;
+
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
@@ -128,8 +130,13 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
         scrollview = findViewById(R.id.constraintlayout);
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
+
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        list = dbHelper.getBuyerRegister("", "");
+        adapter = new BuyerRegisterAdapter(BuyerRegisterActivity.this, list);
+        recyclerView.setAdapter(adapter);
+
         print = findViewById(R.id.print);
 
         initDrawer();
@@ -242,12 +249,12 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
 
         startDate = getStartDate();
         endDate = getEndDate();
-        Log.d(TAG, "StartDate, endDate: " + startDate + " " + endDate);
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
+
         list = dbHelper.getBuyerRegister(startDate, endDate);
-        BuyerRegisterAdapter adapter = new BuyerRegisterAdapter(BuyerRegisterActivity.this, list);
+        adapter = new BuyerRegisterAdapter(BuyerRegisterActivity.this, list);
         recyclerView.setAdapter(adapter);
 
         // Hook up the "Go" button

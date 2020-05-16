@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/linearlayout"
-    tools:context=".UI.ChangePasscodeActivity">
+    tools:context=".UI.Login.ChangePasscodeActivity">
 
     <EditText
         android:id="@+id/current_passcode"

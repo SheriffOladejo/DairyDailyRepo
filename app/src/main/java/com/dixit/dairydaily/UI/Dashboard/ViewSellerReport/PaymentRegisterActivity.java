@@ -19,8 +19,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,16 +27,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
-import com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -52,19 +47,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.dixit.dairydaily.Models.PaymentRegisterModel;
 import com.dixit.dairydaily.MyAdapters.PaymentRegisterAdapter;
-import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
-import com.dixit.dairydaily.Others.Logout;
 import com.dixit.dairydaily.Others.Prevalent;
-import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
-import com.dixit.dairydaily.UI.BluetoothConnectionService;
+import com.dixit.dairydaily.Others.BluetoothConnectionService;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -91,6 +78,8 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
     private static final int PERMISSION_REQUEST_CODE = 1;
     File pdfFile;
     private final int REQUEST_READ_PHONE_STATE = 1;
+
+    PaymentRegisterAdapter adapter;
 
     TextView start_date_text_view, end_date_text_view;
     private static BluetoothConnectionService bluetoothConnectionService;
@@ -125,6 +114,9 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.payment_register);
+
+        startDate = getStartDate();
+        endDate = getEndDate();
 
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
@@ -162,6 +154,16 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
         end_evening_radio.setChecked(true);
         startShift = "Morning";
         endShift = "Evening";
+
+        list = dbHelper.getPaymentRegister(startDate, startShift, endDate, endShift);
+        adapter = new PaymentRegisterAdapter(PaymentRegisterActivity.this, list);
+        for(PaymentRegisterModel model : list){
+            weightTotal += Double.valueOf(model.getWeight());
+            amountTotal += Double.valueOf(model.getAmount());
+        }
+        amount.setText(String.valueOf(truncate(amountTotal)) + "Rs");
+        weight.setText(String.valueOf(truncate(weightTotal)) + "Ltr");
+        recyclerView.setAdapter(adapter);
 
         findViewById(R.id.pdf).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,7 +224,7 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
                         toPrint += StringUtils.rightPad(""+id, 3, "") + "|" +name + "|" + weight + "|" + amount + "| \n";
                     }
                     toPrint += line + "\nTOTAL AMOUNT: " + truncate(amountTotal) + "Rs";
-                    toPrint += "\nTOTAL WEIGHT: " + weightTotal +  "Ltr\n" + line + "\n";
+                    toPrint += "\nTOTAL WEIGHT: " + truncate(weightTotal) +  "Ltr\n" + line + "\n";
                     toPrint += "\n        DAIRYDAILY APP";
                     Log.d(TAG, "toPrint: " + toPrint);
 
@@ -260,7 +262,7 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
                 }
                 else{
                     list = dbHelper.getPaymentRegister(startDate, startShift, endDate, endShift);
-                    PaymentRegisterAdapter adapter = new PaymentRegisterAdapter(PaymentRegisterActivity.this, list);
+                    adapter = new PaymentRegisterAdapter(PaymentRegisterActivity.this, list);
                     for(PaymentRegisterModel model : list){
                         weightTotal += Double.valueOf(model.getWeight());
                         amountTotal += Double.valueOf(model.getAmount());
@@ -300,9 +302,6 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
                 end_evening_radio.setChecked(false);
             }
         });
-
-        startDate = getStartDate();
-        endDate = getEndDate();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
@@ -522,7 +521,7 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
 
         if(selectedUsers.size() >0 ){
             String toPrint = "DATE | " + date + "\n";
-            toPrint += startDate + " To " + endDate + "\nID| " + "NAME |" + "TOTAL WEIGHT |" + "TOTAL AMOUNT\n";
+            toPrint += startDate + " To " + endDate+"\n";
             if(id == R.id.printer){
                 double weightTotal = 0;
                 double amountTotal = 0;
@@ -531,13 +530,15 @@ public class PaymentRegisterActivity extends InitDrawerBoard implements DatePick
                     String amount = object.getAmount();
                     String fat = object.getFat();
                     String snf = object.getSnf();
+                    String name = getFirstname(object.getName());
                     String weight = object.getWeight();
                     weightTotal += Double.valueOf(object.getWeight());
                     amountTotal += Double.valueOf(object.getAmount());
-                    toPrint += sellerId + " | "+fat + "-" + snf + "| " + weight + "| " + amount + "| \n";
+                    toPrint+="ID: " + sellerId + " "+name+"\nTotal Weight: " +weight +"Ltr\nTotal Amount: " + amount+"Rs\n\n";
+                    //toPrint += sellerId + " | "+fat + "-" + snf + "| " + weight + "| " + amount + "| \n";
                 }
-                toPrint += "TOTAL AMOUNT: " + amountTotal + "Rs";
-                toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr\n\n\n";
+
+                Log.d(TAG, "toPrint: " + toPrint);
                 byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
                 if(DashboardActivity.bluetoothAdapter != null) {
                     if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {

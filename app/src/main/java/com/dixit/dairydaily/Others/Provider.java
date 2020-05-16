@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI;
+package com.dixit.dairydaily.Others;
 
 import androidx.core.content.FileProvider;
 

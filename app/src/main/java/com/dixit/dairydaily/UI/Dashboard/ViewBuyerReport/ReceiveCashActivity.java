@@ -91,6 +91,7 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
     File pdfFile;
     TextView nameView;
     TextView start_date_text_view, end_date_text_view;
+    RelativeLayout relativeLayout;
 
     private static final String TAG = "ReceiveCashActivity";
 
@@ -195,6 +196,9 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_cash);
 
+        startDate = getStartDate();
+        endDate = getEndDate();
+
         getSupportActionBar().setTitle("Receive Cash");
         getSupportActionBar().setHomeButtonEnabled(true);
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
@@ -202,6 +206,9 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
         progressBar = new ProgressBar(this);
 
         loadingBar = new ProgressDialog(this);
+
+        View view = findViewById(R.id.view);
+        view.setVisibility(View.GONE);
 
         drawerLayout = findViewById(R.id.drawerlayout);
         cal1 = findViewById(R.id.cal1);
@@ -220,6 +227,7 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
         start_date_text_view = findViewById(R.id.start_date_text_view);
         end_date_text_view = findViewById(R.id.end_date_text_view);
         go = findViewById(R.id.go);
+        go.setVisibility(View.GONE);
         totalCredit = findViewById(R.id.totalCredit);
         totalDebit = findViewById(R.id.totalDebit);
         remaining = findViewById(R.id.remaining);
@@ -228,6 +236,8 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         send_msg = findViewById(R.id.send_msg);
         nameView = findViewById(R.id.name);
+        relativeLayout = findViewById(R.id.linearLayout4);
+        relativeLayout.setVisibility(View.GONE);
 
         list = dbHelper.getReceiveCash(idInt, "", "");
         adapter = new ReceiveCashAdapter(ReceiveCashActivity.this, list);
@@ -313,9 +323,6 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
                     }
                 }
         );
-
-        startDate = getStartDate();
-        endDate = getEndDate();
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
@@ -465,7 +472,7 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
                 String line = "------------------------------";
                 Date dateIntermediate = new Date();
                 String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-                String toPrint ="\nID |" +idInt + "   " + dbHelper.getBuyerName(idInt) + "\n"+date + "\n"+ startDate + " To " + endDate + "\n   Date   |"  + "Title|" + "Debit |" + "Credit|\n" +line + "\n";
+                String toPrint ="\nID |" +idInt + "   " + dbHelper.getBuyerName(idInt) + "\n"+date + "\n"+ "All History" + "\n   Date   |"  + "Title|" + "Debit |" + "Credit|\n" +line + "\n";
 
                 for(ReceiveCashModel object : list){
                     String title = StringUtils.rightPad(getFirstname(StringUtils.truncate(object.getTitle(), 5)), 5, "");

@@ -601,8 +601,6 @@ public class DbHelper extends SQLiteOpenHelper {
     public ArrayList<ReceiveCashModel> getReceiveCash(int id, String startDate, String endDate){
         SQLiteDatabase db = this.getWritableDatabase();
         ArrayList<ReceiveCashModel> list = new ArrayList<>();
-
-
         String query2;
         if(startDate.equals("") && endDate.equals("")){
             query2 = "SELECT * FROM " + receive_cash_table + " WHERE ID ='" + id + "'";
@@ -800,7 +798,13 @@ public class DbHelper extends SQLiteOpenHelper {
         ArrayList<BuyerRegisterModel> list = new ArrayList<>();
         ArrayList<BuyerRegisterModel> users = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + milk_sale_table + " WHERE " + Sale_COL7 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+        String query;
+        if(startDate.equals("") && endDate.equals("")){
+            query = "select * from " + milk_sale_table;
+        }
+        else {
+            query = "SELECT * FROM " + milk_sale_table + " WHERE " + Sale_COL7 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+        }
         String query2 = "SELECT ID, Name FROM " + buyers_table;
 
         Cursor data = db.rawQuery(query, null);
@@ -858,12 +862,17 @@ public class DbHelper extends SQLiteOpenHelper {
         ArrayList<PaymentRegisterModel> endDay = new ArrayList<>();
         ArrayList<PaymentRegisterModel> users = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        Log.d(TAG, "getReportByDate: ");
-        String query = "SELECT * FROM " + milk_buy_table + " WHERE " + Buy_COL7 + " BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+
+        String query;
+        if(beginDate.equals("")&& endDate.equals("")){
+            query = "select * from " + milk_buy_table;
+        }
+        else{
+            query = "SELECT * FROM " + milk_buy_table + " WHERE " + Buy_COL7 + " BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+        }
         String query2 = "SELECT * FROM " + sellers_table;
         Cursor data = db.rawQuery(query, null);
         Cursor data2 = db.rawQuery(query2, null);
-        Log.d(TAG, "getReportByDate: after");
 
         if(data2.getCount() !=0){
             while(data2.moveToNext()){

@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI;
+package com.dixit.dairydaily.UI.Login;
 
 import android.Manifest;
 import android.animation.Animator;
@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -444,13 +443,41 @@ public class LoginActivity extends AppCompatActivity {
                                 Paper.book().write(Prevalent.state,state);
                                 helper.setExpiryDate(expiry_date);
 
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Pricing");
+                                reference.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.exists()){
+                                            String starter = dataSnapshot.child("Starter Plan").getValue().toString();
+                                            String spark = dataSnapshot.child("Spark Plan").getValue().toString();
+                                            String enterprise = dataSnapshot.child("Enterprise Plan").getValue().toString();
+                                            try{
+                                                double starter_double = Double.valueOf(starter);
+                                                double spark_double = Double.valueOf(spark);
+                                                double enterprise_double = Double.valueOf(enterprise);
+                                                Paper.book().write(Prevalent.starter, starter_double+"");
+                                                Paper.book().write(Prevalent.spark, spark_double+"");
+                                                Paper.book().write(Prevalent.enterprise, enterprise_double+"");
+                                            }
+                                            catch(Exception e){
+                                                Toast.makeText(LoginActivity.this, "Error retrieving pricing plans. Contact the admin.", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
                                 StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
                                 ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Uri> task) {
                                         if(task.isSuccessful()){
                                             String url = task.getResult().toString();
-                                            Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(LoginActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
                                             DownloadFile(LoginActivity.this, "Rate File", ".csv", "/dairyDaily", url);
                                         }
                                         else{

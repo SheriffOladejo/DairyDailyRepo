@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI.Dashboard;
+package com.dixit.dairydaily.UI.Dashboard.DrawerLayout;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -50,12 +50,9 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-        //initOrderId();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         Paper.init(this);
         helper = new DbHelper(this);
-
         Intent intent = getIntent();
         orderId = intent.getExtras().getString("orderId");
         custormerid = intent.getExtras().getString("customerId");
@@ -99,12 +96,8 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                         paramMap.put("CHANNEL_ID", "WAP");
                         paramMap.put("TXN_AMOUNT", price);
                         paramMap.put("WEBSITE", "DEFAULT");
-
                         paramMap.put("CALLBACK_URL" ,verifyurl);
-                        //paramMap.put( "EMAIL" , Paper.book().read(Prevalent.email));
-                        //paramMap.put( "MOBILE_NO" , Paper.book().read(Prevalent.phone_number));
                         paramMap.put("CHECKSUMHASH" ,CHECKSUMHASH);
-                        //paramMap.put("PAYMENT_TYPE_ID" ,"CC");    // no need
                         paramMap.put("INDUSTRY_TYPE_ID", "Retail");
 
                         PaytmOrder Order = new PaytmOrder(paramMap);
@@ -113,7 +106,6 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                         // start payment service call here
                         Service.startPaymentTransaction(CheckSum.this, true, true,
                                 CheckSum.this  );
-                        //toast(CheckSum.this, CHECKSUMHASH);
                     }
                     else{
                         toast(CheckSum.this, "Checksum not available");
@@ -123,123 +115,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                 }
             }
         });
-
-        //sendUserDetailTOServerdd dl = new sendUserDetailTOServerdd();
-        //dl.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-// vollye , retrofit, asynch
-
     }
-
-    public class sendUserDetailTOServerdd extends AsyncTask<ArrayList<String>, Void, String> {
-
-        private ProgressDialog dialog = new ProgressDialog(CheckSum.this);
-
-        @Override
-        protected void onPreExecute() {
-            this.dialog.setMessage("Please wait");
-            this.dialog.show();
-        }
-
-        protected String doInBackground(ArrayList<String>... alldata) {
-
-//            JSONParser jsonParser = new JSONParser(CheckSum.this);
-//            String param=
-//                    "MID="+mid+
-//                            "&ORDER_ID=" + orderId+
-//                            "&CUST_ID="+custormerid+
-//                            "&CHANNEL_ID=WAP"+
-//                            "&CALLBACK_URL="+verifyurl+
-//                            "&TXN_AMOUNT="+price+
-//                            "&WEBSITE=DEFAULT"+
-//                            "&INDUSTRY_TYPE_ID=Retail";
-//
-//            JSONObject jsonObject = jsonParser.makeHttpRequest(url,"POST",param);
-//            //Log.d("CheckSum result >>:", "CheckSum Result"+jsonObject.toString());
-//            if(jsonObject != null){
-//                try {
-//                    CHECKSUMHASH=jsonObject.has("CHECKSUMHASH")?jsonObject.getString("CHECKSUMHASH"):"";
-//                    Log.e("CheckSum result >>","Checksum hash: "+CHECKSUMHASH);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-
-//            RequestParams requestParams = new RequestParams();
-//            requestParams.put("MID", mid);
-//            requestParams.put("ORDER_ID", orderId);
-//            requestParams.put("CUST_ID", custormerid);
-//            requestParams.put("CHANNEL_ID", "WAP");
-//            requestParams.put("CALLBACK_URL", verifyurl);
-//            requestParams.put("TXN_AMOUNT", price);
-//            requestParams.put("WEBSITE", "DEFAULT");
-//            requestParams.put("INDUSTRY_TYPE_ID", "Retail");
-//            AsyncHttpClient client = new AsyncHttpClient();
-//            client.post(url, requestParams, new TextHttpResponseHandler() {
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-//                    toast(CheckSum.this, "Failure");
-//                }
-//
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-//                    try {
-//                        JSONObject jsonObject1 = new JSONObject(responseString);
-//                        if(jsonObject1.has("CHECKSUMHASH")){
-//                            CHECKSUMHASH = jsonObject1.getString("CHECKSUMHASH");
-//                            toast(CheckSum.this, CHECKSUMHASH);
-//                        }
-//                        else{
-//                            toast(CheckSum.this, "Checksum not available");
-//                        }
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-
-            return CHECKSUMHASH;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.e(" setup acc ","signup result  " + result);
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
-            PaytmPGService Service = PaytmPGService.getProductionService();
-            // when app is ready to publish use production service
-            // PaytmPGService  Service = PaytmPGService.getProductionService();
-
-            // now call paytm service here
-            //below parameter map is required to construct PaytmOrder object, Merchant should replace below map values with his own values
-            HashMap<String, String> paramMap = new HashMap<String, String>();
-            //these are mandatory parameters
-            paramMap.put("MID", mid);
-            paramMap.put("ORDER_ID", orderId);
-            paramMap.put("CUST_ID", custormerid);
-            paramMap.put("CHANNEL_ID", "WAP");
-            paramMap.put("TXN_AMOUNT", price);
-            paramMap.put("WEBSITE", "DEFAULT");
-
-            paramMap.put("CALLBACK_URL" ,verifyurl);
-            //paramMap.put( "EMAIL" , Paper.book().read(Prevalent.email));
-            //paramMap.put( "MOBILE_NO" , Paper.book().read(Prevalent.phone_number));
-            paramMap.put("CHECKSUMHASH" ,CHECKSUMHASH);
-            //paramMap.put("PAYMENT_TYPE_ID" ,"CC");    // no need
-            paramMap.put("INDUSTRY_TYPE_ID", "Retail");
-
-            PaytmOrder Order = new PaytmOrder(paramMap);
-            Log.e("checksum ", "param "+ paramMap.toString());
-            Service.initialize(Order,null);
-            // start payment service call here
-            Service.startPaymentTransaction(CheckSum.this, true, true,
-                    CheckSum.this  );
-        }
-
-    }
-
 
     private static final String TAG = "CheckSum";
     @Override
@@ -250,12 +126,12 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
             if(status.equals("Txn Success")){
                 Calendar c = Calendar.getInstance();
                 c.setTime(new Date());
-                if(price.equals(""+Prevalent.starter))
-                    c.add(Calendar.DATE, 100);
-                else if(price.equals(""+Prevalent.spark))
-                    c.add(Calendar.DATE, 200);
-                else if(price.equals(""+Prevalent.enterprise))
-                    c.add(Calendar.DATE, 370);
+                if(price.equals(""+Paper.book().read(Prevalent.starter)))
+                    c.add(Calendar.DATE, 90);
+                else if(price.equals(""+Paper.book().read(Prevalent.spark)))
+                    c.add(Calendar.DATE, 180);
+                else if(price.equals(""+Paper.book().read(Prevalent.enterprise)))
+                    c.add(Calendar.DATE, 365);
                 helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
                 Toast.makeText(CheckSum.this, ""+c.getTime(), Toast.LENGTH_LONG).show();
                 String date = new SimpleDateFormat("dd/MM/YYYY").format(new Date());
@@ -292,7 +168,9 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
 
     @Override
     public void networkNotAvailable() {
-
+        toast(CheckSum.this, "Check your network and try again.");
+        startActivity(new Intent(CheckSum.this, UpgradeToPremium.class));
+        finish();
     }
 
     @Override

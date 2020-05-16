@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI;
+package com.dixit.dairydaily.UI.Dashboard;
 
 import android.database.Cursor;
 import android.os.Bundle;

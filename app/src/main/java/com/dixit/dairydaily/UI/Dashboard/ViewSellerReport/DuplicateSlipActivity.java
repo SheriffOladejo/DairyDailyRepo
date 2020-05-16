@@ -41,6 +41,8 @@ import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -147,6 +149,9 @@ public class DuplicateSlipActivity extends InitDrawerBoard {
             public void onClick(View v) {
 
                 try{
+                    totalWeight=0;
+                    totalAmount=0;
+
                     id = Integer.valueOf(idEditText.getText().toString());
                     date = select_date_text_view.getText().toString();
                     list = dbHelper.getDuplicateSlip(id, date, shift);
@@ -160,7 +165,7 @@ public class DuplicateSlipActivity extends InitDrawerBoard {
                     averageFat /= list.size();
                     averageSnf/=list.size();
 
-                    if(list!=null){
+                    if(!list.isEmpty()){
 
                         Date dateIntermediate = new Date();
                         String line = "--------------------------------";
@@ -173,19 +178,19 @@ public class DuplicateSlipActivity extends InitDrawerBoard {
                         catch(Exception e){
                             date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
                         }
-                        String toPrint ="Name| " + dbHelper.getBuyerName(id) + "\nDate | " + date + "\n" + "Shift | " + shift + "\n";
-                        toPrint += "ID |Weight| FAT | Rate |Amount\n" + line + "\n";
 
+                        String toPrint="";
                         for(ShiftReportModel object : list){
                             int id = object.getId();
+                            toPrint +="\nName  | " + dbHelper.getSellerName(id) + "\nDate  | " + date + "\n" + "Shift | " + shift + "\n";
                             String amount = truncate(Double.valueOf(object.getAmount()));
                             String fat = truncate(Double.valueOf(object.getFat()));
                             String rate = truncate(Double.valueOf(object.getRate()));
                             String weight = truncate(Double.valueOf(object.getWeight()));
-                            toPrint += id + "  |" + weight + " |" + fat + " | " + rate + "|" + amount + " | \n";
+                            toPrint+="Weight| " + weight+"Ltr\nFat   | "+fat+"\nRate  | " +rate+"\nAmount| " + amount+"Rs\n\n";
+                            //toPrint += id + "  |" + weight + " |" + fat + " | " + rate + "|" + amount + " | \n";
                         }
-                        toPrint += "TOTAL WEIGHT | " + totalWeight+"Ltr" + "\n";
-                        toPrint += "TOTAL AMOUNT | " + truncate(totalAmount)+"Rs" + "\n";
+
                         Log.d(TAG, "toPrint: " + toPrint);
 
                         byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
@@ -205,6 +210,9 @@ public class DuplicateSlipActivity extends InitDrawerBoard {
                         else{
                             toast(DuplicateSlipActivity.this, "Bluetooth is off");
                         }
+                    }
+                    else{
+                        toast(DuplicateSlipActivity.this, "Nothing to print");
                     }
                 }
                 catch(Exception e){}

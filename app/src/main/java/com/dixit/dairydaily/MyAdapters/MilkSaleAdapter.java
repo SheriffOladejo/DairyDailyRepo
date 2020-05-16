@@ -104,17 +104,13 @@ MilkSaleAdapter extends RecyclerView.Adapter<MilkSaleAdapter.ViewHolder> {
 
                     switch(which){
                         case 0:
-                            Intent intent = new Intent(context, MilkSaleEntryActivity.class);
-                            intent.putExtra("Unique_Id", unique_Id);
-                            intent.putExtra("User_Id", user_Id);
-                            intent.putExtra("Date", date);
-                            intent.putExtra("Shift", shift);
-                            intent.putExtra("Name", name);
-                            intent.putExtra("Rate", String.valueOf(rate));
-                            intent.putExtra("Amount", String.valueOf(amount));
-                            intent.putExtra("Weight", String.valueOf(weight));
-                            context.startActivity(intent);
-                            helper.updateMilkSale(unique_Id, user_Id, name, String.valueOf(weight), String.valueOf(rate), String.valueOf(amount));
+
+                            MilkSaleEntryActivity.id.setText(user_Id+"");
+                            MilkSaleEntryActivity.weight.setText(weight+"");
+                            MilkSaleEntryActivity.amount_display.setText(amount+"");
+                            MilkSaleEntryActivity.wantToUpdate = true;
+                            MilkSaleEntryActivity.unique_id = unique_Id;
+                            MilkSaleEntryActivity.user_id = user_Id;
                             dialog.dismiss();
                             break;
                         case 1:

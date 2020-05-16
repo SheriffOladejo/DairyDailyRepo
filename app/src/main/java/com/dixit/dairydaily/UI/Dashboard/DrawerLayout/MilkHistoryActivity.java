@@ -33,6 +33,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dixit.dairydaily.Models.BuyerRegisterModel;
+import com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.BuyerRegisterActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -54,10 +56,13 @@ import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,8 +71,10 @@ import java.util.List;
 import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.getEndDate;
+import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.dixit.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.dixit.dairydaily.Others.UtilityMethods.hideKeyboard;
+import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
 
 public class MilkHistoryActivity extends InitDrawerBoard {
@@ -99,6 +106,9 @@ public class MilkHistoryActivity extends InitDrawerBoard {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.milk_history);
 
+        startDate = getStartDate();
+        endDate = getEndDate();
+
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         hideKeyboard(MilkHistoryActivity.this);
 
@@ -119,9 +129,60 @@ public class MilkHistoryActivity extends InitDrawerBoard {
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
         print = findViewById(R.id.print);
+        print.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!list.isEmpty()){
+                    ArrayList<MilkHistoryObject> toRemove = new ArrayList<>();
+                    String line = "---------------------------";
+                    Date dateIntermediate = new Date();
+                    String date = new SimpleDateFormat("YYYY-MM-dd").format(dateIntermediate);
+                    String toPrint ="\n"+ startDate + " To " + endDate + "\n    Date    |" + "WEIGHT|" + "AMOUNT|\n" +line + "\n";
 
-        startDate = getStartDate();
-        endDate = getEndDate();
+                    double totalAmount = 0,totalWeight = 0;
+                    for(MilkHistoryObject object : list){
+                        String amount = object.getAmount();
+                        if(amount.equals("0.00"))
+                            toRemove.add(object);
+                    }
+                    list.removeAll(toRemove);
+                    for(MilkHistoryObject object: list){
+                        String datee = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getDate()), 10), 10, "");
+                        String amount = StringUtils.rightPad(StringUtils.truncate(object.getAmount(),6), 6, "");
+                        String weight = StringUtils.rightPad(object.getWeight(),6,"");
+                        String fat = StringUtils.rightPad(object.getFat(),6,"");
+                        String shift = object.getSession().substring(0,1);
+                        totalAmount += Double.valueOf(amount);
+                        totalWeight += Double.valueOf(weight);
+                        toPrint += shift+"-"+datee+"|"+weight+"|"+amount+"|"+"\n";
+                    }
+                    toPrint += line + "\n";
+                    toPrint += "TOTAL AMOUNT: "+ truncate(totalAmount) + "Rs\n";
+                    toPrint += "TOTAL WEIGHT: " + totalWeight + "Ltr\n";
+                    toPrint += line + "\n";
+                    toPrint += "       DAIRY DAILY APP\n\n";
+
+                    Log.d(TAG, "toPrint: "+toPrint);
+                    byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
+                    if(DashboardActivity.bluetoothAdapter != null) {
+                        if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
+                            try {
+                                DashboardActivity.bluetoothConnectionService.write(mybyte);
+                                Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
+                            } catch (Exception e) {
+                                Log.d(TAG, "onOptionsSelected: Unable to print");
+                                toast(MilkHistoryActivity.this, "Unable to print");
+                            }
+                        } else {
+                            toast(MilkHistoryActivity.this, "Printer is not connected");
+                        }
+                    }
+                    else{
+                        toast(MilkHistoryActivity.this, "Bluetooth is off");
+                    }
+                }
+            }
+        });
 
         start_date_text_view.setText(startDate);
         end_date_text_view.setText(endDate);
@@ -165,8 +226,6 @@ public class MilkHistoryActivity extends InitDrawerBoard {
             }
         });
 
-
-        Log.d("MilkHistory", "startDate, endDate: " + startDate + " " + endDate);
         list = helper.getMilkHistory(startDate, endDate);
         MilkHistoryAdapter adapter = new MilkHistoryAdapter(MilkHistoryActivity.this, list);
         recyclerView.setAdapter(adapter);
@@ -269,6 +328,14 @@ public class MilkHistoryActivity extends InitDrawerBoard {
     }
 
     private void createPdf() throws IOException, DocumentException {
+        ArrayList<MilkHistoryObject> toRemove = new ArrayList<>();
+        double totalAmount = 0,totalWeight = 0;
+        for(MilkHistoryObject object : list){
+            String amount = object.getAmount();
+            if(amount.equals("0.00"))
+                toRemove.add(object);
+        }
+        list.removeAll(toRemove);
         File docFolder = new File(Environment.getExternalStorageDirectory() + "/DairyDaily/ShiftReport");
         if((!docFolder.exists())){
             docFolder.mkdirs();
@@ -335,7 +402,7 @@ public class MilkHistoryActivity extends InitDrawerBoard {
 
         document.add(table);
 
-        PdfPTable table1 = new PdfPTable(new float[]{2,2,2,2,2,2});
+        PdfPTable table1 = new PdfPTable(new float[]{2,2});
         table1.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         table1.getDefaultCell().setFixedHeight(20);
         table1.setTotalWidth(PageSize.A4.getWidth());
@@ -346,7 +413,8 @@ public class MilkHistoryActivity extends InitDrawerBoard {
         table1.addCell("Total Amount: " + amountTotal.getText().toString());
         document.add(table1);
 
-        document.add(new Paragraph("DairyDaily Download App Now:\nHttps://www.google.playstore.com/DairyDaily",f));
+        String link = "http://play.google.com/store/apps/details?id=" + getPackageName();
+        document.add(new Paragraph("Download DairyDaily app from google playstore:\n" + link ,f));
         document.close();
         previewPdf();
     }

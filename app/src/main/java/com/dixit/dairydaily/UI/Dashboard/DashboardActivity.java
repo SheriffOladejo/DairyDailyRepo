@@ -46,8 +46,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
-import com.dixit.dairydaily.UI.LoginActivity;
-import com.dixit.dairydaily.UI.PasscodeViewClass;
+import com.dixit.dairydaily.UI.Login.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -69,7 +68,7 @@ import com.dixit.dairydaily.Others.SpinnerItem;
 import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.RateChart.RateChartOptions;
-import com.dixit.dairydaily.UI.BluetoothConnectionService;
+import com.dixit.dairydaily.Others.BluetoothConnectionService;
 import com.dixit.dairydaily.UI.Dashboard.AddProducts.AddProductActivity;
 import com.dixit.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.dixit.dairydaily.UI.Dashboard.Customers.CustomersActivity;
@@ -116,8 +115,6 @@ public class DashboardActivity extends InitDrawerBoard {
     private ImageView imageView1, imageView2, imageView3, imageView4;
     ViewFlipper viewFlipper;
 
-    public static boolean can_pay =false;
-
     DatabaseReference ref;
     String message, time, status;
     public static boolean isReminderShown = false;
@@ -161,6 +158,7 @@ public class DashboardActivity extends InitDrawerBoard {
 
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -172,6 +170,12 @@ public class DashboardActivity extends InitDrawerBoard {
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
 
         initDrawer();
+
+        if(Paper.book().read(Prevalent.has_account).equals("false")){
+            toast(DashboardActivity.this, "Please Login");
+            startActivity(new Intent(DashboardActivity.this, LoginActivity.class));
+            finish();
+        }
 
         helper = new DbHelper(this);
         progressDialog = new ProgressDialog(this);
@@ -455,14 +459,19 @@ public class DashboardActivity extends InitDrawerBoard {
         whatsapp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent sendintent = new Intent("android.intent.action.MAIN");
-                String phoneNumber = "918449852828";
-                sendintent.setAction(Intent.ACTION_SEND);
-                sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
-                sendintent.setType("text/plain");
-                sendintent.setPackage("com.whatsapp");
-                sendintent.putExtra("jid", phoneNumber+"@s.whatsapp.net");
-                startActivity(sendintent);
+                try{
+                    Intent sendintent = new Intent("android.intent.action.MAIN");
+                    String phoneNumber = "918449852828";
+                    sendintent.setAction(Intent.ACTION_SEND);
+                    sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
+                    sendintent.setType("text/plain");
+                    sendintent.setPackage("com.whatsapp");
+                    sendintent.putExtra("jid", phoneNumber+"@s.whatsapp.net");
+                    startActivity(sendintent);
+                }
+                catch(Exception e){
+                    toast(DashboardActivity.this, "Unable to open WhatsApp.");
+                }
             }
         });
 
@@ -621,38 +630,6 @@ public class DashboardActivity extends InitDrawerBoard {
             }
         });
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Pricing");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    String starter = dataSnapshot.child("Starter Plan").getValue().toString();
-                    String spark = dataSnapshot.child("Spark Plan").getValue().toString();
-                    String enterprise = dataSnapshot.child("Enterprise Plan").getValue().toString();
-                    try{
-                        double starter_double = Double.valueOf(starter);
-                        double spark_double = Double.valueOf(spark);
-                        double enterprise_double = Double.valueOf(enterprise);
-                        Prevalent.starter = starter_double;
-                        Prevalent.enterprise = enterprise_double;
-                        Prevalent.spark = spark_double;
-                        can_pay = true;
-                    }
-                    catch(Exception e){
-                        Toast.makeText(DashboardActivity.this, "Unable to load pricing", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        //Broadcasts when bond state changes(i.e pairing)
-        IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-//        registerReceiver(mBroadcastReceiver4, intentFilter);
         registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 

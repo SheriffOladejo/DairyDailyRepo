@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.dixit.dairydaily.MyAdapters.SpinnerAdapter;
 import com.dixit.dairydaily.R;
-import com.dixit.dairydaily.UI.BluetoothConnectionService;
 
 
 import java.util.ArrayList;

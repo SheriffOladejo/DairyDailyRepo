@@ -20,7 +20,6 @@ import androidx.annotation.RequiresApi;
 
 import com.dixit.dairydaily.MyAdapters.SpinnerAdapter;
 import com.dixit.dairydaily.R;
-import com.dixit.dairydaily.UI.BluetoothConnectionService;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 
 import java.util.ArrayList;

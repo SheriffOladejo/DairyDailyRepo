@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
-import com.dixit.dairydaily.UI.SendOtpActivity;
+import com.dixit.dairydaily.UI.Login.SendOtpActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;

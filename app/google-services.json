@@ -8,12 +8,57 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:865747894516:android:2a22d4ecc569e124081ea1",
+        "android_client_info": {
+          "package_name": "com.dairydailyadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "865747894516-s38a9hff4pil5rrgsueq8cmhq155puce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dairydailyadmin",
+            "certificate_hash": "4e9f51ca32fbd7b9c993b3173d80460e47164fd5"
+          }
+        },
+        {
+          "client_id": "865747894516-n1fgldadvitdithlejdqtblkdo6rsj6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtQebxFOUmBD0mDKeS1Oq2ZuiKsHpXeZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "865747894516-n1fgldadvitdithlejdqtblkdo6rsj6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:865747894516:android:6cdc48ada104e1b8081ea1",
         "android_client_info": {
           "package_name": "com.dixit.dairydaily"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "865747894516-uk4r1o5llkmnqp4b4gbm72qdfuqeprbo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dixit.dairydaily",
+            "certificate_hash": "9421634a412695bf60321a21005618def929fd15"
+          }
+        },
         {
           "client_id": "865747894516-9vnas0av5af31n155cflr8liobeb4nct.apps.googleusercontent.com",
           "client_type": 1,

@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.dixit.dairydaily.UI.LoginActivity;
 
 import org.json.JSONObject;
 
@@ -37,7 +36,6 @@ public class DataRetrievalHandler {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-
                     try {
                         String retrievedJsonString = dataSnapshot.child("Receive Cash Data").getValue().toString();
                         Log.d("BackupHandler", "retrieveReceiveCashData: " + retrievedJsonString);
@@ -55,13 +53,12 @@ public class DataRetrievalHandler {
                             dbHelper.addReceiveCash(id, date, credit, debit, title, shift);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        //toast(context, "Unable to retrieve receive cash data");
+                        Log.d(TAG, "Unable to retrieve receive cash data." + e.getMessage());
                     }
 
                 }
                 else{
-
+                    Log.d(TAG, "retrieveReceiveCashData: datasnapshot doesn't exist");
                 }
             }
 
@@ -72,6 +69,8 @@ public class DataRetrievalHandler {
         });
         retrieveMilkSaleData();
     }
+
+    private static final String TAG = "DataRetrievalHandler";
 
     public void retrieveMilkSaleData(){
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
@@ -101,7 +100,7 @@ public class DataRetrievalHandler {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        //toast(context, "Unable to retrieve milk sale data");
+                        Log.d(TAG, "Unable to retrieve milk sale data." + e.getMessage());
                     }
 
                 }
@@ -143,7 +142,7 @@ public class DataRetrievalHandler {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        //toast(context, "Unable to retrieve seller data");
+                        Log.d(TAG, "Unable to retrieve seller data." + e.getMessage());
                     }
 
                 }
@@ -175,7 +174,7 @@ public class DataRetrievalHandler {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        //toast(context, "Unable to retrieve buyer data");
+                        Log.d(TAG, "Unable to retrieve buyer data." + e.getMessage());
                     }
 
                 }
@@ -220,7 +219,6 @@ public class DataRetrievalHandler {
                             dbHelper.addBuyEntry(id, name, weight, amount, rate, shift, date, fat, snf, type);
 
                         }
-                        toast(context, "Data recovered successfully");
                         try{
                             rpd.dismiss();
                         }
@@ -229,7 +227,7 @@ public class DataRetrievalHandler {
                         }
 
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Log.d(TAG, "Unable to retrieve milk buy data." + e.getMessage());
                     }
 
                 }
@@ -240,6 +238,7 @@ public class DataRetrievalHandler {
 
             }
         });
+
         retrieveProductSale();
     }
 
@@ -268,8 +267,7 @@ public class DataRetrievalHandler {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-
-                        //toast(context, "Unable to retrieve product sale data");
+                        Log.d(TAG, "Unable to retrieve product sale data." + e.getMessage());
                     }
 
                 }
@@ -307,8 +305,7 @@ public class DataRetrievalHandler {
                         Log.d("BackupHandler", "retrieveProductData: " + retrievedJsonString);
                     } catch (Exception e) {
                         e.printStackTrace();
-
-                        //toast(context, "Unable to retrieve milk rate data");
+                        Log.d(TAG, "Unable to retrieve receive products data." + e.getMessage());
                     }
 
                 }
@@ -341,6 +338,7 @@ public class DataRetrievalHandler {
                         retrieveExpiryDate();
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Log.d(TAG, "Unable to retrieve milk rate data." + e.getMessage());
                     }
                     //toast(context, "Data recovered successfully");
                 }
@@ -369,13 +367,14 @@ public class DataRetrievalHandler {
                         //dbHelper.clearRate();
                         JSONObject obj = new JSONObject(retrievedJsonString);
                         dbHelper.setExpiryDate(obj.getString("Expiry Date"));
+                        toast(context, "Data recovered successfully");
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Log.d(TAG, "Unable to retrieve expiry date data." + e.getMessage());
                     }
                 }
                 else{
 
-                        //toast(context, "Data recovered successfully");
                 }
             }
 

@@ -36,9 +36,9 @@ import com.dixit.dairydaily.MyAdapters.MilkBuyAdapter;
 import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.R;
-import com.dixit.dairydaily.UI.BluetoothConnectionService;
+import com.dixit.dairydaily.Others.BluetoothConnectionService;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.UsersListActivity;
+import com.dixit.dairydaily.UI.Dashboard.UsersListActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,7 +57,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
     private final int REQUEST_READ_PHONE_STATE = 1;
     public static BluetoothConnectionService bluetoothConnectionService;
 
-    boolean wantToUpdate = false;
+    public static boolean wantToUpdate = false;
     double weightAmount;
     MilkBuyAdapter adapter;
 
@@ -73,10 +73,11 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
     String snfValue;
     private String rate;
     private static ConstraintLayout linearLayout;
-    String type;
+    public static String type;
     public static RecyclerView recyclerView;
 
     boolean printed = false;
+    public static int unique_id = -1;
 
     public static double weightTotal = 0;
     public static double amountTotal = 0;
@@ -86,12 +87,12 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
 
     String passedDate;
 
-    private RadioButton cow_button;
+    public static RadioButton cow_button;
     private RadioButton buffalo_button;
     ArrayList<DailyBuyObject> list;
 
-    private EditText id, weight, snf, fat, rate_display;
-    private TextView seller_display, amount_display;
+    public static EditText id, weight, snf, fat, rate_display;
+    public static TextView seller_display, amount_display;
 
     public static DbHelper dbHelper;
 
@@ -148,47 +149,65 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
         date = getIntent().getStringExtra("Date");
         passedDate = getIntent().getStringExtra("PassedDate");
 
-        int unique_id = getIntent().getIntExtra("Unique_Id", -1);
-        int user_id = getIntent().getIntExtra("User_Id", -1);
-        String name = getIntent().getStringExtra("Name");
-        String passedweight = getIntent().getStringExtra("Weight");
-        String passedFat = getIntent().getStringExtra("Fat");
-
-        String passedSnf= getIntent().getStringExtra("SNF");
-        String passedrate = getIntent().getStringExtra("Rate");
-        String passedamount = getIntent().getStringExtra("Amount");
-
-        if(unique_id != -1 && user_id != -1){
-            id.setText(String.valueOf(user_id));
-            weight.setText(passedweight);
-            fat.setText(passedFat);
-            amount_display.setText(passedamount);
-            snf.setText(passedSnf);
-            seller_display.setText(name);
-            wantToUpdate = true;
-        }
-
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 if(wantToUpdate){
-                    dbHelper.updateMilkBuy(unique_id, user_id, seller_display.getText().toString(),
-                            weight.getText().toString(), rate_display.getText().toString(),
-                            amount_display.getText().toString(), fat.getText().toString(), snf.getText().toString(), type);
-                    id.setText("");
-                    seller_display.setText("All Sellers");
-                    weight.setText("");
-                    fat.setText("");
-                    snf.setText("");
-                    rate_display.setText("Rs/Ltr");
-                    amount_display.setText("Amount");
-                    list = dbHelper.getDailyBuyData(date, shift);
-                    Log.d(TAG, "list size: " + list.size());
-                    MilkBuyAdapter adapter = new MilkBuyAdapter(MilkBuyEntryActivity.this, list);
-                    recyclerView.setAdapter(adapter);
-                    new BackupHandler(MilkBuyEntryActivity.this);
-                    wantToUpdate = false;
+
+                    fatString = fat.getText().toString();
+                    snfValue = snf.getText().toString();
+                    weightString = weight.getText().toString();
+                    String user_id = id.getText().toString();
+                    if(user_id.equals("") || seller_display.getText().toString().equals("Not Found"))
+                        toast(MilkBuyEntryActivity.this, "Error");
+                    else{
+                        if(fatString.equals("") || snfValue.equals("") || weightString.equals("")){
+                            toast(MilkBuyEntryActivity.this, "Error");
+                        }
+                        else{
+                            try{
+                                dbHelper.updateMilkBuy(unique_id, Integer.valueOf(id.getText().toString()), seller_display.getText().toString(),
+                                        weightString, rate_display.getText().toString(),
+                                        amount_display.getText().toString(), fatString, snfValue, type);
+                            }
+                            catch (Exception e){
+                                toast(MilkBuyEntryActivity.this, "Unable to update. Check values");
+                            }
+                        }
+
+
+                        id.setText("");
+                        seller_display.setText("All Sellers");
+                        weight.setText("");
+                        fat.setText("");
+                        snf.setText("");
+                        rate_display.setText("Rs/Ltr");
+                        amount_display.setText("Amount");
+                        list = dbHelper.getDailyBuyData(date, shift);
+                        Log.d(TAG, "list size: " + list.size());
+                        MilkBuyAdapter adapter = new MilkBuyAdapter(MilkBuyEntryActivity.this, list);
+                        recyclerView.setAdapter(adapter);
+                        new BackupHandler(MilkBuyEntryActivity.this);
+                        wantToUpdate = false;
+                        list = dbHelper.getDailyBuyData(date, shift);
+
+
+                        weightTotal = 0;
+                        amountTotal = 0;
+                        averageFat = 0;
+
+                        for(DailyBuyObject model : list){
+                            weightTotal += Double.valueOf(model.getWeight());
+                            amountTotal += Double.valueOf(model.getAmount());
+                            averageFat += Double.valueOf(model.getFat());
+                        }
+                        totalAmount.setText(String.valueOf(truncate(amountTotal)) + "Rs");
+                        totalWeight.setText(String.valueOf(truncate(weightTotal)) + "Ltr");
+                        fatAverage.setText(String.valueOf(truncate(averageFat/list.size())) + "%");
+
+                    }
+
                 }
                 else{
                     saveEntry();
@@ -212,6 +231,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
         totalAmount.setText(String.valueOf(truncate(amountTotal)) + "Rs");
         totalWeight.setText(String.valueOf(truncate(weightTotal)) + "Ltr");
         fatAverage.setText(String.valueOf(truncate(averageFat/list.size())) + "%");
+
 
         int permissionChceck = ContextCompat.checkSelfPermission(MilkBuyEntryActivity.this, Manifest.permission.READ_PHONE_STATE);
         if(permissionChceck != PackageManager.PERMISSION_GRANTED){
@@ -266,6 +286,50 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
                 catch(Exception e){
 
                 }
+            }
+        });
+
+        weight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                fatString = fat.getText().toString();
+                snfValue = snf.getText().toString();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(!snfValue.isEmpty()){
+                    try{
+                        double intermediate = truncateDouble(Double.valueOf(snfValue) * 10);
+                        int convertedValue = (int) intermediate;
+                        String concatValue = "SNF" + convertedValue;
+                        Log.d(TAG, "concatvalue:"+concatValue);
+                        if(cow_button.isChecked()) {
+                            type = "COW";
+                            rate = dbHelper.getRate(fatString, concatValue);
+                        }
+                        else {
+                            type = "BUFFALO";
+                            rate = dbHelper.getBuffaloRate(fatString, concatValue);
+                        }
+                        if(!rate.equals("Not Found") && !rate.equals("")){
+                            rate_display.setText(rate);
+                            amount_display.setText(String.valueOf(truncate(Double.valueOf(weightString) * Double.valueOf(rate))));
+                        }
+                        else{
+                            rate_display.setText("Not Found");
+                            amount_display.setText("Amount");
+                        }
+                    }
+                    catch(Exception e){
+                        //toast(MilkBuyEntryActivity.this,"Error: " + e.getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -582,7 +646,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
             toPrint += "TOTAL AMOUNT: " + truncate(amountTotal) + "Rs";
             toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr\n";
             toPrint += line + "\n";
-            toPrint += "      DAIRYDAILY APP";
+            toPrint += "      DAIRYDAILY APP\n\n\n";
             Log.d(TAG, "toPrint: " + toPrint);
             byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
 

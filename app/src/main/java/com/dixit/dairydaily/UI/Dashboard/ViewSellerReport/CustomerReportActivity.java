@@ -33,7 +33,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.dixit.dairydaily.Models.ReceiveCashListModel;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.itextpdf.text.BaseColor;
@@ -52,7 +51,7 @@ import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.Others.Prevalent;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.UsersListActivity;
+import com.dixit.dairydaily.UI.Dashboard.UsersListActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,7 +69,6 @@ import java.util.List;
 import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.getEndDate;
-import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.dixit.dairydaily.Others.UtilityMethods.getStartDate;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 import static com.dixit.dairydaily.Others.UtilityMethods.truncate;

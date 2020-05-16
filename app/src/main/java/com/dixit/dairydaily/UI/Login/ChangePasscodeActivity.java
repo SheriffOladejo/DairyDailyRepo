@@ -1,4 +1,4 @@
-package com.dixit.dairydaily.UI;
+package com.dixit.dairydaily.UI.Login;
 
 import android.content.Intent;
 import android.os.Bundle;

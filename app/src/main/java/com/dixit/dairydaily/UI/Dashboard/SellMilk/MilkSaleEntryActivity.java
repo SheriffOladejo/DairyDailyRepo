@@ -1,6 +1,5 @@
 package com.dixit.dairydaily.UI.Dashboard.SellMilk;
 
-import android.Manifest;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -13,17 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,27 +29,15 @@ import com.dixit.dairydaily.Models.DailySalesObject;
 import com.dixit.dairydaily.MyAdapters.MilkSaleAdapter;
 import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
-import com.dixit.dairydaily.Others.Logout;
-import com.dixit.dairydaily.Others.Prevalent;
-import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.dixit.dairydaily.UI.UsersListActivity;
+import com.dixit.dairydaily.UI.Dashboard.UsersListActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-
-import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
@@ -75,13 +58,16 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
     public static double amountTotal = 0;
     public static double averageFat = 0;
 
+    public static int unique_id;
+    public static int user_id;
+
     ArrayList<DailySalesObject> list;
     static ConstraintLayout scrollview;
 
     public static String shift, date;
 
-    EditText id, weight;
-    TextView all_buyers, amount_display, rate_view;
+    public static EditText id, weight;
+    public static TextView all_buyers, amount_display, rate_view;
     public static TextView totalAmount;
     public static TextView totalWeight;
     public static TextView fatAverage;
@@ -91,7 +77,7 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
 
     public static DbHelper dbHelper;
 
-    boolean wantToUpdate = false;
+   public static boolean wantToUpdate = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -140,21 +126,6 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
         shift = getIntent().getStringExtra("Shift");
         date = getIntent().getStringExtra("Date");
 
-        int unique_id = getIntent().getIntExtra("Unique_Id", -1);
-        int user_id = getIntent().getIntExtra("User_Id", -1);
-        String name = getIntent().getStringExtra("Name");
-        String passedweight = getIntent().getStringExtra("Weight");
-        String passedrate = getIntent().getStringExtra("Rate");
-        String passedamount = getIntent().getStringExtra("Amount");
-
-        if(unique_id != -1 && user_id != -1){
-            id.setText(String.valueOf(user_id));
-            weight.setText(passedweight);
-            rate_view.setText(passedrate);
-            amount_display.setText(passedamount);
-            all_buyers.setText(name);
-            wantToUpdate = true;
-        }
 
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)

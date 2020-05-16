@@ -57,9 +57,7 @@ public class PaymentRegisterAdapter extends RecyclerView.Adapter<PaymentRegister
                 @Override
                 public void onClick(View v) {
                     PaymentRegisterModel model = list.get(getAdapterPosition());
-                    selectedUsers = new ArrayList<>();
                     selectedUsers.add(model);
-                    Log.d("PaymentRegisterAdapter", "Added");
                 }
             });
         }

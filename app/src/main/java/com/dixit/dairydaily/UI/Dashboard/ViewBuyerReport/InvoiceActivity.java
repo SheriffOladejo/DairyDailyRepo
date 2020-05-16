@@ -69,6 +69,7 @@ import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.getFirstname;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
+import static com.dixit.dairydaily.Others.UtilityMethods.truncate;
 
 public class InvoiceActivity extends InitDrawerBoard {
 
@@ -155,7 +156,7 @@ public class InvoiceActivity extends InitDrawerBoard {
                         String id = StringUtils.rightPad(object.getId(), 3, "");
                         String name = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getName()), 9), 9, "");
                         String amount = object.getDue();
-                        String weight = object.getWeight();
+                        String weight = truncate(Double.valueOf(object.getWeight()));
                         try{
                             totalAmount += Double.valueOf(amount);
                             totalWeight += Double.valueOf(weight);

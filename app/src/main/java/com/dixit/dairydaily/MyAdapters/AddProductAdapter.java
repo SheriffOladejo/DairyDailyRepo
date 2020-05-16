@@ -69,7 +69,7 @@ public class AddProductAdapter extends RecyclerView.Adapter<AddProductAdapter.Vi
 
             ImageView optionsView = view.findViewById(R.id.options);
 
-            String[] options = {"Edit", "Delete", "Print"};
+            String[] options = {"Edit", "Delete"};
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Select Action");
             builder.setItems(options, new DialogInterface.OnClickListener() {
@@ -87,11 +87,13 @@ public class AddProductAdapter extends RecyclerView.Adapter<AddProductAdapter.Vi
                             AddProductActivity.id = id;
                             AddProductActivity.want_to_update = true;
                             dialog.dismiss();
+                            new BackupHandler(context);
                             break;
                         case 1:
                             helper.deleteProduct(id);
                             new BackupHandler(context);
                             list = helper.getProducts();
+                            new BackupHandler(context);
                             AddProductActivity.adapter = new AddProductAdapter(context, list);
                             AddProductActivity.recyclerView.setAdapter(AddProductActivity.adapter);
                             break;

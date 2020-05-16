@@ -15,10 +15,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\HunchoMufasa\\Desktop\\new Apps\\DairyDaily\\dairydaily.jks')
-            storePassword 'dairydaily'
+            storeFile file('C:\\Users\\HunchoMufasa\\Desktop\\DairyDaily\\dairydaily.jks')
+            storePassword 'newtonman99'
             keyAlias = 'DairyDaily'
-            keyPassword 'dairydaily'
+            keyPassword 'newtonman99'
         }
     }
     compileSdkVersion 28
@@ -36,7 +36,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            debuggable = true
+            debuggable = false
         }
     }
 }
@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0-alpha3'
     implementation 'io.paperdb:paperdb:2.6'
     implementation 'com.android.volley:volley:1.1.0'
+    implementation 'org.jsoup:jsoup:1.11.1'
     implementation('com.paytm:pgplussdk:1.4.1') {
         transitive = true
     }

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.CountDownTimer;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +15,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.dixit.dairydaily.UI.LoginActivity;
+import com.dixit.dairydaily.UI.Login.LoginActivity;
 
 import java.util.HashMap;
 
@@ -42,6 +41,9 @@ public class Logout extends AppCompatActivity {
         pd.setMessage("Logging out...");
         pd.setCancelable(false);
         pd.show();
+
+        Paper.book().write(Prevalent.remember_me, "false");
+        Paper.book().write(Prevalent.has_account, "false");
 
         //Paper.book().write(Prevalent.offline_password, "");
         new BackupHandler(context);
@@ -86,8 +88,6 @@ public class Logout extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Paper.book().write(Prevalent.remember_me, "false");
-                            Paper.book().write(Prevalent.has_account, "true");
                             pd.dismiss();
                             DashboardActivity.updated = false;
                             Paper.book().destroy();

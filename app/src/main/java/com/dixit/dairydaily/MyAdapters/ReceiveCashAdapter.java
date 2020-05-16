@@ -93,23 +93,32 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
 
                     switch(which){
                         case 0:
-                            new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit, shift).show();
+                            if(title.equals("Sale"))
+                                toast(context, "Edit this from milk entry page instead");
+                            else
+                                new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit, shift).show();
                             dialog.dismiss();
                             break;
                         case 1:
-                            helper.deleteReceiveCash(unique_id, "","");
-                            ReceiveCashActivity.list = helper.getReceiveCash(user_Id, "", "");
-                            ReceiveCashActivity. adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
-                            for(ReceiveCashModel model : list){
-                                ReceiveCashActivity.creditTotal += Double.valueOf(model.getCredit());
-                                ReceiveCashActivity.debitTotal += Double.valueOf(model.getDebit());
+                            if(title.equals("Sale"))
+                                toast(context, "Delete this from milk entry page instead");
+                            else{
+                                helper.deleteReceiveCash(unique_id, "","");
+                                //helper.deleteMilkSaleEntry(unique_id, true);
+                                ReceiveCashActivity.list = helper.getReceiveCash(user_Id, "", "");
+                                ReceiveCashActivity. adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                                for(ReceiveCashModel model : list){
+                                    ReceiveCashActivity.creditTotal += Double.valueOf(model.getCredit());
+                                    ReceiveCashActivity.debitTotal += Double.valueOf(model.getDebit());
+                                }
+                                ReceiveCashActivity.remain = ReceiveCashActivity.creditTotal - ReceiveCashActivity.debitTotal;
+                                ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
+                                ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
+                                ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
+                                ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
+                                dialog.dismiss();
+                                new BackupHandler(context);
                             }
-                            ReceiveCashActivity.remain = ReceiveCashActivity.creditTotal - ReceiveCashActivity.debitTotal;
-                            ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
-                            ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
-                            ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
-                            ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
-                            dialog.dismiss();
                             break;
                         case 2:
                             String toPrint ="\n\n\n"+ date + "\n" + "ID " + user_Id + " " + helper.getBuyerName(user_Id) + "\n" +

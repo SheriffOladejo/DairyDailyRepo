@@ -1,6 +1,5 @@
 package com.dixit.dairydaily.UI.Dashboard.ProductSale;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,43 +10,29 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.dixit.dairydaily.Models.AddProductModel;
 import com.dixit.dairydaily.MyAdapters.ProductSaleAdapter;
 import com.dixit.dairydaily.MyAdapters.ProductsAdapter;
 import com.dixit.dairydaily.Others.BackupHandler;
 import com.dixit.dairydaily.Others.DbHelper;
-import com.dixit.dairydaily.Others.Logout;
-import com.dixit.dairydaily.Others.Prevalent;
-import com.dixit.dairydaily.Others.WarningDialog;
 import com.dixit.dairydaily.R;
 import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.DeleteHistory;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.MilkHistoryActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ProfileActivity;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.UpgradeToPremium;
-import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.ViewAllEntryActivity;
-import com.dixit.dairydaily.UI.UsersListActivity;
+import com.dixit.dairydaily.UI.Dashboard.UsersListActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
-import io.paperdb.Paper;
 
 import static com.dixit.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
@@ -99,6 +84,7 @@ public class ProductSaleActivity extends AppCompatActivity {
         all_buyers = findViewById(R.id.all_buyers);
         all_products = findViewById(R.id.all_products);
         amount = findViewById(R.id.amount);
+        amount.setText("Amount");
         id = findViewById(R.id.id);
         rate = findViewById(R.id.rate);
         units = findViewById(R.id.units);
@@ -139,10 +125,16 @@ public class ProductSaleActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spinnerItem = (AddProductModel) parent.getItemAtPosition(position);
-                String rateString = spinnerItem.getRate();
                 if(!spinnerItem.getProduct_name().equals("Select Product")){
+                    String rateString = spinnerItem.getRate();
                     rate.setText(rateString);
                     product = spinnerItem.getProduct_name();
+                    try{
+                        double rateValue = Double.valueOf(rate.getText().toString());
+                        double unitsValue = Double.valueOf(units.getText().toString());
+                        amount.setText(String.valueOf(rateValue * unitsValue));
+                    }
+                    catch (Exception e){}
                 }
                 else
                     product = "";
@@ -195,7 +187,7 @@ public class ProductSaleActivity extends AppCompatActivity {
                         String name = dbHelper.getBuyerName(id);
                         all_buyers.setText(name);
                     } else {
-                        all_buyers.setText("All Buyers");
+                        all_buyers.setText("All Sellers");
                     }
                 }
                 catch (Exception e){}
@@ -225,17 +217,17 @@ public class ProductSaleActivity extends AppCompatActivity {
                 }
 
                 if(want_to_update){
-                    if(!product.equals("")){
+                    if(!product.equals("") && !amountValue.equals("Amount")){
                         dbHelper.updateProductSale(ProductSaleAdapter.id+"", name, product, unitsValue, amountValue);
                         id.setText("");
                         units.setText("");
                         rate.setText("");
                         amount.setText("Amount");
-                        all_buyers.setText("All Buyers");
-                        toast(ProductSaleActivity.this, "Updated");
+                        all_buyers.setText("All Sellers");
                         productSaleAdapter = new ProductSaleAdapter(ProductSaleActivity.this, dbHelper.getProductSale());
                         recyclerView.setAdapter(productSaleAdapter);
                         want_to_update = false;
+                        new BackupHandler(ProductSaleActivity.this);
                     }
                     else
                         toast(ProductSaleActivity.this, "Select a product");
@@ -245,6 +237,7 @@ public class ProductSaleActivity extends AppCompatActivity {
                         if(!dbHelper.addProductSale(idInt, name, product, unitsValue, amountValue, date))
                             toast(ProductSaleActivity.this, "Unable to add data");
                         else {
+                            new BackupHandler(ProductSaleActivity.this);
                             startActivity(new Intent(ProductSaleActivity.this, ProductSaleActivity.class));
                             finish();
                         }

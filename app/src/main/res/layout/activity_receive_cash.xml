@@ -176,6 +176,7 @@
                 </LinearLayout>
 
                 <Button
+                    android:visibility="gone"
                     android:id="@+id/go"
                     android:layout_width="160dp"
                     android:layout_height="50dp"

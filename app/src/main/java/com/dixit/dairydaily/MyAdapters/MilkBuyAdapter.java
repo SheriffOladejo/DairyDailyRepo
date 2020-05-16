@@ -106,21 +106,17 @@ public class MilkBuyAdapter extends RecyclerView.Adapter<MilkBuyAdapter.ViewHold
 
                     switch(which){
                         case 0:
-                            Intent intent = new Intent(context, MilkBuyEntryActivity.class);
-                            intent.putExtra("Unique_Id", unique_Id);
-                            intent.putExtra("Fat", String.valueOf(fat));
-                            intent.putExtra("SNF", String.valueOf(snf));
-                            intent.putExtra("Type", type);
-                            intent.putExtra("User_Id", user_Id);
-                            intent.putExtra("Date", date);
-                            intent.putExtra("Shift", shift);
-                            intent.putExtra("Name", name);
-                            intent.putExtra("Rate", String.valueOf(rate));
-                            intent.putExtra("Amount", String.valueOf(amount));
-                            intent.putExtra("Weight", String.valueOf(weight));
-                            context.startActivity(intent);
 
-                            helper.updateMilkBuy(unique_Id, user_Id, name, String.valueOf(weight), String.valueOf(rate), String.valueOf(amount), String.valueOf(fat), String.valueOf(snf), type);
+                            MilkBuyEntryActivity.id.setText(user_Id+"");
+                            MilkBuyEntryActivity.weight.setText(weight+"");
+                            MilkBuyEntryActivity.amount_display.setText(amount+"");
+                            MilkBuyEntryActivity.rate_display.setText(rate+"");
+                            MilkBuyEntryActivity.unique_id = unique_Id;
+                            MilkBuyEntryActivity.cow_button.setChecked(true);
+                            MilkBuyEntryActivity.type=type;
+                            MilkBuyEntryActivity.fat.setText(fat+"");
+                            MilkBuyEntryActivity.snf.setText(snf+"");
+                            MilkBuyEntryActivity.wantToUpdate = true;
                             dialog.dismiss();
                             break;
                         case 1:

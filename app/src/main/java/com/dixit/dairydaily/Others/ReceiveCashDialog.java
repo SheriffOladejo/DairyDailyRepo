@@ -34,7 +34,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
     DbHelper dbHelper;
     int id;
     int unique_id;
-    String shift;
+    String shift = "Morning";
 
     ProgressBar progressBar;
 
@@ -99,7 +99,6 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                     if(wantToUpdate){
                         //Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
                         dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString, shift);
-                        new BackupHandler(context);
                         ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
                         ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
                         ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
@@ -119,6 +118,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                         InvoiceActivity.list = dbHelper.getReceiveCashList();
                         InvoiceActivity.adapter = new InvoiceAdapter(getContext(), InvoiceActivity.list);
                         InvoiceActivity.recyclerView.setAdapter(InvoiceActivity.adapter);
+                        new BackupHandler(context);
                         dismiss();
                     }
                     else{
@@ -150,7 +150,6 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                             ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
                             ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
                             dismiss();
-                            //context.startActivity(new Intent(context, ReceiveCashActivity.class));
                         }
                     }
                 }
