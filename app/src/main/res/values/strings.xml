@@ -4,6 +4,7 @@
     <string name="select_printer">Select Printer</string>
     <string name="close">Close</string>
     <string name="open">Open</string>
+    <string name="versionName">2.0.1</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

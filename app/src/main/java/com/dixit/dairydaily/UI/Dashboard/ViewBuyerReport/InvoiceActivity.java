@@ -155,8 +155,16 @@ public class InvoiceActivity extends InitDrawerBoard {
                     for(ReceiveCashListModel object : list){
                         String id = StringUtils.rightPad(object.getId(), 3, "");
                         String name = StringUtils.rightPad(StringUtils.truncate(getFirstname(object.getName()), 9), 9, "");
-                        String amount = object.getDue();
-                        String weight = truncate(Double.valueOf(object.getWeight()));
+                        String amount, weight;
+                        try{
+                            amount = object.getDue();
+                            weight = truncate(Double.valueOf(object.getWeight()));
+                        }
+                        catch(Exception e){
+                            amount = "0";
+                            weight="0";
+                        }
+
                         try{
                             totalAmount += Double.valueOf(amount);
                             totalWeight += Double.valueOf(weight);
@@ -166,7 +174,7 @@ public class InvoiceActivity extends InitDrawerBoard {
                         }
                         toPrint += id + "|"+name + "|" + StringUtils.rightPad(weight, 6, "") + "|" + StringUtils.rightPad(amount,6,"") + "|\n";
                     }
-                    toPrint += line + "\nTOTAL AMOUNT: "+ totalAmount + "Rs\n";
+                    toPrint += line + "\nTOTAL AMOUNT: "+ truncate(totalAmount) + "Rs\n";
                     toPrint += "TOTAL WEIGHT: " + totalWeight + "Ltr\n";
                     toPrint += line + "\n";
                     toPrint += "       DAIRY DAILY APP\n\n";

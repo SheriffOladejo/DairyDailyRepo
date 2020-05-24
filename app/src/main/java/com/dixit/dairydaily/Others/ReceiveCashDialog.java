@@ -98,7 +98,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                 else{
                     if(wantToUpdate){
                         //Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
-                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString, shift);
+                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString, shift, "0");
                         ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
                         ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
                         ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
@@ -123,7 +123,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                     }
                     else{
                         Log.d("ReceiveCashDialog", "Trying to add new");
-                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift)){
+                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift, "0")){
                             toast(context, "Operation failed");
                             dismiss();
                         }

@@ -70,7 +70,7 @@ public class BackupHandler {
         if(data.getCount() != 0){
             while(data.moveToNext()){
 
-                Log.d("BackupHandler", "backupReceiveCashData: " + key);
+                //Log.d("BackupHandler", "backupReceiveCashData: " + key);
                 try{
                     JSONObject values = new JSONObject();
                     values.put("Date", data.getString(data.getColumnIndex("Date")));
@@ -79,9 +79,10 @@ public class BackupHandler {
                     values.put("Debit", data.getString(data.getColumnIndex("Debit")));
                     values.put("ID", data.getInt(data.getColumnIndex("ID")));
                     values.put("Shift", data.getString(data.getColumnIndex("Shift")));
+                    values.put("Weight", data.getString(data.getColumnIndex("Weight")));
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
-                    Log.d("BackupHandler", "backupReceiveCashData: onAdd" + jsonToUpload.toString());
+                    //Log.d("BackupHandler", "backupReceiveCashData: onAdd" + jsonToUpload.toString());
                 }
                 catch (Exception e){
                     Log.d("BackupHandler", "backupReceiveCashData: Unable to write JSON Object: " + e.getMessage());
@@ -116,7 +117,7 @@ public class BackupHandler {
         if(data.getCount() != 0){
             while(data.moveToNext()){
 
-                Log.d("BackupHandler", "backupMilkSaleData: " + key);
+                //Log.d("BackupHandler", "backupMilkBuyData: " + key);
                 try{
                     JSONObject values = new JSONObject();
                     values.put("ID", data.getInt(data.getColumnIndex("ID")));
@@ -132,7 +133,7 @@ public class BackupHandler {
 
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
-                    Log.d("BackupHandler", "backupMilkBuyData: onAdd" + jsonToUpload.toString());
+                    //Log.d("BackupHandler", "backupMilkBuyData: onAdd" + jsonToUpload.toString());
                 }
                 catch (Exception e){
                     toast(context, "Unable to write JSON Object");
@@ -159,8 +160,10 @@ public class BackupHandler {
     }
 
     private void backupCustomers() {
-        JSONObject jsonToUpload = new JSONObject();
-        HashMap<String, Object> toUpload = new HashMap<>();
+        JSONObject buyerJsonToUpload = new JSONObject();
+        JSONObject sellerJsonToUpload =new JSONObject();
+        HashMap<String, Object> buyerToUpload = new HashMap<>();
+        HashMap<String, Object>sellerToUpload = new HashMap<>();
 
         Cursor allBuyers = dbHelper.getAllBuyers();
         Cursor allSellers = dbHelper.getAllSellers();
@@ -169,7 +172,7 @@ public class BackupHandler {
             int key = 0;
             while(allSellers.moveToNext()){
 
-                Log.d("BackupHandler", "backupSellerData: " + key);
+                //Log.d("BackupHandler", "backupSellerData: " + key);
                 try{
                     JSONObject values = new JSONObject();
                     values.put("Name", allSellers.getString(allSellers.getColumnIndex("Name")));
@@ -177,17 +180,17 @@ public class BackupHandler {
                     values.put("Address", allSellers.getString(allSellers.getColumnIndex("Address")));
                     values.put("Status", allSellers.getString(allSellers.getColumnIndex("Status")));
                     values.put("ID", allSellers.getInt(allSellers.getColumnIndex("ID")));
-                    jsonToUpload.put(String.valueOf(key), values);
+                    sellerJsonToUpload.put(String.valueOf(key), values);
                     key++;
-                    Log.d("BackupHandler", "backupSellerData: onAdd" + jsonToUpload.toString());
+                    //Log.d("BackupHandler", "backupSellerData: onAdd" + sellerJsonToUpload.toString());
                 }
                 catch (Exception e){
                     Log.d("BackupHandler", "backupSellerData: Unable to write JSON Object: " + e.getMessage());
                 }
             }
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-            toUpload.put("All Sellers", jsonToUpload.toString());
-            ref.updateChildren(toUpload).addOnCompleteListener(new OnCompleteListener<Void>() {
+            sellerToUpload.put("All Sellers", sellerJsonToUpload.toString());
+            ref.updateChildren(sellerToUpload).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
@@ -207,7 +210,7 @@ public class BackupHandler {
             int key = 0;
             while(allBuyers.moveToNext()){
 
-                Log.d("BackupHandler", "backupBuyerData: " + key);
+                //Log.d("BackupHandler", "backupBuyerData: " + key);
                 try{
                     JSONObject values = new JSONObject();
                     values.put("Name", allBuyers.getString(allBuyers.getColumnIndex("Name")));
@@ -215,17 +218,17 @@ public class BackupHandler {
                     values.put("Address", allBuyers.getString(allBuyers.getColumnIndex("Address")));
                     values.put("Status", allBuyers.getString(allBuyers.getColumnIndex("Status")));
                     values.put("ID", allBuyers.getInt(allBuyers.getColumnIndex("ID")));
-                    jsonToUpload.put(String.valueOf(key), values);
+                    buyerJsonToUpload.put(String.valueOf(key), values);
                     key++;
-                    Log.d("BackupHandler", "backupBuyerData: onAdd" + jsonToUpload.toString());
+                    //Log.d("BackupHandler", "backupBuyerData: onAdd" + buyerJsonToUpload.toString());
                 }
                 catch (Exception e){
                     Log.d("BackupHandler", "backupBuyerData: Unable to write JSON Object: " + e.getMessage());
                 }
             }
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-            toUpload.put("All Buyers", jsonToUpload.toString());
-            ref.updateChildren(toUpload).addOnCompleteListener(new OnCompleteListener<Void>() {
+            buyerToUpload.put("All Buyers", buyerJsonToUpload.toString());
+            ref.updateChildren(buyerToUpload).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
@@ -253,7 +256,7 @@ public class BackupHandler {
         if(data.getCount() != 0){
             while(data.moveToNext()){
 
-                Log.d("BackupHandler", "backupMilkSaleData: " + key);
+                //Log.d("BackupHandler", "backupMilkSaleData: " + key);
                 try{
                     JSONObject values = new JSONObject();
                     values.put("ID", data.getInt(data.getColumnIndex("ID")));
@@ -270,7 +273,7 @@ public class BackupHandler {
 
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
-                    Log.d("BackupHandler", "backupMilkSaleData: onAdd" + jsonToUpload.toString());
+                    //Log.d("BackupHandler", "backupMilkSaleData: onAdd" + jsonToUpload.toString());
                 }
                 catch (Exception e){
                     toast(context, "Unable to write JSON Object: MilkSale");

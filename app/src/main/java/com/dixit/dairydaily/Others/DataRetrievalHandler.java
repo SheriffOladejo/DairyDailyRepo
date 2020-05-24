@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,23 +24,25 @@ public class DataRetrievalHandler {
 
     Context context;
     DbHelper dbHelper;
+    DatabaseReference ref;
+    ValueEventListener valueEventListener, valueEventListener1;
 
     public DataRetrievalHandler(Context context){
         this.context = context;
         dbHelper = new DbHelper(context);
-        retrieveReceiveCash();
+        retrieveMilkSaleData();
     }
 
     private void retrieveReceiveCash(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     try {
                         String retrievedJsonString = dataSnapshot.child("Receive Cash Data").getValue().toString();
                         Log.d("BackupHandler", "retrieveReceiveCashData: " + retrievedJsonString);
-                            dbHelper.clearReceiveCash();
+                        dbHelper.clearReceiveCash();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
 
                         for(int i = 0; i<jsonObject.names().length(); i++){
@@ -50,7 +53,9 @@ public class DataRetrievalHandler {
                             String credit = obj.getString("Credit");
                             String debit = obj.getString("Debit");
                             String shift = obj.getString("Shift");
-                            dbHelper.addReceiveCash(id, date, credit, debit, title, shift);
+                            String weight = obj.getString("Weight");
+                            Log.d(TAG, "weoght: " +weight);
+                            dbHelper.addReceiveCash(id, date, credit, debit, title, shift, weight);
                         }
                     } catch (Exception e) {
                         Log.d(TAG, "Unable to retrieve receive cash data." + e.getMessage());
@@ -66,15 +71,16 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener);
         retrieveMilkSaleData();
     }
 
     private static final String TAG = "DataRetrievalHandler";
 
     public void retrieveMilkSaleData(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
@@ -82,7 +88,7 @@ public class DataRetrievalHandler {
                     try {
                         String retrievedJsonString = dataSnapshot.child("Milk Sale Data").getValue().toString();
                         Log.d("BackupHandler", "retrieveMilkSaleData: " + retrievedJsonString);
-                            dbHelper.clearMilkSaleTable();
+                        dbHelper.clearMilkSaleTable();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
                             JSONObject obj = jsonObject.getJSONObject(jsonObject.names().getString(i));
@@ -97,6 +103,7 @@ public class DataRetrievalHandler {
                             String credit = truncate(Double.valueOf(obj.getString("Credit")));
                             String debit = truncate(Double.valueOf(obj.getString("Debit")));
                             dbHelper.addSalesEntry(id, name, weight, amount, rate, shift, date, debit, credit);
+                            dbHelper.addReceiveCash(id,date,credit,debit,"Sale",shift,weight);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -113,13 +120,15 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener);
+        //ref.removeEventListener(valueEventListener);
         retrieveCustomers();
     }
 
     private void retrieveCustomers(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
@@ -127,7 +136,7 @@ public class DataRetrievalHandler {
                     try {
                         String retrievedJsonString = dataSnapshot.child("All Sellers").getValue().toString();
                         Log.d("BackupHandler", "retrieveSellerData: " + retrievedJsonString);
-                            dbHelper.clearSellerTable();
+                        dbHelper.clearSellerTable();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         Log.d("DataRetrievalHandler", "retrieveCustomers: " + retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
@@ -152,8 +161,11 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
-        ref.addValueEventListener(new ValueEventListener() {
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener);
+        //ref.removeEventListener(valueEventListener);
+
+        valueEventListener1 = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
@@ -161,7 +173,7 @@ public class DataRetrievalHandler {
                     try {
                         String retrievedJsonString = dataSnapshot.child("All Buyers").getValue().toString();
                         Log.d("DataRetrievalHandler", "This is also called");
-                            dbHelper.clearBuyerTable();
+                        dbHelper.clearBuyerTable();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
                             JSONObject obj = jsonObject.getJSONObject(jsonObject.names().getString(i));
@@ -187,13 +199,15 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener1);
+        //ref.removeEventListener(valueEventListener1);
         retrieveMilkBuyData();
     }
 
     public void retrieveMilkBuyData(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
@@ -201,7 +215,7 @@ public class DataRetrievalHandler {
                     try {
                         String retrievedJsonString = dataSnapshot.child("Milk Buy Data").getValue().toString();
                         Log.d("DataRetrievalHandler", "This is called");
-                            dbHelper.clearMilkBuyTable();
+                        dbHelper.clearMilkBuyTable();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
                             JSONObject obj = jsonObject.getJSONObject(jsonObject.names().getString(i));
@@ -237,21 +251,22 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
-
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener);
+        //ref.removeEventListener(valueEventListener);
         retrieveProductSale();
     }
 
     private void retrieveProductSale(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
 
                     try {
                         String retrievedJsonString = dataSnapshot.child("Product Sale Data").getValue().toString();
-                            dbHelper.clearProductSale();
+                        dbHelper.clearProductSale();
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
                             JSONObject obj = jsonObject.getJSONObject(jsonObject.names().getString(i));
@@ -280,20 +295,22 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener);
+        //ref.removeEventListener(valueEventListener);
         retrieveProducts();
     }
 
     private void retrieveProducts(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
 
                     try {
                         String retrievedJsonString = dataSnapshot.child("Products Data").getValue().toString();
-                            dbHelper.clearProducts();
+                        dbHelper.clearProducts();
 
                         JSONObject jsonObject = new JSONObject(retrievedJsonString);
                         for(int i = 0; i<jsonObject.names().length(); i++){
@@ -318,13 +335,15 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        ref.addListenerForSingleValueEvent(valueEventListener);
+        //ref.removeEventListener(valueEventListener);
         retrieveMilkRate();
     }
 
     private void retrieveMilkRate(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
@@ -335,7 +354,6 @@ public class DataRetrievalHandler {
                         //dbHelper.clearRate();
                         JSONObject obj = new JSONObject(retrievedJsonString);
                         dbHelper.setRate(obj.getDouble("Rate"));
-                        retrieveExpiryDate();
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.d(TAG, "Unable to retrieve milk rate data." + e.getMessage());
@@ -351,22 +369,24 @@ public class DataRetrievalHandler {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        ref.addListenerForSingleValueEvent(valueEventListener);
+        retrieveExpiryDate();
     }
 
     private void retrieveExpiryDate(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
-        ref.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-
                     try {
-                        String retrievedJsonString = dataSnapshot.child("Subscription Details").getValue().toString();
+                        String retrievedJsonString = dataSnapshot.child("Expiry Date").getValue().toString();
                         Log.d("RetrievalHandler", "retrieveMilkRateData: " + retrievedJsonString);
                         //dbHelper.clearRate();
-                        JSONObject obj = new JSONObject(retrievedJsonString);
-                        dbHelper.setExpiryDate(obj.getString("Expiry Date"));
+                        //JSONObject obj = new JSONObject(retrievedJsonString);
+                        dbHelper.setExpiryDate(retrievedJsonString);
                         toast(context, "Data recovered successfully");
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -383,5 +403,11 @@ public class DataRetrievalHandler {
 
             }
         });
+        //ref.addValueEventListener(valueEventListener);
+    }
+
+    public void removeValueEventListener(){
+        ref.removeEventListener(valueEventListener);
+        ref.removeEventListener(valueEventListener1);
     }
 }

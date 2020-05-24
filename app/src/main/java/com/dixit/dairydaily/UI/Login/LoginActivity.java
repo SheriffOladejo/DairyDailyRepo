@@ -382,10 +382,11 @@ public class LoginActivity extends AppCompatActivity {
         return suspended;
     }
 
+    DataRetrievalHandler dataRetrievalHandler;
     private void verifyLoginInput(){
         hideKeyboard(LoginActivity.this);
         Paper.book().write(Prevalent.phone_number, login_phone_number);
-        new DataRetrievalHandler(LoginActivity.this);
+        dataRetrievalHandler = new DataRetrievalHandler(LoginActivity.this);
 
         if(login_phone_number.isEmpty() || login_password.isEmpty() || login_country_code_string.isEmpty()){
             useSnackBar("All fields are required", frameLayout);
@@ -397,7 +398,7 @@ public class LoginActivity extends AppCompatActivity {
 
             // We first want to check if the phone number exists and if the password matches.
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(login_phone_number);
-            ref.addValueEventListener(new ValueEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
@@ -444,7 +445,7 @@ public class LoginActivity extends AppCompatActivity {
                                 helper.setExpiryDate(expiry_date);
 
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Pricing");
-                                reference.addValueEventListener(new ValueEventListener() {
+                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if(dataSnapshot.exists()){
@@ -594,7 +595,7 @@ public class LoginActivity extends AppCompatActivity {
             else {
                 if(sign_up_password.equals(confirm_password)){
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(sign_up_phone_number);
-                    ref.addValueEventListener(new ValueEventListener() {
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(dataSnapshot.exists()){
@@ -658,6 +659,7 @@ public class LoginActivity extends AppCompatActivity {
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName+fileExtension);
         request.setTitle("Rate File");
         downloadId = downloadManager.enqueue(request);
+        //dataRetrievalHandler.removeValueEventListener();
         //Toast.makeText(DashboardActivity.this,"Directory for file: " + downloadManager.getUriForDownloadedFile(downloadId), Toast.LENGTH_LONG).show();
     }
 

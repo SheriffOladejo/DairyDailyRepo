@@ -85,6 +85,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -134,7 +135,7 @@ public class DashboardActivity extends InitDrawerBoard {
 
     long downloadId;
 
-    boolean isExpired = false;
+    public static boolean isExpired = false;
 
     int numberOfMessages = 0;
     TextView notif_count;
@@ -329,6 +330,34 @@ public class DashboardActivity extends InitDrawerBoard {
         StorageReference reference2 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 2");
         StorageReference reference3 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 3");
         StorageReference reference4 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 4");
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Pricing");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String starter = dataSnapshot.child("Starter Plan").getValue().toString();
+                    String spark = dataSnapshot.child("Spark Plan").getValue().toString();
+                    String enterprise = dataSnapshot.child("Enterprise Plan").getValue().toString();
+                    try{
+                        double starter_double = Double.valueOf(starter);
+                        double spark_double = Double.valueOf(spark);
+                        double enterprise_double = Double.valueOf(enterprise);
+                        Paper.book().write(Prevalent.starter, starter_double+"");
+                        Paper.book().write(Prevalent.spark, spark_double+"");
+                        Paper.book().write(Prevalent.enterprise, enterprise_double+"");
+                    }
+                    catch(Exception e){
+                        Toast.makeText(DashboardActivity.this, "Error retrieving pricing plans. Contact the admin.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         reference1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
@@ -755,148 +784,6 @@ public class DashboardActivity extends InitDrawerBoard {
         dialog.dismiss();
     }
 
-
-    void initDashboard(){
-        findViewById(R.id.profile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
-            }
-        });
-        findViewById(R.id.legal_policies).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
-            }
-        });
-        findViewById(R.id.view_all_entry).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, ViewAllEntryActivity.class));
-            }
-        });
-        findViewById(R.id.milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, MilkHistoryActivity.class));
-            }
-        });
-        findViewById(R.id.upgrade).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, UpgradeToPremium.class));
-            }
-        });
-        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Logout(DashboardActivity.this);
-            }
-        });
-        findViewById(R.id.recover_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new WarningDialog(DashboardActivity.this).show();
-            }
-        });
-        findViewById(R.id.backup_data).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ActivityCompat.requestPermissions(DashboardActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                // Send user's phone number for verification
-                Date dateIntermediate = new Date();
-                String date = new SimpleDateFormat("dd/MM/YYYY").format(dateIntermediate);
-                Paper.book().write(Prevalent.last_update, date);
-                new BackupHandler(DashboardActivity.this);
-            }
-        });
-
-        LinearLayout backup, recover, update_rate_charts, erase_milk_history;
-        ImageView arrow = findViewById(R.id.arrow);
-        final boolean[] arrowClicked = {false};
-        backup = findViewById(R.id.backup_data);
-        erase_milk_history = findViewById(R.id.erase_milk_history);
-        update_rate_charts = findViewById(R.id.update_rate_charts);
-        recover = findViewById(R.id.recover_data);
-        update_rate_charts.setVisibility(View.GONE);
-        erase_milk_history.setVisibility(View.GONE);
-        backup.setVisibility(View.GONE);
-        recover.setVisibility(View.GONE);
-        findViewById(R.id.erase_milk_history).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(DashboardActivity.this, DeleteHistory.class));
-            }
-        });
-        update_rate_charts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressDialog.show();
-                StorageReference ref = FirebaseStorage.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Rate File");
-                ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if(task.isSuccessful()){
-                            String url = task.getResult().toString();
-                            Toast.makeText(DashboardActivity.this, "Downloading file...", Toast.LENGTH_SHORT).show();
-                            DownloadFile(DashboardActivity.this, "Rate File", ".csv", "/dairyDaily", url);
-                        }
-                        else{
-                            Toast.makeText(DashboardActivity.this, "Something went wrong when downloading the file.", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                        }
-                    }
-                });
-            }
-        });
-        findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-        arrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(arrowClicked[0]){
-                    backup.setVisibility(View.GONE);
-                    recover.setVisibility(View.GONE);
-                    erase_milk_history.setVisibility(View.GONE);
-                    update_rate_charts.setVisibility(View.GONE);
-                    arrowClicked[0] = false;
-                    arrow.setImageResource(R.drawable.ic_drop_down);
-                }
-                else{
-                    arrow.setImageResource(R.drawable.drop_down);
-                    backup.setVisibility(View.VISIBLE);
-                    erase_milk_history.setVisibility(View.VISIBLE);
-                    update_rate_charts.setVisibility(View.VISIBLE);
-                    recover.setVisibility(View.VISIBLE);
-                    arrowClicked[0] = true;
-                }
-            }
-        });
-
-
-    }
-
-
     private void DownloadFile(Context context, String fileName, String fileExtension, String destinationDirectoy, String url) {
         File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "Rate File.csv");
         file.delete();
@@ -1198,14 +1085,27 @@ public class DashboardActivity extends InitDrawerBoard {
                 dialog.show();
                 break;
             case R.id.whatsapp:
-                Intent sendintent = new Intent("android.intent.action.MAIN");
-                String formattedPhoneNumber = "918449852828";
-                sendintent.setAction(Intent.ACTION_SEND);
-                sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
-                sendintent.setType("text/plain");
-                sendintent.setPackage("com.whatsapp");
-                sendintent.putExtra("jid", formattedPhoneNumber+"@s.whatsapp.net");
-                startActivity(sendintent);
+                PackageManager packageManager = getPackageManager();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                try{
+                    String url = "https://api.whatsapp.com/send?phone=918449852828&text="+ URLEncoder.encode("Hi, I need help", "UTF-8");
+                    i.setPackage("com.whatsapp");
+                    i.setData(Uri.parse(url));
+                    if(i.resolveActivity(packageManager) != null){
+                        startActivity(i);
+                    }
+                }
+                catch (Exception e){
+                    Toast.makeText(DashboardActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+//                Intent sendintent = new Intent("android.intent.action.MAIN");
+//                String formattedPhoneNumber = "918449852828";
+//                sendintent.setAction(Intent.ACTION_SEND);
+//                sendintent.putExtra(Intent.EXTRA_TEXT, "Hello");
+//                sendintent.setType("text/plain");
+//                sendintent.setPackage("com.whatsapp");
+//                sendintent.putExtra("jid", formattedPhoneNumber+"@s.whatsapp.net");
+//                startActivity(sendintent);
                 break;
         }
         if(toggle.onOptionsItemSelected(item))

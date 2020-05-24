@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.dixit.dairydaily.UI.Dashboard.DashboardActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -133,6 +134,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                 else if(price.equals(""+Paper.book().read(Prevalent.enterprise)))
                     c.add(Calendar.DATE, 365);
                 helper.setExpiryDate(String.valueOf(c.getTime().getTime()));
+                Paper.book().write(Prevalent.expiry_date, ""+c.getTime().getTime());
                 Toast.makeText(CheckSum.this, ""+c.getTime(), Toast.LENGTH_LONG).show();
                 String date = new SimpleDateFormat("dd/MM/YYYY").format(new Date());
                 HashMap<String, Object> map = new HashMap<>();
@@ -148,12 +150,14 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Payment History").child(""+System.currentTimeMillis());
                 DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("Users").child(Paper.book().read(Prevalent.phone_number)).child("Expiry Date");
                 ref1.setValue(""+c.getTime().getTime());
+                DashboardActivity.isExpired = false;
 
                 ref.updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(CheckSum.this, "Payment Successful.", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(CheckSum.this, DashboardActivity.class));
                             finish();
                         }
                     }

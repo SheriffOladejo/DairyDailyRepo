@@ -279,7 +279,7 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
                 if(!dbHelper.addSalesEntry(Id,name, Weight, Amount, rate, shift, date, Amount, truncate(0.00)))
                     Toast.makeText(MilkSaleEntryActivity.this, "Unable to add entry", Toast.LENGTH_SHORT).show();
                 else {
-                    if(dbHelper.addReceiveCash(Id, date, truncate(0.00), Amount, "Sale", shift.substring(0,1))){
+                    if(dbHelper.addReceiveCash(Id, date, truncate(0.00), Amount, "Sale", shift.substring(0,1), Weight)){
                         String toPrint ="\n\n\n"+ date + "\n" + "ID      : " + Id + " " + name + "\n" +
                                 "SHIFT   :   " + shift  +
                                 "\nWEIGHT  :   " + Weight + "Ltr\nRATE    :   " + rate + "Rs/Ltr\n" + "TOTAL RS:   " + Amount + "Rs\n      DAIRYDAILY APP\n\n\n";

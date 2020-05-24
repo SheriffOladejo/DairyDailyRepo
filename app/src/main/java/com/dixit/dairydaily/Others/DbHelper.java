@@ -56,6 +56,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String Rec_COL3 = "Debit";
     private static final String Rec_COL4 = "Title";
     private static final String Rec_COL7 = "Shift";
+    private static final String Rec_COL8 = "Weight";
 
     // Expiry date
     private static final String expiry_date_table = "Expiry_Date";
@@ -160,7 +161,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 "BuyerName TEXT, Weight String, Amount String, Rate String, Shift TEXT, Date TEXT, Credit String, Debit String, Recog_Date TEXT)";
         String createBuyTable = "CREATE TABLE " + milk_buy_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, " +
                 "SellerName TEXT,  Weight TEXT, Fat TEXT, SNF TEXT, Amount TEXT, Date TEXT, Shift TEXT, Rate TEXT, Type TEXT)";
-        String createReceiveCashTable = "CREATE TABLE " + receive_cash_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, Date TEXT, Credit TEXT, Debit TEXT, Title TEXT, Shift TEXT)";
+        String createReceiveCashTable = "CREATE TABLE " + receive_cash_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, Date TEXT, Credit TEXT, Debit TEXT, Title TEXT, Shift TEXT, Weight TEXT)";
         String createProductTable = "CREATE TABLE " + product_table + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, Product_Name TEXT, Price_Per_Unit TEXT)";
 
         db.execSQL(createProductSaleTable);
@@ -413,7 +414,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     // Add receive cash entry
-    public boolean addReceiveCash(int id, String date, String credit, String debit, String title, String shift){
+    public boolean addReceiveCash(int id, String date, String credit, String debit, String title, String shift, String weight){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Rec_COL5, id);
@@ -422,6 +423,7 @@ public class DbHelper extends SQLiteOpenHelper {
         contentValues.put(Rec_COL3, debit);
         contentValues.put(Rec_COL4, title);
         contentValues.put(Rec_COL7, shift);
+        contentValues.put(Rec_COL8, weight);
         Log.d(TAG, "addReceiveCash: " + title);
 
         long result = db.insert(receive_cash_table, null, contentValues);
@@ -434,11 +436,11 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateReceiveCash(int unique_id, int id, String date, String title, String debit, String credit, String shift){
+    public void updateReceiveCash(int unique_id, int id, String date, String title, String debit, String credit, String shift, String weight){
         SQLiteDatabase db = this.getWritableDatabase();
         String query2 = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL6 + " ='" + unique_id + "'";
         db.execSQL(query2);
-        addReceiveCash(id, date, credit, debit, title, shift);
+        addReceiveCash(id, date, credit, debit, title, shift, weight);
         String query = "UPDATE " + receive_cash_table + " SET " + Rec_COL1 + " ='" + date + "' AND " + Rec_COL2 + " ='" + credit + "' AND "
                 + Rec_COL3 + " ='" + debit + "' AND " + Rec_COL5 + " ='" + id + "' AND " + Rec_COL4 + " ='" + title + "' WHERE " + Rec_COL6 + " ='" + unique_id + "'";
         Log.d(TAG, "Query: " + query);
@@ -579,9 +581,9 @@ public class DbHelper extends SQLiteOpenHelper {
                     while(data.moveToNext()){
                         debit += Double.valueOf(data.getString(data.getColumnIndex(Rec_COL3)));
                         credit += Double.valueOf(data.getString(data.getColumnIndex(Rec_COL2)));
+                        weight+= Double.valueOf(data.getString(data.getColumnIndex(Rec_COL8)));
                     }
                     try{
-                        weight = (debit-credit)/getRate();
                         remaining_amount = debit-credit;
                         list.get(i).setDue(""+remaining_amount);
                         list.get(i).setWeight(""+weight);

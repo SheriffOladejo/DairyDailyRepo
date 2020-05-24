@@ -51,6 +51,7 @@ public class InitDrawerBoard extends AppCompatActivity {
     boolean[] arrowClicked = {false};
     ProgressDialog progressDialog;
     private static long downloadId;
+    private TextView versionName;
 
     public InitDrawerBoard(){}
 
@@ -67,6 +68,7 @@ public class InitDrawerBoard extends AppCompatActivity {
         view_all_entry = findViewById(R.id.view_all_entry);
         milk_history = findViewById(R.id.milk_history);
         settings = findViewById(R.id.settings);
+        versionName = findViewById(R.id.versionName);
         logout = findViewById(R.id.logout);
         update_rate_charts = findViewById(R.id.update_rate_charts);
         erase_milk_history = findViewById(R.id.erase_milk_history);
@@ -83,6 +85,8 @@ public class InitDrawerBoard extends AppCompatActivity {
         progressDialog = new ProgressDialog(InitDrawerBoard.this);
         progressDialog.setMessage("Updating...");
         progressDialog.setCancelable(true);
+
+        versionName.setText("App Version 3.0.1");
 
         retrieve_data.setOnClickListener(new View.OnClickListener() {
             @Override
