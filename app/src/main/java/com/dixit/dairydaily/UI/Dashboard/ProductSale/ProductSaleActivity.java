@@ -20,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.dixit.dairydaily.Models.AddProductModel;
 import com.dixit.dairydaily.MyAdapters.ProductSaleAdapter;
@@ -37,7 +38,7 @@ import java.util.Date;
 import static com.dixit.dairydaily.Others.UtilityMethods.hideKeyboard;
 import static com.dixit.dairydaily.Others.UtilityMethods.toast;
 
-public class ProductSaleActivity extends AppCompatActivity {
+public class ProductSaleActivity extends InitDrawerBoard {
 
     public static TextView all_buyers;
     Spinner all_products;
@@ -79,6 +80,8 @@ public class ProductSaleActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        initDrawer();
 
         recyclerView = findViewById(R.id.recyclerview);
         all_buyers = findViewById(R.id.all_buyers);
@@ -259,7 +262,6 @@ public class ProductSaleActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ProductSaleActivity.this, DashboardActivity.class));
         finish();
     }
 }

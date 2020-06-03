@@ -1,6 +1,7 @@
 package com.dixit.dairydaily.UI.Dashboard;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
@@ -8,16 +9,26 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelUuid;
 import android.text.format.DateFormat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +37,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -47,14 +59,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.dixit.dairydaily.UI.Login.LoginActivity;
+import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.dixit.dairydaily.Models.MessagesModel;
@@ -82,15 +102,21 @@ import com.dixit.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 import com.dixit.dairydaily.UI.Dashboard.ViewBuyerReport.ViewBuyerReportActivity;
 import com.dixit.dairydaily.UI.Dashboard.ViewSellerReport.ViewReportActivity;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -102,6 +128,7 @@ import static com.dixit.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class DashboardActivity extends InitDrawerBoard {
 
+    private static final int MY_REQUEST_CODE = 1000;
     // Bluetooth variables
     public static BluetoothAdapter bluetoothAdapter;
     public static BluetoothDevice bluetoothDevice;
@@ -109,6 +136,8 @@ public class DashboardActivity extends InitDrawerBoard {
     public static ArrayList<SpinnerItem> deviceList;
     public static Set<BluetoothDevice> pairedDevice;
     public static SelectPrinterDialog dialog;
+    AsyncTask<Void, Void, String> task1, task2, task3, task4;
+    String imageString1, imageString2, imageString3, imageString4, adsDate;
     private static final UUID MY_UUID_INSECURE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     public static boolean updated = false;
@@ -326,10 +355,53 @@ public class DashboardActivity extends InitDrawerBoard {
         viewFlipper = findViewById(R.id.viewflipper);
         viewFlipper.setVisibility(View.GONE);
 
-        StorageReference reference1 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 1");
-        StorageReference reference2 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 2");
-        StorageReference reference3 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 3");
-        StorageReference reference4 = FirebaseStorage.getInstance().getReference().child("Ads").child("Image 4");
+        String adsD = Paper.book().read(Prevalent.adsDate);
+
+        DatabaseReference dateRef= FirebaseDatabase.getInstance().getReference().child("Ads");
+        dateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                adsDate = dataSnapshot.child("Date").getValue().toString();
+                if(adsD != null){
+                    if(!adsD.equals(adsDate))
+                        getAds();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        Log.d(TAG, "imageString"+ adsD);
+
+        if(adsD != null){
+            imageString1 = Paper.book().read(Prevalent.image1);
+            imageString2 = Paper.book().read(Prevalent.image2);
+            imageString3 = Paper.book().read(Prevalent.image3);
+            imageString4 = Paper.book().read(Prevalent.image4);
+            Log.d(TAG, "imageString"+ "called");
+
+            byte[] decodedString1 = Base64.decode(imageString1, Base64.DEFAULT);
+            byte[] decodedString2 = Base64.decode(imageString2, Base64.DEFAULT);
+            byte[] decodedString3 = Base64.decode(imageString3, Base64.DEFAULT);
+            byte[] decodedString4 = Base64.decode(imageString4, Base64.DEFAULT);
+
+            Bitmap decodedByte1 = BitmapFactory.decodeByteArray(decodedString1, 0, decodedString1.length);
+            Bitmap decodedByte2 = BitmapFactory.decodeByteArray(decodedString2, 0, decodedString2.length);
+            Bitmap decodedByte3 = BitmapFactory.decodeByteArray(decodedString3, 0, decodedString3.length);
+            Bitmap decodedByte4 = BitmapFactory.decodeByteArray(decodedString4, 0, decodedString4.length);
+
+            imageView1.setImageBitmap(decodedByte1);
+            imageView2.setImageBitmap(decodedByte2);
+            imageView3.setImageBitmap(decodedByte3);
+            imageView4.setImageBitmap(decodedByte4);
+            viewFlipper.setVisibility(View.VISIBLE);
+        }
+        else{
+            getAds();
+        }
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Pricing");
         reference.addValueEventListener(new ValueEventListener() {
@@ -359,38 +431,6 @@ public class DashboardActivity extends InitDrawerBoard {
             }
         });
 
-        reference1.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                try{
-                String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView1);}
-                catch(Exception e){}
-            }
-        });
-
-        reference2.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                try{
-                String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView2);}
-                catch(Exception e){}
-            }
-        });
-
-        reference3.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                try{
-                String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView3); }
-                catch (Exception e){
-
-                }
-            }
-        });
-
         DatabaseReference reference5 = FirebaseDatabase.getInstance().getReference().child("Show Ads");
         reference5.addValueEventListener(new ValueEventListener() {
             @Override
@@ -412,16 +452,6 @@ public class DashboardActivity extends InitDrawerBoard {
             }
         });
 
-        reference4.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                try{
-                String url = task.getResult().toString();
-                Picasso.get().load(url).into(imageView4);}
-                catch(Exception e){}
-                //viewFlipper.setVisibility(View.VISIBLE);
-            }
-        });
 
         notif.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -503,6 +533,8 @@ public class DashboardActivity extends InitDrawerBoard {
                 }
             }
         });
+
+        getUpdate();
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -660,6 +692,110 @@ public class DashboardActivity extends InitDrawerBoard {
         });
 
         registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    private void getAds(){
+        DatabaseReference adsRef = FirebaseDatabase.getInstance().getReference().child("Ads");
+        adsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    imageString1 = dataSnapshot.child("Image 1").getValue().toString();
+                    imageString2 = dataSnapshot.child("Image 2").getValue().toString();
+                    imageString3 = dataSnapshot.child("Image 3").getValue().toString();
+                    imageString4 = dataSnapshot.child("Image 4").getValue().toString();
+                    adsDate = dataSnapshot.child("Date").getValue().toString();
+
+                    Paper.book().write(Prevalent.image1, imageString1);
+                    Paper.book().write(Prevalent.image2, imageString2);
+                    Paper.book().write(Prevalent.image3, imageString3);
+                    Paper.book().write(Prevalent.image4, imageString4);
+                    Paper.book().write(Prevalent.adsDate, adsDate);
+
+                    byte[] decodedString1 = Base64.decode(imageString1, Base64.DEFAULT);
+                    byte[] decodedString2 = Base64.decode(imageString2, Base64.DEFAULT);
+                    byte[] decodedString3 = Base64.decode(imageString3, Base64.DEFAULT);
+                    byte[] decodedString4 = Base64.decode(imageString4, Base64.DEFAULT);
+
+                    Bitmap decodedByte1 = BitmapFactory.decodeByteArray(decodedString1, 0, decodedString1.length);
+                    Bitmap decodedByte2 = BitmapFactory.decodeByteArray(decodedString2, 0, decodedString2.length);
+                    Bitmap decodedByte3 = BitmapFactory.decodeByteArray(decodedString3, 0, decodedString3.length);
+                    Bitmap decodedByte4 = BitmapFactory.decodeByteArray(decodedString4, 0, decodedString4.length);
+
+                    imageView1.setImageBitmap(decodedByte1);
+                    imageView2.setImageBitmap(decodedByte2);
+                    imageView3.setImageBitmap(decodedByte3);
+                    imageView4.setImageBitmap(decodedByte4);
+                    //viewFlipper.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public static String versionName;
+
+    private void getUpdate() {
+
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Updates");
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        String new_version_code = dataSnapshot.child("Latest_Version_Code").getValue().toString();
+                        String priority = dataSnapshot.child("Priority").getValue().toString();
+                        versionName = dataSnapshot.child("Version Name").getValue().toString();
+                        Paper.book().write(Prevalent.version_name, versionName);
+                        if(Integer.valueOf(new_version_code) > pInfo.versionCode){
+                            AlertDialog dialog = new AlertDialog.Builder(DashboardActivity.this).
+                                    setTitle("Update").
+                                    setMessage("This version is obsolete, please update to a newer version.").
+                                    setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startActivity(new Intent(ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/details?id="+pInfo.packageName)));
+                                        }
+                                    }).create();
+                            if(priority.equals("low"))
+                                dialog.setCancelable(true);
+                            else
+                                dialog.setCancelable(false);
+                            try {
+                                dialog.show();
+                            }
+                            catch (Exception e){}
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                toast(DashboardActivity.this, "Update failed. Retrying");
+            }
+            else{
+                getUpdate();
+            }
+        }
     }
 
     @Override
@@ -999,6 +1135,7 @@ public class DashboardActivity extends InitDrawerBoard {
             if(pairedDevice.size() > 0){
                 for(BluetoothDevice pairedDev : pairedDevice){
                     deviceList.add(new SpinnerItem(pairedDev.getName()));
+
                 }
             }
         }

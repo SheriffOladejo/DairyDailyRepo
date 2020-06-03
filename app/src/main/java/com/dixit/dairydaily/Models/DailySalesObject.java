@@ -11,11 +11,12 @@ public class DailySalesObject {
     private double debit;
     private double credit;
     private int unique_id;
+    private String date_in_long;
 
     public DailySalesObject() {
     }
 
-    public DailySalesObject(int id, String buyerName, double weight, double amount, double rate, String shift, String date, double debit, double credit, int unique_id) {
+    public DailySalesObject(int id, String buyerName, double weight, double amount, double rate, String shift, String date, double debit, double credit, int unique_id, String date_in_long) {
         this.id = id;
         this.buyerName = buyerName;
         this.weight = weight;
@@ -26,6 +27,15 @@ public class DailySalesObject {
         this.debit = debit;
         this.credit = credit;
         this.unique_id = unique_id;
+        this.date_in_long = date_in_long;
+    }
+
+    public String getDate_in_long(){
+        return date_in_long;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
     }
 
     public int getId() {

@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -24,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.dixit.dairydaily.Others.Prevalent;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.dixit.dairydaily.R;
@@ -44,14 +46,17 @@ public class BuyMilkActivity extends InitDrawerBoard implements DatePickerDialog
     private Button proceed;
 
     static ScrollView scrollview;
+    public static boolean usePrinter = false;
     public static boolean online = false;
+    public static boolean sms_enable = false;
+    private long date_in_long = System.currentTimeMillis();
 
     private static final String TAG = "BuyMilkActivity";
 
     // Date picker dialog pops up on calendar image click
     DatePickerDialog datePickerDialog;
     TextView dateView;
-    Switch online_switch, print_switch, morning_switch, evening_switch;
+    Switch online_switch, printer_switch, morning_switch, evening_switch, sms_switch;
 
     private String date;
     private String am_pm;
@@ -69,10 +74,29 @@ public class BuyMilkActivity extends InitDrawerBoard implements DatePickerDialog
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buy_milk_activity);
 
+        Paper.init(this);
+        String sms_setting = Paper.book().read(Prevalent.sms_setting);
+        String printer_setting = Paper.book().read(Prevalent.printer_setting);
+
+        if(sms_setting != null){
+            if(sms_setting.equals("true"))
+                BuyMilkActivity.sms_enable = true;
+            else
+                BuyMilkActivity.sms_enable = false;
+        }
+
+        if(printer_setting != null){
+            if(printer_setting.equals("true"))
+                BuyMilkActivity.usePrinter = true;
+            else
+                BuyMilkActivity.usePrinter = false;
+        }
+
         dateView = findViewById(R.id.date_textview);
         initDrawer();
         online_switch = findViewById(R.id.online_switch);
-        //print_switch = findViewById(R.id.print_switch);
+        sms_switch = findViewById(R.id.sms_switch);
+        printer_switch = findViewById(R.id.printer_switch);
         morning_switch = findViewById(R.id.morning_switch);
         evening_switch = findViewById(R.id.evening_switch);
         scrollview = findViewById(R.id.scrollview);
@@ -119,7 +143,35 @@ public class BuyMilkActivity extends InitDrawerBoard implements DatePickerDialog
                 }
                 else if(!online_switch.isChecked()){
                     online = false;
-                                    }
+                }
+            }
+        });
+        printer_switch.setChecked(BuyMilkActivity.usePrinter);
+        printer_switch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(printer_switch.isChecked()){
+                    Paper.book().write(Prevalent.printer_setting, "true");
+                    usePrinter = true;
+                }
+                else if(!printer_switch.isChecked()){
+                    Paper.book().write(Prevalent.printer_setting, "false");
+                    usePrinter = false;
+                }
+            }
+        });
+        sms_switch.setChecked(BuyMilkActivity.sms_enable);
+        sms_switch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sms_switch.isChecked()){
+                    Paper.book().write(Prevalent.sms_setting, "true");
+                    sms_enable = true;
+                }
+                else if(!sms_switch.isChecked()){
+                    Paper.book().write(Prevalent.sms_setting, "false");
+                    sms_enable = false;
+                }
             }
         });
 
@@ -166,6 +218,7 @@ public class BuyMilkActivity extends InitDrawerBoard implements DatePickerDialog
                     Intent intent = new Intent(BuyMilkActivity.this, MilkBuyEntryActivity.class);
                     intent.putExtra("Shift", morning_switch.isChecked() ? "Morning" : "Evening");
                     intent.putExtra("Date", date);
+                    intent.putExtra("Date_In_Long", date_in_long+"");
                     startActivity(intent);
                 }
             }
@@ -181,6 +234,8 @@ public class BuyMilkActivity extends InitDrawerBoard implements DatePickerDialog
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                date_in_long = view.getDate();
+                Log.d(TAG, "second date_in_long: " + date_in_long);
                 if(String.valueOf(month).length() == 1){
                     if(String.valueOf(dayOfMonth).length() == 1){
                         date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;

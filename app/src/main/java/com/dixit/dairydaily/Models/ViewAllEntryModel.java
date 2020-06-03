@@ -9,12 +9,14 @@ public class ViewAllEntryModel {
     private String weight;
     private String amount;
     private String bonus;
+    private String date_in_long;
 
     public ViewAllEntryModel() {
     }
 
-    public ViewAllEntryModel(String date, String session, String fat, String snf, String rate, String weight, String amount, String bonus) {
+    public ViewAllEntryModel(String date, String session, String fat, String snf, String rate, String weight, String amount, String bonus, String date_in_long) {
         this.date = date;
+        this.date_in_long = date_in_long;
         this.session = session;
         this.fat = fat;
         this.snf = snf;
@@ -22,6 +24,14 @@ public class ViewAllEntryModel {
         this.weight = weight;
         this.amount = amount;
         this.bonus = bonus;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
+    }
+
+    public String getDate_in_long() {
+        return date_in_long;
     }
 
     public String getDate() {

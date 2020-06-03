@@ -57,6 +57,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String Rec_COL4 = "Title";
     private static final String Rec_COL7 = "Shift";
     private static final String Rec_COL8 = "Weight";
+    private static final String Rec_COL9 = "Date_In_Long";
 
     // Expiry date
     private static final String expiry_date_table = "Expiry_Date";
@@ -104,6 +105,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String Sale_COL7 = "Date";
     private static final String Sale_COL8 = "Debit";
     private static final String Sale_COL9 = "Credit";
+    private static final String Sale_COL10 = "Date_In_Long";
 
     // Product Table
     private static final String product_table = "ProductTable";
@@ -123,6 +125,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String Buy_COL8 = "Shift";
     private static final String Buy_COL9 = "Rate";
     private static final String Buy_COL10 = "Type";
+    private static final String Buy_COL11 = "Date_In_Long";
 
     // SNF tables
     private static final String SNF_table = "SNF_Table";
@@ -158,10 +161,10 @@ public class DbHelper extends SQLiteOpenHelper {
                 "SNF82 TEXT, SNF83 TEXT, SNF84 TEXT, SNF85 TEXT, SNF86 TEXT, SNF87 TEXT, SNF88 TEXT, SNF89 TEXT, " +
                 "SNF90 TEXT, SNF91 TEXT, SNF92 TEXT, SNF93 TEXT, SNF94 TEXT, SNF95 TEXT)";
         String createSalesTable = "CREATE TABLE " + milk_sale_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, " +
-                "BuyerName TEXT, Weight String, Amount String, Rate String, Shift TEXT, Date TEXT, Credit String, Debit String, Recog_Date TEXT)";
+                "BuyerName TEXT, Weight String, Amount String, Rate String, Shift TEXT, Date TEXT, Credit String, Debit String, Recog_Date TEXT, Date_In_Long TEXT)";
         String createBuyTable = "CREATE TABLE " + milk_buy_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, " +
-                "SellerName TEXT,  Weight TEXT, Fat TEXT, SNF TEXT, Amount TEXT, Date TEXT, Shift TEXT, Rate TEXT, Type TEXT)";
-        String createReceiveCashTable = "CREATE TABLE " + receive_cash_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, Date TEXT, Credit TEXT, Debit TEXT, Title TEXT, Shift TEXT, Weight TEXT)";
+                "SellerName TEXT,  Weight TEXT, Fat TEXT, SNF TEXT, Amount TEXT, Date TEXT, Shift TEXT, Rate TEXT, Type TEXT, Date_In_Long TEXT)";
+        String createReceiveCashTable = "CREATE TABLE " + receive_cash_table + " (Unique_ID INTEGER PRIMARY KEY AUTOINCREMENT, ID INTEGER, Date TEXT, Credit TEXT, Debit TEXT, Title TEXT, Shift TEXT, Weight TEXT,Date_In_Long TEXT)";
         String createProductTable = "CREATE TABLE " + product_table + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, Product_Name TEXT, Price_Per_Unit TEXT)";
 
         db.execSQL(createProductSaleTable);
@@ -210,7 +213,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     // Add buy data to buy table
-    public boolean addBuyEntry(int id, String name, String weight, String amount, String rate, String shift, String date, String fat, String snf, String type){
+    public boolean addBuyEntry(int id, String name, String weight, String amount, String rate, String shift, String date, String fat, String snf, String type, String date_in_long){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Buy_COL1, id);
@@ -223,6 +226,7 @@ public class DbHelper extends SQLiteOpenHelper {
         contentValues.put(Buy_COL9, String.valueOf(rate));
         contentValues.put(Buy_COL7, date);
         contentValues.put(Buy_COL10, type);
+        contentValues.put(Buy_COL11, date_in_long);
         return db.insert(milk_buy_table, null, contentValues) != -1;
     }
 
@@ -414,7 +418,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     // Add receive cash entry
-    public boolean addReceiveCash(int id, String date, String credit, String debit, String title, String shift, String weight){
+    public boolean addReceiveCash(int id, String date, String credit, String debit, String title, String shift, String weight, String date_in_long){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Rec_COL5, id);
@@ -424,6 +428,7 @@ public class DbHelper extends SQLiteOpenHelper {
         contentValues.put(Rec_COL4, title);
         contentValues.put(Rec_COL7, shift);
         contentValues.put(Rec_COL8, weight);
+        contentValues.put(Rec_COL9, date_in_long);
         Log.d(TAG, "addReceiveCash: " + title);
 
         long result = db.insert(receive_cash_table, null, contentValues);
@@ -436,11 +441,11 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateReceiveCash(int unique_id, int id, String date, String title, String debit, String credit, String shift, String weight){
+    public void updateReceiveCash(int unique_id, int id, String date, String title, String debit, String credit, String shift, String weight, String date_in_long){
         SQLiteDatabase db = this.getWritableDatabase();
         String query2 = "DELETE FROM " + receive_cash_table + " WHERE " + Rec_COL6 + " ='" + unique_id + "'";
         db.execSQL(query2);
-        addReceiveCash(id, date, credit, debit, title, shift, weight);
+        addReceiveCash(id, date, credit, debit, title, shift, weight, date_in_long);
         String query = "UPDATE " + receive_cash_table + " SET " + Rec_COL1 + " ='" + date + "' AND " + Rec_COL2 + " ='" + credit + "' AND "
                 + Rec_COL3 + " ='" + debit + "' AND " + Rec_COL5 + " ='" + id + "' AND " + Rec_COL4 + " ='" + title + "' WHERE " + Rec_COL6 + " ='" + unique_id + "'";
         Log.d(TAG, "Query: " + query);
@@ -621,12 +626,29 @@ public class DbHelper extends SQLiteOpenHelper {
                 String debit = data2.getString(data2.getColumnIndex(Rec_COL3));
                 int unique_id = data2.getInt(data2.getColumnIndex(Rec_COL6));
                 String shift = data2.getString(data2.getColumnIndex(Rec_COL7));
-                ReceiveCashModel model = new ReceiveCashModel(date, title, credit, debit, id, unique_id, shift);
+                String date_in_long = data2.getString(data2.getColumnIndex(Rec_COL9));
+                ReceiveCashModel model = new ReceiveCashModel(date, title, credit, debit, id, unique_id, shift, date_in_long);
                 list.add(model);
             }
         }
         else{
 
+        }
+        for(int i=0; i<list.size();i++){
+            for(int j=0; j<list.size()-1; j++){
+                long value1 = Long.valueOf(list.get(j).getDate_in_long());
+                long value2 = Long.valueOf(list.get(j+1).getDate_in_long());
+                if(value1 > value2){
+                    ReceiveCashModel temp;
+                    temp = list.get(j);
+                    list.set(j, list.get(j+1));
+                    list.set(j+1, temp);
+//                    int temp = 0;
+//                    temp = array[j];
+//                    array[j] = array[j+1];
+//                    array[j+1] = temp;
+                }
+            }
         }
         return list;
     }
@@ -695,9 +717,10 @@ public class DbHelper extends SQLiteOpenHelper {
                 String date = data.getString(7);
                 String debit = data.getString(8);
                 String credit = data.getString(9);
+                String date_in_long = data.getString(data.getColumnIndex(Sale_COL10));
                 Log.d(TAG, "getSalesData: " + weight);
                 DailySalesObject object = new DailySalesObject(id, name, Double.valueOf(weight), Double.valueOf(amount),
-                        Double.valueOf(rate), shift, date, Double.valueOf(debit), Double.valueOf(credit), unique_id);
+                        Double.valueOf(rate), shift, date, Double.valueOf(debit), Double.valueOf(credit), unique_id, date_in_long);
                 list.add(object);
             }
         }
@@ -723,9 +746,10 @@ public class DbHelper extends SQLiteOpenHelper {
                 String date = data.getString(7);
                 String type = data.getString(10);
                 String shift = data.getString(8);
+                String date_in_long = data.getString(data.getColumnIndex(Buy_COL11));
                 Log.d(TAG, "getSalesData: " + date);
                 DailyBuyObject object = new DailyBuyObject(id, name, Double.valueOf(weight), Double.valueOf(rate),
-                        Double.valueOf(amount), shift, Double.valueOf(fat), Double.valueOf(snf), date, type, unique_id);
+                        Double.valueOf(amount), shift, Double.valueOf(fat), Double.valueOf(snf), date, type, unique_id, date_in_long);
                 list.add(object);
             }
         }
@@ -755,8 +779,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 String shift = data.getString(data.getColumnIndex(Sale_COL6));
                 String credit = data.getString(data.getColumnIndex(Sale_COL9));
                 String debit = data.getString(data.getColumnIndex(Sale_COL8));
-                String thisMointh = date.substring(3,5);
-                ReportByDateModels model = new ReportByDateModels(date, rate, weight, amount, shift, credit, debit);
+                String date_in_long = data.getString(data.getColumnIndex(Sale_COL10));
+                ReportByDateModels model = new ReportByDateModels(date, rate, weight, amount, shift, credit, debit,date_in_long);
                 list.add(model);
             }
             // Sort list further by shift
@@ -791,7 +815,22 @@ public class DbHelper extends SQLiteOpenHelper {
         else{
             Log.d(TAG, "getReportByDate: Data count is 0");
         }
-        Log.d(TAG, "getReportByDate:listSize " + list.size());
+        for(int i=0; i<list.size();i++){
+            for(int j=0; j<list.size()-1; j++){
+                long value1 = Long.valueOf(list.get(j).getDate_in_long());
+                long value2 = Long.valueOf(list.get(j+1).getDate_in_long());
+                if(value1 > value2){
+                    ReportByDateModels temp;
+                    temp = list.get(j);
+                    list.set(j, list.get(j+1));
+                    list.set(j+1, temp);
+//                    int temp = 0;
+//                    temp = array[j];
+//                    array[j] = array[j+1];
+//                    array[j+1] = temp;
+                }
+            }
+        }
         return list;
     }
 
@@ -853,6 +892,22 @@ public class DbHelper extends SQLiteOpenHelper {
                 }
             }
         }
+        for(int i=0; i<users.size();i++){
+            for(int j=0; j<users.size()-1; j++){
+                long value1 = Integer.valueOf(users.get(j).getId());
+                long value2 = Integer.valueOf(users.get(j+1).getId());
+                if(value1 > value2){
+                    BuyerRegisterModel temp;
+                    temp = users.get(j);
+                    users.set(j, users.get(j+1));
+                    users.set(j+1, temp);
+//                    int temp = 0;
+//                    temp = array[j];
+//                    array[j] = array[j+1];
+//                    array[j+1] = temp;
+                }
+            }
+        }
         return users;
     }
 
@@ -880,7 +935,7 @@ public class DbHelper extends SQLiteOpenHelper {
             while(data2.moveToNext()){
                 int id = data2.getInt(data2.getColumnIndex(STCOL1));
                 String name = data2.getString(data2.getColumnIndex(STCOL2));
-                PaymentRegisterModel model = new PaymentRegisterModel(id, "0","0","0","0","0","0",name);
+                PaymentRegisterModel model = new PaymentRegisterModel(id, "0","0","0","0","0","0",name,"0");
                 users.add(model);
             }
         }
@@ -895,7 +950,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 String shift = data.getString(data.getColumnIndex(Buy_COL8));
                 String date = data.getString(data.getColumnIndex(Buy_COL7));
                 String name = data.getString(data.getColumnIndex(Buy_COL2));
-                PaymentRegisterModel model = new PaymentRegisterModel(id, fat, snf, weight, amount, date, shift, name);
+                String date_in_long = data.getString(data.getColumnIndex(Buy_COL11));
+                PaymentRegisterModel model = new PaymentRegisterModel(id, fat, snf, weight, amount, date, shift, name,date_in_long);
                 list.add(model);
                 // list object after sorting by date
             }
@@ -941,7 +997,22 @@ public class DbHelper extends SQLiteOpenHelper {
                 }
             }
         }
-        Log.d(TAG, "getReportByDate:listSize " + list.size());
+        for(int i=0; i<users.size();i++){
+            for(int j=0; j<users.size()-1; j++){
+                long value1 = Long.valueOf(users.get(j).getDate_in_long());
+                long value2 = Long.valueOf(users.get(j+1).getDate_in_long());
+                if(value1 > value2){
+                    PaymentRegisterModel temp;
+                    temp = users.get(j);
+                    users.set(j, users.get(j+1));
+                    users.set(j+1, temp);
+//                    int temp = 0;
+//                    temp = array[j];
+//                    array[j] = array[j+1];
+//                    array[j+1] = temp;
+                }
+            }
+        }
         return users;
     }
 
@@ -1019,9 +1090,10 @@ public class DbHelper extends SQLiteOpenHelper {
                     String date = data.getString(7);
                     String type = data.getString(10);
                     String shift = data.getString(8);
+                    String date_in_long = data.getString(data.getColumnIndex(Buy_COL11));
                     Log.d(TAG, "getSalesData: " + date);
                     DailyBuyObject object = new DailyBuyObject(id, name, Double.valueOf(weight), Double.valueOf(rate),
-                            Double.valueOf(amount), shift, Double.valueOf(fat), Double.valueOf(snf), date, type, unique_id);
+                            Double.valueOf(amount), shift, Double.valueOf(fat), Double.valueOf(snf), date, type, unique_id, date_in_long);
                     list.add(object);
                 }
                 else{
@@ -1050,20 +1122,40 @@ public class DbHelper extends SQLiteOpenHelper {
                 String snf = data.getString(data.getColumnIndex(Buy_COL5));
                 String weight = data.getString(data.getColumnIndex(Buy_COL3));
                 String amount = data.getString(data.getColumnIndex(Buy_COL6));
+                String date_in_long = data.getString(data.getColumnIndex(Buy_COL11));
                 Log.d(TAG, "getCustomerReport: Date " + date);
-                CustomerReportModel model = new CustomerReportModel(date, fat, snf, weight, amount, shift);
+                CustomerReportModel model = new CustomerReportModel(date, fat, snf, weight, amount, shift, date_in_long);
                 list.add(model);
             }
         }
         else{
             Log.d(TAG, "getCustomerReport: Data count is 0");
         }
+        for(int i=0; i<list.size();i++){
+            for(int j=0; j<list.size()-1; j++){
+                long value1 = Long.valueOf(list.get(j).getDate_in_long());
+                long value2 = Long.valueOf(list.get(j+1).getDate_in_long());
+                if(value1 > value2){
+                    CustomerReportModel temp;
+                    temp = list.get(j);
+                    list.set(j, list.get(j+1));
+                    list.set(j+1, temp);
+//                    int temp = 0;
+//                    temp = array[j];
+//                    array[j] = array[j+1];
+//                    array[j+1] = temp;
+                }
+            }
+        }
+        for(int i=0; i<list.size(); i++){
+            Log.d(TAG, "Date: " + list.get(i).getDate() + "  Date_In_Long: " + list.get(i).getDate_in_long());
+        }
         return list;
     }
 
     // Add sales data to sales table
     public boolean addSalesEntry(int id, String name, String weight, String amount, String rate, String shift, String date
-                                    ,String debit, String credit){
+                                    ,String debit, String credit, String date_in_long){
         SQLiteDatabase db = this.getWritableDatabase();
         long dateInLong;
         long result;
@@ -1077,6 +1169,7 @@ public class DbHelper extends SQLiteOpenHelper {
         contentValues.put(Sale_COL7, date);
         contentValues.put(Sale_COL8, String.valueOf(debit));
         contentValues.put(Sale_COL9, String.valueOf(credit));
+        contentValues.put(Sale_COL10, date_in_long);
         result = db.insert(milk_sale_table, null, contentValues);
         return result != -1;
     }
@@ -1105,14 +1198,31 @@ public class DbHelper extends SQLiteOpenHelper {
                 String weight = entries.getString(entries.getColumnIndex(Buy_COL3));
                 String rate = entries.getString(entries.getColumnIndex(Buy_COL9));
                 String amount = entries.getString(entries.getColumnIndex(Buy_COL6));
+                String date_in_long = entries.getString(entries.getColumnIndex(Buy_COL11));
                 Log.d(TAG, "getEntries: " + startDate + " " + endDate);
                 Log.d(TAG, "getEntries: " + date);
-                ViewAllEntryModel model = new ViewAllEntryModel(date,shift,fat,snf,weight,rate,amount,"-");
+                ViewAllEntryModel model = new ViewAllEntryModel(date,shift,fat,snf,weight,rate,amount,"-", date_in_long);
                 list.add(model);
             }
         }
         else{
             toast(context, "Entry data is empty");
+        }
+        for(int i=0; i<list.size();i++){
+            for(int j=0; j<list.size()-1; j++){
+                long value1 = Long.valueOf(list.get(j).getDate_in_long());
+                long value2 = Long.valueOf(list.get(j+1).getDate_in_long());
+                if(value1 > value2){
+                    ViewAllEntryModel temp;
+                    temp = list.get(j);
+                    list.set(j, list.get(j+1));
+                    list.set(j+1, temp);
+//                    int temp = 0;
+//                    temp = array[j];
+//                    array[j] = array[j+1];
+//                    array[j+1] = temp;
+                }
+            }
         }
         return list;
     }
@@ -1137,8 +1247,9 @@ public class DbHelper extends SQLiteOpenHelper {
                     String debit = data.getString(8);
                     String credit = data.getString(9);
                     String date = data.getString(7);
+                    String date_in_long = data.getString(data.getColumnIndex(Sale_COL10));
                     DailySalesObject object = new DailySalesObject(id, name, Double.valueOf(weight), Double.valueOf(amount),
-                            Double.valueOf(rate), shift, date, Double.valueOf(debit), Double.valueOf(credit), unique_id);
+                            Double.valueOf(rate), shift, date, Double.valueOf(debit), Double.valueOf(credit), unique_id, date_in_long);
                     list.add(object);
                 }
                 else{

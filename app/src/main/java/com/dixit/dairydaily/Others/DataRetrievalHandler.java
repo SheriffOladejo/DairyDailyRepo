@@ -54,8 +54,9 @@ public class DataRetrievalHandler {
                             String debit = obj.getString("Debit");
                             String shift = obj.getString("Shift");
                             String weight = obj.getString("Weight");
+                            String date_in_long = obj.getString("Date_In_Long");
                             Log.d(TAG, "weoght: " +weight);
-                            dbHelper.addReceiveCash(id, date, credit, debit, title, shift, weight);
+                            dbHelper.addReceiveCash(id, date, credit, debit, title, shift, weight, date_in_long);
                         }
                     } catch (Exception e) {
                         Log.d(TAG, "Unable to retrieve receive cash data." + e.getMessage());
@@ -99,11 +100,11 @@ public class DataRetrievalHandler {
                             String rate = truncate(Double.valueOf(obj.getString("Rate")));
                             String shift = obj.getString("Shift");
                             String date = obj.getString("Date");
-                            Log.d("BackupHandler", "retrieveMilkSaleData: " + date);
+                            String date_in_long = obj.getString("Date_In_Long");
                             String credit = truncate(Double.valueOf(obj.getString("Credit")));
                             String debit = truncate(Double.valueOf(obj.getString("Debit")));
-                            dbHelper.addSalesEntry(id, name, weight, amount, rate, shift, date, debit, credit);
-                            dbHelper.addReceiveCash(id,date,credit,debit,"Sale",shift,weight);
+                            dbHelper.addSalesEntry(id, name, weight, amount, rate, shift, date, debit, credit, date_in_long);
+                            dbHelper.addReceiveCash(id,date,credit,debit,"Sale",shift,weight, date_in_long);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -230,7 +231,8 @@ public class DataRetrievalHandler {
                             Log.d("BackupHandler", "retrieveMilkBuyData: " + date);
                             String fat = obj.getString("Fat");
                             String snf = obj.getString("SNF");
-                            dbHelper.addBuyEntry(id, name, weight, amount, rate, shift, date, fat, snf, type);
+                            String date_in_long = obj.getString("Date_In_Long");
+                            dbHelper.addBuyEntry(id, name, weight, amount, rate, shift, date, fat, snf, type, date_in_long);
 
                         }
                         try{

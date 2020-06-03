@@ -12,11 +12,12 @@ public class DailyBuyObject {
     private String date;
     private String type;
     private int Unique_Id;
+    private String date_in_long;
 
     public DailyBuyObject() {
     }
 
-    public DailyBuyObject(int id, String sellerName, double weight, double rate, double amount, String shift, double fat, double snf, String date, String type, int unique_Id) {
+    public DailyBuyObject(int id, String sellerName, double weight, double rate, double amount, String shift, double fat, double snf, String date, String type, int unique_Id, String date_in_long) {
         this.id = id;
         SellerName = sellerName;
         this.weight = weight;
@@ -28,6 +29,15 @@ public class DailyBuyObject {
         this.date = date;
         this.type = type;
         Unique_Id = unique_Id;
+        this.date_in_long = date_in_long;
+    }
+
+    public String getDate_in_long(){
+        return date_in_long;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
     }
 
     public int getId() {

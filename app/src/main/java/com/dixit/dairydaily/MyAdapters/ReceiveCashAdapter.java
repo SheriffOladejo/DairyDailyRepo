@@ -63,10 +63,29 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+
         View view;
+        AlertDialog.Builder builder;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             view = itemView;
+//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View v) {
+//                    return false;
+//                }
+//            });
+
+
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    builder.show();
+                    return true;
+                }
+            });
         }
 
         void setData(String date, String title, String credit, String debit, String shift){
@@ -78,7 +97,7 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
             ImageView optionsView = view.findViewById(R.id.options);
 
             String[] options = {"Edit", "Delete", "Print"};
-            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder = new AlertDialog.Builder(context);
             builder.setTitle("Select Action");
             builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
@@ -90,18 +109,36 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
                     String debit = list.get(getAdapterPosition()).getDebit();
                     String date = list.get(getAdapterPosition()).getDate();
                     int unique_id = list.get(getAdapterPosition()).getUnique_Id();
+                    String date_in_long = list.get(getAdapterPosition()).getDate_in_long();
 
                     switch(which){
                         case 0:
                             if(title.equals("Sale"))
                                 toast(context, "Edit this from milk entry page instead");
                             else
-                                new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit, shift).show();
+                                new ReceiveCashDialog(context,unique_id, user_Id, date, title, debit, credit, shift, date_in_long).show();
                             dialog.dismiss();
                             break;
                         case 1:
-                            if(title.equals("Sale"))
-                                toast(context, "Delete this from milk entry page instead");
+                            if(title.equals("Sale")){
+                                helper.deleteReceiveCash(unique_id, "","");
+                                ReceiveCashActivity.list = helper.getReceiveCash(user_Id, "", "");
+                                ReceiveCashActivity. adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
+                                ReceiveCashActivity.creditTotal  =0;
+                                ReceiveCashActivity.debitTotal = 0;
+
+                                for(ReceiveCashModel model : ReceiveCashActivity.list){
+                                    ReceiveCashActivity.creditTotal += Double.valueOf(model.getCredit());
+                                    ReceiveCashActivity.debitTotal += Double.valueOf(model.getDebit());
+                                }
+                                ReceiveCashActivity.remain = ReceiveCashActivity.creditTotal - ReceiveCashActivity.debitTotal;
+                                ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
+                                ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
+                                ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
+                                ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
+                                dialog.dismiss();
+                                new BackupHandler(context);
+                                }
                             else{
                                 helper.deleteReceiveCash(unique_id, "","");
                                 //helper.deleteMilkSaleEntry(unique_id, true);
@@ -157,7 +194,9 @@ public class ReceiveCashAdapter extends RecyclerView.Adapter<ReceiveCashAdapter.
                 }
             });
 
-            dateView.setText(date);
+
+
+            dateView.setText(date+"-"+shift.substring(0,1));
             titleView.setText(title);
             creditView.setText(credit);
             debitView.setText(debit);

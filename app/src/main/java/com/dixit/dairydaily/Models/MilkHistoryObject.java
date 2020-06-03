@@ -18,6 +18,7 @@ public class MilkHistoryObject {
         this.fat = fat;
     }
 
+
     public String getSession() {
         return session;
     }

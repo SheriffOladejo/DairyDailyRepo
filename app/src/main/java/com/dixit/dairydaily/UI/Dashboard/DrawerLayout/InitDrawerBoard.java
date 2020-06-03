@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -52,6 +53,8 @@ public class InitDrawerBoard extends AppCompatActivity {
     ProgressDialog progressDialog;
     private static long downloadId;
     private TextView versionName;
+    private TextView editName;
+    private EditText mytext;
 
     public InitDrawerBoard(){}
 
@@ -86,7 +89,7 @@ public class InitDrawerBoard extends AppCompatActivity {
         progressDialog.setMessage("Updating...");
         progressDialog.setCancelable(true);
 
-        versionName.setText("App Version 3.0.1");
+        versionName.setText(Paper.book().read(Prevalent.version_name) == null ? "Version 3.0.2" : "Version "+Paper.book().read(Prevalent.version_name));
 
         retrieve_data.setOnClickListener(new View.OnClickListener() {
             @Override

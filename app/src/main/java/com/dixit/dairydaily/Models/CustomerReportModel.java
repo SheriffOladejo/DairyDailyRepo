@@ -7,17 +7,27 @@ public class CustomerReportModel {
     private String weight;
     private String amount;
     private String shift;
+    private String date_in_long;
 
     public CustomerReportModel() {
     }
 
-    public CustomerReportModel(String date, String fat, String snf, String weight, String amount, String shift) {
+    public CustomerReportModel(String date, String fat, String snf, String weight, String amount, String shift, String date_in_long) {
         this.date = date;
         this.fat = fat;
         this.snf = snf;
         this.weight = weight;
         this.amount = amount;
         this.shift = shift;
+        this.date_in_long = date_in_long;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
+    }
+
+    public String getDate_in_long() {
+        return date_in_long;
     }
 
     public String getDate() {

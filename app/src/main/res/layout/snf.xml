@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:layout_marginTop="10dp"
-                    android:text="Rate Of Cow"/>
+                    android:text="Rates Of Cow and Buffalo"/>
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -51,6 +51,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:visibility="gone"
             android:id="@+id/buffalo_snf"
             android:foreground="?android:attr/selectableItemBackground"
             android:clickable="true"

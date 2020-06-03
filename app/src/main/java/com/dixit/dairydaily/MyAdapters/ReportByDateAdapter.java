@@ -40,9 +40,10 @@ public class  ReportByDateAdapter extends RecyclerView.Adapter<ReportByDateAdapt
         String amount = truncate(Double.valueOf(list.get(i).getAmount()));
         String credit = truncate(Double.valueOf(list.get(i).getCredit()));
         String debit = truncate(Double.valueOf(list.get(i).getDebit()));
+        String shift = list.get(i).getShift().substring(0,1);
         Log.d("ReportByDateAdapter", "i Size: " +i);
 
-        viewHolder.setData(date, rate, weight, amount, credit, debit);
+        viewHolder.setData(date, rate, weight, amount, credit, debit, shift);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class  ReportByDateAdapter extends RecyclerView.Adapter<ReportByDateAdapt
             view = itemView;
         }
 
-        void setData(String date, String rate, String weight, String amount, String credit, String debit){
+        void setData(String date, String rate, String weight, String amount, String credit, String debit, String shift){
             TextView dateView = view.findViewById(R.id.date);
             TextView rateView = view.findViewById(R.id.rate);
             TextView weightView = view.findViewById(R.id.weight);
@@ -68,7 +69,7 @@ public class  ReportByDateAdapter extends RecyclerView.Adapter<ReportByDateAdapt
 
             Log.d("ReportByDateAdapter", "setData: " + date);
 
-            dateView.setText(date);
+            dateView.setText(date+"-"+shift);
             rateView.setText(rate);
             weightView.setText(weight);
             amountView.setText(amount);

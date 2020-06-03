@@ -9,11 +9,13 @@ public class PaymentRegisterModel {
     private String date;
     private String shift;
     private String name;
+    private String date_in_long;
 
     public PaymentRegisterModel() {
     }
 
-    public PaymentRegisterModel(int id, String fat, String snf, String weight, String amount, String date, String shift, String name) {
+    public PaymentRegisterModel(int id, String fat, String snf, String weight, String amount, String date, String shift, String name, String date_in_long) {
+        this.date_in_long = date_in_long;
         this.id = id;
         this.fat = fat;
         this.snf = snf;
@@ -22,6 +24,14 @@ public class PaymentRegisterModel {
         this.date = date;
         this.shift = shift;
         this.name = name;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
+    }
+
+    public String getDate_in_long() {
+        return date_in_long;
     }
 
     public int getId() {

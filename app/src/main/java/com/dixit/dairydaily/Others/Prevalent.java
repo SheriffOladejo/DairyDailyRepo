@@ -12,6 +12,16 @@ public class Prevalent {
     public static final String email = "Email";
     public static String address = "Address";
     public static String expiry_date = "Expiry Date";
+    public static String image1 = "Image1";
+    public static String image2 = "Image2";
+    public static String image3 = "Image3";
+    public static String image4 = "Image4";
+    public static String sms_setting = "sms_setting";
+    public static String printer_setting = "printer_setting";
+    public static String sms_setting_sell = "sms_setting_sell";
+    public static String printer_setting_sell = "printer_setting_sell";
+    public static String version_name = "version_name";
+    public static String adsDate = "adsDate";
     public static String last_update = "Update";
     public static String starter = "starter";
     public static String spark = "spark";

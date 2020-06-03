@@ -4,13 +4,14 @@ public class ReceiveCashModel {
     private String date, title, credit, debit;
     private int id;
     private int unique_Id;
+    private String date_in_long;
 
     private String shift;
 
     public ReceiveCashModel() {
     }
 
-    public ReceiveCashModel(String date, String title, String credit, String debit, int id, int unique_Id, String shift) {
+    public ReceiveCashModel(String date, String title, String credit, String debit, int id, int unique_Id, String shift, String date_in_long) {
         this.date = date;
         this.title = title;
         this.credit = credit;
@@ -18,10 +19,19 @@ public class ReceiveCashModel {
         this.id = id;
         this.unique_Id = unique_Id;
         this.shift = shift;
+        this.date_in_long = date_in_long;
     }
 
     public String getDate() {
         return date;
+    }
+
+    public String getDate_in_long(){
+        return date_in_long;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
     }
 
     public void setDate(String date) {

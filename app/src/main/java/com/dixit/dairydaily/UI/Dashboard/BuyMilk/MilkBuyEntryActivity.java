@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
+import com.dixit.dairydaily.UI.Dashboard.SellMilk.SellMilkActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.dixit.dairydaily.Models.DailyBuyObject;
 import com.dixit.dairydaily.MyAdapters.MilkBuyAdapter;
@@ -76,7 +77,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
     public static String type;
     public static RecyclerView recyclerView;
 
-    boolean printed = false;
+    private String date_in_long;
     public static int unique_id = -1;
 
     public static double weightTotal = 0;
@@ -147,6 +148,8 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
         boolean received_a_name = getIntent().getBooleanExtra("passed", false);
         shift = getIntent().getStringExtra("Shift");
         date = getIntent().getStringExtra("Date");
+        date_in_long = getIntent().getStringExtra("Date_In_Long").equals("0") ? System.currentTimeMillis()+"":getIntent().getStringExtra("Date_In_Long");
+        Log.d(TAG, "date_in_long: " + date_in_long);
         passedDate = getIntent().getStringExtra("PassedDate");
 
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
@@ -514,6 +517,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
     private void saveEntry(){
         int idInt = -1;
         try {
+
             idInt = Integer.valueOf(id.getText().toString());
             String nameString = seller_display.getText().toString();
             String amountDouble = truncate(Double.valueOf(amount_display.getText().toString()));
@@ -528,7 +532,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
                     useSnackBar("Operation Failed", linearLayout);
                 }
                 else{
-                    if(!dbHelper.addBuyEntry(idInt, nameString, weightDouble, amountDouble, rateDouble, shift, date, fatString, snfDouble, type)){
+                    if(!dbHelper.addBuyEntry(idInt, nameString, weightDouble, amountDouble, rateDouble, shift, date, fatString, snfDouble, type, date_in_long)){
                         useSnackBar("Unable to add entry.", linearLayout);
                         Log.d(TAG, "Unable to add entry");
                     }
@@ -552,21 +556,33 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
                         totalWeight.setText(String.valueOf(truncate(weightTotal)) + "Ltr");
                         fatAverage.setText(String.valueOf(truncate(averageFat/list.size())) + "%");
                         byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
-                        Log.d(TAG, "toPrint: " + toPrint);
 
                         recyclerView.setAdapter(adapter);
 
                         //new BackupHandler(MilkBuyEntryActivity.this);
-                        if(DashboardActivity.bluetoothAdapter != null) {
-                            if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
-                                DashboardActivity.bluetoothConnectionService.write(mybyte);
-                            } else {
-                                toast(MilkBuyEntryActivity.this, "Printer is not connected");
+                        if(BuyMilkActivity.usePrinter){
+                            Log.d(TAG, "toPrint: " + toPrint);
+                            if(DashboardActivity.bluetoothAdapter != null) {
+                                if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
+                                    DashboardActivity.bluetoothConnectionService.write(mybyte);
+                                } else {
+                                    toast(MilkBuyEntryActivity.this, "Printer is not connected");
+                                }
+                            }
+                            else{
+                                toast(MilkBuyEntryActivity.this, "Bluetooth is off");
                             }
                         }
-                        else{
-                            toast(MilkBuyEntryActivity.this, "Bluetooth is off");
+
+                        if(BuyMilkActivity.sms_enable){
+
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.putExtra("address", dbHelper.getSellerPhone(idInt));
+                            i.putExtra("sms_body", toPrint);
+                            i.setType("vnd.android-dir/mms-sms");
+                            startActivity(i);
                         }
+
                         id.setText("");
                         amount_display.setText("Amount");
                         rate_display.setText("Rs/Ltr");
@@ -629,41 +645,45 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
         if(toggle.onOptionsItemSelected(item))
             return true;
         String line = "----------------------------";
-        list = dbHelper.getDailyBuyData(date, shift);
-        String toPrint = "\nDATE  |" + date + "\nSHIFT |" + shift + "\n"+line +  "\nID |" + " FAT/SNF | " + "WEIGHT|" + "AMOUNT\n";
-        if (id == R.id.printer) {
-            Collections.reverse(list);
-            for (DailyBuyObject object : list) {
-                int sellerId = object.getId();
-                String amount = StringUtils.rightPad(StringUtils.truncate(truncate(object.getAmount()), 5), 6, " ");
-                String fat = truncate(object.getFat());
-                String snf = truncate(object.getSnf());
-                String weight = StringUtils.rightPad(truncate(object.getWeight()), 6, " ");
-                Log.d(TAG, "amount:" +amount);
-                toPrint += StringUtils.rightPad(""+sellerId, 3, "") + "|" + fat + "-" + snf + "| "  + weight + "|" + amount + "\n";
-            }
-            toPrint += line + "\n";
-            toPrint += "TOTAL AMOUNT: " + truncate(amountTotal) + "Rs";
-            toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr\n";
-            toPrint += line + "\n";
-            toPrint += "      DAIRYDAILY APP\n\n\n";
-            Log.d(TAG, "toPrint: " + toPrint);
-            byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
+        if(BuyMilkActivity.usePrinter){
+            list = dbHelper.getDailyBuyData(date, shift);
+            String toPrint = "\nDATE  |" + date + "\nSHIFT |" + shift + "\n"+line +  "\nID |" + " FAT/SNF | " + "WEIGHT|" + "AMOUNT\n";
+            if (id == R.id.printer) {
+                Collections.reverse(list);
+                for (DailyBuyObject object : list) {
+                    int sellerId = object.getId();
+                    String amount = StringUtils.rightPad(StringUtils.truncate(truncate(object.getAmount()), 5), 6, " ");
+                    String fat = truncate(object.getFat());
+                    String snf = truncate(object.getSnf());
+                    String weight = StringUtils.rightPad(truncate(object.getWeight()), 6, " ");
+                    Log.d(TAG, "amount:" +amount);
+                    toPrint += StringUtils.rightPad(""+sellerId, 3, "") + "|" + fat + "-" + snf + "| "  + weight + "|" + amount + "\n";
+                }
+                toPrint += line + "\n";
+                toPrint += "TOTAL AMOUNT: " + truncate(amountTotal) + "Rs";
+                toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr\n";
+                toPrint += line + "\n";
+                toPrint += "      DAIRYDAILY APP\n\n\n";
+                Log.d(TAG, "toPrint: " + toPrint);
+                byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
 
-            if (DashboardActivity.bluetoothAdapter != null) {
-                if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
-                    try {
-                        DashboardActivity.bluetoothConnectionService.write(mybyte);
-                    } catch (Exception e) {
-                        toast(MilkBuyEntryActivity.this, "Unable to print");
+                if (DashboardActivity.bluetoothAdapter != null) {
+                    if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
+                        try {
+                            DashboardActivity.bluetoothConnectionService.write(mybyte);
+                        } catch (Exception e) {
+                            toast(MilkBuyEntryActivity.this, "Unable to print");
+                        }
+                    } else {
+                        toast(MilkBuyEntryActivity.this, "Printer is not connected");
                     }
                 } else {
-                    toast(MilkBuyEntryActivity.this, "Printer is not connected");
+                    toast(MilkBuyEntryActivity.this, "Bluetooth is off");
                 }
-            } else {
-                toast(MilkBuyEntryActivity.this, "Bluetooth is off");
             }
         }
+        else
+            toast(MilkBuyEntryActivity.this, "Enable printer use");
         return true;
     }
 

@@ -220,8 +220,8 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
                         toPrint += StringUtils.rightPad(""+id, 3, "") + "|"+name + "|" + weight + "|" + amount + "|\n";
                     }
                     toPrint += line + "\n";
-                    toPrint += "TOTAL AMOUNT: "+ totalAmount + "Rs\n";
-                    toPrint += "TOTAL WEIGHT: " + totalWeight + "Ltr\n";
+                    toPrint += "TOTAL AMOUNT: "+ truncate(totalAmount) + "Rs\n";
+                    toPrint += "TOTAL WEIGHT: " + truncate(totalWeight) + "Ltr\n";
                     toPrint += line + "\n";
                     toPrint += "       DAIRY DAILY APP";
 

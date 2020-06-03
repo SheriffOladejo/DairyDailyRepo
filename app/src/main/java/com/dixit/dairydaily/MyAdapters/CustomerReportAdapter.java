@@ -37,8 +37,9 @@ public class CustomerReportAdapter extends RecyclerView.Adapter<CustomerReportAd
         String snf = list.get(i).getSnf();
         String weight = list.get(i).getWeight();
         String amount = list.get(i).getAmount();
+        String shift = list.get(i).getShift().substring(0,1);
 
-        viewHolder.setData(date, fat, snf, weight, amount);
+        viewHolder.setData(date, fat, snf, weight, amount, shift);
     }
 
     @Override
@@ -53,14 +54,14 @@ public class CustomerReportAdapter extends RecyclerView.Adapter<CustomerReportAd
             view = itemView;
         }
 
-        void setData(String date, String fat, String snf, String weight, String amount){
+        void setData(String date, String fat, String snf, String weight, String amount, String shift){
             TextView dateView = view.findViewById(R.id.date);
             TextView fatView = view.findViewById(R.id.fat);
             TextView snfView = view.findViewById(R.id.snf);
             TextView weightView = view.findViewById(R.id.weight);
             TextView amountView = view.findViewById(R.id.amount);
 
-            dateView.setText(date);
+            dateView.setText(date+"-"+shift);
             fatView.setText(fat);
             snfView.setText(snf);
             weightView.setText(weight);

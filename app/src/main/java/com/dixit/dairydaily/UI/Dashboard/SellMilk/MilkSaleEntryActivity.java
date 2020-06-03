@@ -64,7 +64,7 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
     ArrayList<DailySalesObject> list;
     static ConstraintLayout scrollview;
 
-    public static String shift, date;
+    public static String shift, date, date_in_long;
 
     public static EditText id, weight;
     public static TextView all_buyers, amount_display, rate_view;
@@ -125,7 +125,7 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
         boolean received_a_name = getIntent().getBooleanExtra("passed", false);
         shift = getIntent().getStringExtra("Shift");
         date = getIntent().getStringExtra("Date");
-
+        date_in_long = getIntent().getStringExtra("Date_In_Long").equals("0") ? System.currentTimeMillis()+"":getIntent().getStringExtra("Date_In_Long");
 
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -258,6 +258,7 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
         String name = all_buyers.getText().toString();
         int Id = -1;
         try{
+            user_id = Integer.valueOf(id.getText().toString());
             Id = Integer.valueOf(id.getText().toString());
         }
         catch (Exception e){}
@@ -276,10 +277,11 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
         if(Id != -1 && !name.equals("Not Found")){
             if(!String.valueOf(weight).equals("")){
                 Log.d(TAG, "saveEntry: " + date);
-                if(!dbHelper.addSalesEntry(Id,name, Weight, Amount, rate, shift, date, Amount, truncate(0.00)))
-                    Toast.makeText(MilkSaleEntryActivity.this, "Unable to add entry", Toast.LENGTH_SHORT).show();
+                if(!dbHelper.addSalesEntry(Id,name, Weight, Amount, rate, shift, date, Amount, truncate(0.00), date_in_long)){
+                    toast(MilkSaleEntryActivity.this, "Sale entry not saved.");
+                }
                 else {
-                    if(dbHelper.addReceiveCash(Id, date, truncate(0.00), Amount, "Sale", shift.substring(0,1), Weight)){
+                    if(dbHelper.addReceiveCash(Id, date, truncate(0.00), Amount, "Sale", shift.substring(0,1), Weight, date_in_long)){
                         String toPrint ="\n\n\n"+ date + "\n" + "ID      : " + Id + " " + name + "\n" +
                                 "SHIFT   :   " + shift  +
                                 "\nWEIGHT  :   " + Weight + "Ltr\nRATE    :   " + rate + "Rs/Ltr\n" + "TOTAL RS:   " + Amount + "Rs\n      DAIRYDAILY APP\n\n\n";
@@ -296,21 +298,33 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
                         totalAmount.setText(String.valueOf(truncate(amountTotal)) + "Rs");
                         totalWeight.setText(String.valueOf(truncate(weightTotal)) + "Ltr");
                         fatAverage.setText(String.valueOf(truncate(averageFat/list.size())) + "%");
-                        Log.d(TAG, "toPrint: " + toPrint);
                         byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
 
                         recyclerView.setAdapter(adapter);
                         //new BackupHandler(MilkSaleEntryActivity.this);
 
-                        if(DashboardActivity.bluetoothAdapter != null) {
-                            if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
-                                DashboardActivity.bluetoothConnectionService.write(mybyte);
-                            } else {
-                                toast(MilkSaleEntryActivity.this, "Printer is not connected");
+                        //toast(MilkSaleEntryActivity.this, ""+SellMilkActivity.usePrinter);
+                        if(SellMilkActivity.usePrinter == true){
+                            Log.d(TAG, "toPrint: " + toPrint);
+                            if(DashboardActivity.bluetoothAdapter != null) {
+                                if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
+                                    DashboardActivity.bluetoothConnectionService.write(mybyte);
+                                } else {
+                                    toast(MilkSaleEntryActivity.this, "Printer is not connected");
+                                }
+                            }
+                            else{
+                                toast(MilkSaleEntryActivity.this, "Bluetooth is off");
                             }
                         }
-                        else{
-                            toast(MilkSaleEntryActivity.this, "Bluetooth is off");
+
+                        if(SellMilkActivity.sms_enable){
+
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.putExtra("address", dbHelper.getBuyerPhone(user_id));
+                            i.putExtra("sms_body", toPrint);
+                            i.setType("vnd.android-dir/mms-sms");
+                            startActivity(i);
                         }
                     }
                     else{
@@ -375,53 +389,57 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
             return true;
 
         int id = item.getItemId();
-        list = dbHelper.getDailySalesData(date, shift);
-        String line = "--------------------------------";
-        String toPrint = "\n\n\nDATE  : " + date + "\nSHIFT : " + shift + "\nRate  :" + " " + rate_view.getText().toString() +"Rs/Ltr\n"+line + "\nID | " + " FAT/SNF |" + "WEIGHT| " + "AMOUNT\n";
-        if(id == R.id.printer){
-            if(list.isEmpty()){
-                toast(MilkSaleEntryActivity.this, "Nothing to print");
-            }
-            else{
-                Collections.reverse(list);
-                for(DailySalesObject object : list){
-                    int sellerId = object.getId();
-                    double amount = object.getAmount();
-                    double fat = object.getRate();
-                    double weight = object.getWeight();
-                    double snf = 0.00;
-                    toPrint += StringUtils.rightPad(""+sellerId, 3, "") + "|" +truncate(fat) + "-" + truncate(snf) +"|"  + StringUtils.rightPad(""+truncate(weight), 6,"") + "|" + StringUtils.rightPad(truncate(amount), 6, "") + "\n";
-                }
-                toPrint += line + "\n";
-                toPrint += "TOTAL AMOUNT: " + amountTotal + "Rs";
-                toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr";
-                toPrint += "\n" + line;
-                toPrint += "\n      DAIRYDAILY APP\n\n\n";
-                Log.d(TAG, "toPrint: " + toPrint);
-
-                byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
-
-                if(DashboardActivity.bluetoothAdapter != null) {
-                    if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
-                        try {
-                            DashboardActivity.bluetoothConnectionService.write(mybyte);
-                            list.clear();
-                            adapter = new MilkSaleAdapter(list,MilkSaleEntryActivity.this);
-                            recyclerView.setAdapter(adapter);
-                            Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
-                        } catch (Exception e) {
-                            Log.d(TAG, "onOptionsSelected: Unable to print");
-                            toast(MilkSaleEntryActivity.this, "Unable to print");
-                        }
-                    } else {
-                        toast(MilkSaleEntryActivity.this, "Printer is not connected");
-                    }
+        if(SellMilkActivity.usePrinter){
+            list = dbHelper.getDailySalesData(date, shift);
+            String line = "--------------------------------";
+            String toPrint = "\n\n\nDATE  : " + date + "\nSHIFT : " + shift + "\nRate  :" + " " + rate_view.getText().toString() +"Rs/Ltr\n"+line + "\nID | " + " FAT/SNF |" + "WEIGHT| " + "AMOUNT\n";
+            if(id == R.id.printer){
+                if(list.isEmpty()){
+                    toast(MilkSaleEntryActivity.this, "Nothing to print");
                 }
                 else{
-                    toast(MilkSaleEntryActivity.this, "Bluetooth is off");
+                    Collections.reverse(list);
+                    for(DailySalesObject object : list){
+                        int sellerId = object.getId();
+                        double amount = object.getAmount();
+                        double fat = object.getRate();
+                        double weight = object.getWeight();
+                        double snf = 0.00;
+                        toPrint += StringUtils.rightPad(""+sellerId, 3, "") + "|" +truncate(fat) + "-" + truncate(snf) +"|"  + StringUtils.rightPad(""+truncate(weight), 6,"") + "|" + StringUtils.rightPad(truncate(amount), 6, "") + "\n";
+                    }
+                    toPrint += line + "\n";
+                    toPrint += "TOTAL AMOUNT: " + amountTotal + "Rs";
+                    toPrint += "\nTOTAL WEIGHT: " + weightTotal + "Ltr";
+                    toPrint += "\n" + line;
+                    toPrint += "\n      DAIRYDAILY APP\n\n\n";
+                    Log.d(TAG, "toPrint: " + toPrint);
+
+                    byte[] mybyte = toPrint.getBytes(Charset.defaultCharset());
+
+                    if(DashboardActivity.bluetoothAdapter != null) {
+                        if (DashboardActivity.bluetoothAdapter.isEnabled() && DashboardActivity.bluetoothDevice != null) {
+                            try {
+                                DashboardActivity.bluetoothConnectionService.write(mybyte);
+                                list.clear();
+                                adapter = new MilkSaleAdapter(list,MilkSaleEntryActivity.this);
+                                recyclerView.setAdapter(adapter);
+                                Log.d(TAG, "onOptionsSelected: Printing with DashboardActivity BT");
+                            } catch (Exception e) {
+                                Log.d(TAG, "onOptionsSelected: Unable to print");
+                                toast(MilkSaleEntryActivity.this, "Unable to print");
+                            }
+                        } else {
+                            toast(MilkSaleEntryActivity.this, "Printer is not connected");
+                        }
+                    }
+                    else{
+                        toast(MilkSaleEntryActivity.this, "Bluetooth is off");
+                    }
                 }
             }
         }
+        else
+            toast(MilkSaleEntryActivity.this, "Enable printer use");
         return true;
     }
 

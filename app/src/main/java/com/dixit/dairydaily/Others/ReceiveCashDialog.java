@@ -32,6 +32,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
     EditText title, amount;
     Button save;
     DbHelper dbHelper;
+    String date_in_long;
     int id;
     int unique_id;
     String shift = "Morning";
@@ -49,12 +50,13 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
         this.id = id;
     }
 
-    public ReceiveCashDialog(Context context,int unique_id, int id, String date, String title, String debit, String credit, String shift){
+    public ReceiveCashDialog(Context context,int unique_id, int id, String date, String title, String debit, String credit, String shift, String date_in_long){
         super(context);
         this.shift = shift;
         this.unique_id = unique_id;
         this.context = context;
         dbHelper = new DbHelper(this.context);
+        this.date_in_long = date_in_long;
         this.id = id;
         this.date = date;
         this.titleString = title;
@@ -98,7 +100,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                 else{
                     if(wantToUpdate){
                         //Log.d("ReceiveCashDialog", "Trying to update " + unique_id + "  " + date);
-                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString, shift, "0");
+                        dbHelper.updateReceiveCash(unique_id, id, date, titleString, debit, amountString, shift, "0", date_in_long);
                         ReceiveCashActivity.list = dbHelper.getReceiveCash(id, "", "");
                         ReceiveCashAdapter adapter = new ReceiveCashAdapter(context, ReceiveCashActivity.list);
                         ReceiveCashActivity.recyclerView.setAdapter(ReceiveCashActivity.adapter);
@@ -123,7 +125,7 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                     }
                     else{
                         Log.d("ReceiveCashDialog", "Trying to add new");
-                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift, "0")){
+                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift, "0", date_in_long)){
                             toast(context, "Operation failed");
                             dismiss();
                         }

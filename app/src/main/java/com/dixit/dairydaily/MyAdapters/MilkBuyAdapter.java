@@ -70,10 +70,18 @@ public class MilkBuyAdapter extends RecyclerView.Adapter<MilkBuyAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         View view;
+        AlertDialog.Builder builder;
 
         public ViewHolder(@NonNull View itemView){
             super(itemView);
             view = itemView;
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    builder.show();
+                    return true;
+                }
+            });
         }
 
         void setData(String sr, String name, double weight, double snf, double rate, double amount, int id, double fat){
@@ -86,7 +94,7 @@ public class MilkBuyAdapter extends RecyclerView.Adapter<MilkBuyAdapter.ViewHold
             ImageView optionsView = view.findViewById(R.id.options);
 
             String[] options = {"Edit", "Delete", "Print"};
-            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder = new AlertDialog.Builder(context);
             builder.setTitle("Select Action");
             builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override

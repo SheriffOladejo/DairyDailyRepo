@@ -52,6 +52,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "865747894516-itnhfbdkp2o3rch0koll6avm2uef4m5l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dixit.dairydaily",
+            "certificate_hash": "092db8dc0020b468b9eb0d239b3ce028671dac1d"
+          }
+        },
+        {
           "client_id": "865747894516-uk4r1o5llkmnqp4b4gbm72qdfuqeprbo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

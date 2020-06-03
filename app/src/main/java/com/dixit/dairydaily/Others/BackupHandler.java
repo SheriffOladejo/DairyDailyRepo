@@ -31,14 +31,16 @@ public class BackupHandler {
 
     Context context;
     DbHelper dbHelper;
+    private static final String TAG = "BackupHandler";
 
     public BackupHandler(Context context){
         this.context = context;
         dbHelper = new DbHelper(context);
+        Log.d(TAG, "context: " + context.toString());
 
         checkInternetConnect();
         if(isInternetConnected) {
-            backupReceiveCash();
+            backupMilkBuyData();
         }
         else{
             toast(context, "Please connect to the internet");
@@ -130,6 +132,7 @@ public class BackupHandler {
                     values.put("Date", data.getString(data.getColumnIndex("Date")));
                     values.put("Rate", data.getString(data.getColumnIndex("Rate")));
                     values.put("Type", data.getString(data.getColumnIndex("Type")));
+                    values.put("Date_In_Long", data.getString(data.getColumnIndex("Date_In_Long")));
 
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
@@ -270,6 +273,7 @@ public class BackupHandler {
                     values.put("Date", date);
                     values.put("Credit", data.getString(data.getColumnIndex("Credit")));
                     values.put("Debit", data.getString(data.getColumnIndex("Debit")));
+                    values.put("Date_In_Long", data.getString(data.getColumnIndex("Date_In_Long")));
 
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;

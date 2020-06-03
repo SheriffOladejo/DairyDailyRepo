@@ -130,8 +130,13 @@ public class AddCustomers extends AppCompatActivity {
                         "Seller", getIntent().getStringExtra("firstname")+" " +getIntent().getStringExtra("lastname"));
                 new BackupHandler(AddCustomers.this);
                 Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
-                startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
-                finish();
+                firstnameEdittext.setText("");
+                lastnameEdittext.setText("");
+                phone_numberEdittext.setText("");
+                addressEdittext.setText("");
+                idEditText.setText("");
+                update = false;
+                Toast.makeText(AddCustomers.this, "Customer updated", Toast.LENGTH_SHORT).show();
             }
 
             else if(update && buyer.isChecked()){
@@ -141,8 +146,13 @@ public class AddCustomers extends AppCompatActivity {
                         "Buyer", getIntent().getStringExtra("firstname")+" " +getIntent().getStringExtra("lastname"));
                 new BackupHandler(AddCustomers.this);
                 Log.d(TAG, "update: passId: " + passId + " new Id: " + Integer.valueOf(idEditText.getText().toString()));
-                startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
-                finish();
+                firstnameEdittext.setText("");
+                lastnameEdittext.setText("");
+                phone_numberEdittext.setText("");
+                addressEdittext.setText("");
+                idEditText.setText("");
+                update = false;
+                Toast.makeText(AddCustomers.this, "Customer updated", Toast.LENGTH_SHORT).show();
             }
 
             if(seller.isChecked() && !update){
@@ -150,8 +160,13 @@ public class AddCustomers extends AppCompatActivity {
                 if(!sellerExists(id)){
                     if(dbHelper.addSeller(Integer.valueOf(id), convertFirstLetter(fullname), phone_number, address, status)){
                         new BackupHandler(AddCustomers.this);
-                        startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
-                        finish();
+                        firstnameEdittext.setText("");
+                        lastnameEdittext.setText("");
+                        phone_numberEdittext.setText("");
+                        addressEdittext.setText("");
+                        idEditText.setText("");
+                        update = false;
+                        Toast.makeText(AddCustomers.this, "Added Customer", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         Toast.makeText(AddCustomers.this, "Unable to add customer", Toast.LENGTH_SHORT).show();
@@ -167,9 +182,13 @@ public class AddCustomers extends AppCompatActivity {
                 if(!buyerExists(id)){
                     if(dbHelper.addBuyer(Integer.valueOf(id) ,convertFirstLetter(fullname), phone_number, address, status)){
                         new BackupHandler(AddCustomers.this);
-                        startActivity(new Intent(AddCustomers.this, CustomersActivity.class));
-                        Log.d(TAG, "saveEntry: " +status);
-                        finish();
+                        firstnameEdittext.setText("");
+                        lastnameEdittext.setText("");
+                        phone_numberEdittext.setText("");
+                        addressEdittext.setText("");
+                        idEditText.setText("");
+                        update = false;
+                        Toast.makeText(AddCustomers.this, "Added Customer", Toast.LENGTH_SHORT).show();
                     }
                     else
                         Toast.makeText(AddCustomers.this, "Unable to add customer", Toast.LENGTH_SHORT).show();

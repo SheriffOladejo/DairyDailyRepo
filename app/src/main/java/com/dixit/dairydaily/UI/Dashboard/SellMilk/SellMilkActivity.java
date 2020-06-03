@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.dixit.dairydaily.UI.Dashboard.BuyMilk.BuyMilkActivity;
 import com.dixit.dairydaily.UI.Dashboard.DrawerLayout.InitDrawerBoard;
 import com.google.android.material.navigation.NavigationView;
 import com.dixit.dairydaily.Others.BackupHandler;
@@ -60,7 +61,9 @@ public class SellMilkActivity extends InitDrawerBoard {
     private Button proceed;
     static ScrollView scrollview;
 
+    public static boolean usePrinter = false;
     public static boolean online = false;
+    public static boolean sms_enable = false;
 
     private EditText rate;
     private Button update;
@@ -70,12 +73,15 @@ public class SellMilkActivity extends InitDrawerBoard {
     NavigationView navigationView;
 
     String date;
+    private long date_in_long;
 
     private static final String TAG = "SellMilkActivity";
 
     // Date picker dialog pops up on calendar image click
     TextView dateView;
     Switch online_switch;
+    Switch printer_switch;
+    Switch sms_switch;
 
     private String am_pm;
 
@@ -100,6 +106,24 @@ public class SellMilkActivity extends InitDrawerBoard {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_milk);
 
+        Paper.init(this);
+        String sms_setting = Paper.book().read(Prevalent.sms_setting_sell);
+        String printer_setting = Paper.book().read(Prevalent.printer_setting_sell);
+
+        if(sms_setting != null){
+            if(sms_setting.equals("true"))
+                SellMilkActivity.sms_enable = true;
+            else
+                SellMilkActivity.sms_enable = false;
+        }
+
+        if(printer_setting != null){
+            if(printer_setting.equals("true"))
+                SellMilkActivity.usePrinter = true;
+            else
+                SellMilkActivity.usePrinter = false;
+        }
+
         getSupportActionBar().setTitle("Sell Milk");
         getSupportActionBar().setHomeButtonEnabled(true);
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
@@ -117,7 +141,8 @@ public class SellMilkActivity extends InitDrawerBoard {
         initDrawer();
 
         online_switch = findViewById(R.id.online_switch);
-        //print_switch = findViewById(R.id.print_switch);
+        printer_switch = findViewById(R.id.printer_switch);
+        sms_switch = findViewById(R.id.sms_switch);
         morning_switch = findViewById(R.id.morning_switch);
         evening_switch = findViewById(R.id.evening_switch);
         scrollview = findViewById(R.id.scrollview);
@@ -147,11 +172,39 @@ public class SellMilkActivity extends InitDrawerBoard {
             public void onClick(View v) {
                 if(online_switch.isChecked()){
                     online = true;
-                    Log.d(TAG, "online milk sell: " + online);
                 }
                 else if(!online_switch.isChecked()){
                     online = false;
-                    Log.d(TAG, "online milk sell: " + online);
+                }
+            }
+        });
+
+        printer_switch.setChecked(SellMilkActivity.usePrinter);
+        printer_switch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(printer_switch.isChecked()){
+                    Paper.book().write(Prevalent.printer_setting_sell, "true");
+                    usePrinter = true;
+                }
+                else if(!printer_switch.isChecked()){
+                    Paper.book().write(Prevalent.printer_setting_sell, "false");
+                    usePrinter = false;
+                }
+            }
+        });
+
+        sms_switch.setChecked(SellMilkActivity.sms_enable);
+        sms_switch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sms_switch.isChecked()){
+                    Paper.book().write(Prevalent.sms_setting_sell, "true");
+                    sms_enable = true;
+                }
+                else if(!sms_switch.isChecked()){
+                    Paper.book().write(Prevalent.sms_setting_sell, "false");
+                    sms_enable = false;
                 }
             }
         });
@@ -251,6 +304,7 @@ public class SellMilkActivity extends InitDrawerBoard {
                     Intent intent = new Intent(SellMilkActivity.this, MilkSaleEntryActivity.class);
                     intent.putExtra("Shift", morning_switch.isChecked() ? "Morning" : "Evening");
                     intent.putExtra("Date", date);
+                    intent.putExtra("Date_In_Long", date_in_long+"");
                     startActivity(intent);
                 }
             }
@@ -282,6 +336,7 @@ public class SellMilkActivity extends InitDrawerBoard {
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                date_in_long = view.getDate();
                 if(String.valueOf(month).length() == 1){
                     if(String.valueOf(dayOfMonth).length() == 1){
                         date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;

@@ -108,7 +108,7 @@
             android:name="com.dixit.dairydaily.UI.Dashboard.ProductSale.ProductSaleActivity"
             android:parentActivityName="com.dixit.dairydaily.UI.Dashboard.DashboardActivity" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.DashboardActivity"
-            android:theme="@style/Theme.Design.NoActionBar"/>
+            android:theme="@style/Dashboard"/>
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.UsersListActivity" />
         <activity android:name="com.dixit.dairydaily.CowChart.CowSNF" />
         <activity android:name="com.dixit.dairydaily.UI.Dashboard.Customers.CustomersActivity" />

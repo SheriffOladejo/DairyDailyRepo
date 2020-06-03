@@ -479,7 +479,8 @@ public class ReceiveCashActivity extends InitDrawerBoard implements DatePickerDi
                     String credit = StringUtils.rightPad(StringUtils.truncate(object.getCredit(),6), 6, "");
                     String debit = StringUtils.rightPad(StringUtils.truncate(object.getDebit(),6), 6, "");
                     String datee = object.getDate();
-                    toPrint += datee + "|"+title + "|" + StringUtils.rightPad(truncate(Double.valueOf(debit)), 6, "") + "|" + StringUtils.rightPad(truncate(Double.valueOf(credit)), 6, "") + "|\n";
+                    String shift = object.getShift().substring(0,1);
+                    toPrint += datee+ "|"+title + "|" + StringUtils.rightPad(truncate(Double.valueOf(debit)), 6, "") + "|" + StringUtils.rightPad(truncate(Double.valueOf(credit)), 6, "") + "|\n";
                 }
                 toPrint += line + "\n";
                 toPrint += "TOTAL CREDIT: "+ truncate(creditTotal) + "Rs\n";

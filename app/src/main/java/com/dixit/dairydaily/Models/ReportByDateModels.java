@@ -8,11 +8,12 @@ public class ReportByDateModels {
     private String shift;
     private String credit;
     private String debit;
+    private String date_in_long;
 
     public ReportByDateModels() {
     }
 
-    public ReportByDateModels(String date, String rate, String weight, String amount, String shift, String credit, String debit) {
+    public ReportByDateModels(String date, String rate, String weight, String amount, String shift, String credit, String debit, String date_in_long) {
         this.date = date;
         this.rate = rate;
         this.weight = weight;
@@ -20,6 +21,15 @@ public class ReportByDateModels {
         this.shift = shift;
         this.credit = credit;
         this.debit = debit;
+        this.date_in_long = date_in_long;
+    }
+
+    public void setDate_in_long(String date_in_long) {
+        this.date_in_long = date_in_long;
+    }
+
+    public String getDate_in_long() {
+        return date_in_long;
     }
 
     public String getDate() {
