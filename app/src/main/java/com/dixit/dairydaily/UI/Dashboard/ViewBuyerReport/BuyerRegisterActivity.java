@@ -95,7 +95,7 @@ public class BuyerRegisterActivity extends InitDrawerBoard implements DatePicker
     public static double totalWeight;
     public static double totalAmount;
 
-    BuyerRegisterAdapter adapter;
+    static BuyerRegisterAdapter adapter;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;

@@ -76,6 +76,7 @@ public class Logout extends AppCompatActivity {
                     values.put("Date", data.getString(data.getColumnIndex("Date")));
                     values.put("Rate", data.getString(data.getColumnIndex("Rate")));
                     values.put("Type", data.getString(data.getColumnIndex("Type")));
+                    values.put("Date_In_Long", data.getString(data.getColumnIndex("Date_In_Long")));
 
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
@@ -216,6 +217,7 @@ public class Logout extends AppCompatActivity {
                     values.put("Date", date);
                     values.put("Credit", data.getString(data.getColumnIndex("Credit")));
                     values.put("Debit", data.getString(data.getColumnIndex("Debit")));
+                    values.put("Date_In_Long", data.getString(data.getColumnIndex("Date_In_Long")));
 
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;

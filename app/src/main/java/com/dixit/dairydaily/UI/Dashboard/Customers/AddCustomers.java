@@ -25,9 +25,9 @@ import static com.dixit.dairydaily.Others.UtilityMethods.useSnackBar;
 
 public class AddCustomers extends AppCompatActivity {
 
-    private RadioButton buyer, seller;
-    private EditText firstnameEdittext, lastnameEdittext, phone_numberEdittext, addressEdittext, idEditText;
-    private Button save;
+    public static RadioButton buyer, seller;
+    public static EditText firstnameEdittext, lastnameEdittext, phone_numberEdittext, addressEdittext, idEditText;
+    public static Button save;
     private static final String TAG = "AddCustomers";
     private LinearLayout add_customer;
 

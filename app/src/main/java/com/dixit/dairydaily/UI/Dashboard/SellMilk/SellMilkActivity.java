@@ -334,9 +334,14 @@ public class SellMilkActivity extends InitDrawerBoard {
         dialog.setContentView(R.layout.calendar_view_dialog);
         CalendarView cal = dialog.findViewById(R.id.calendar_view);
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                date_in_long = view.getDate();
+
+                Calendar c = Calendar.getInstance();
+                c.set(year, month, dayOfMonth);
+                date_in_long = c.getTimeInMillis();
+
                 if(String.valueOf(month).length() == 1){
                     if(String.valueOf(dayOfMonth).length() == 1){
                         date = year + "-0" + (month+1) + "-" + "0"+dayOfMonth;
@@ -351,7 +356,9 @@ public class SellMilkActivity extends InitDrawerBoard {
                     date = year + "-" + (month+1) + "-" + dayOfMonth;
                     dateView.setText(date);
                 }
-                dialog.dismiss();
+
+                Log.d(TAG, "Date: " + date + " Date in long: " + date_in_long);
+                        dialog.dismiss();
             }
         });
         dialog.show();

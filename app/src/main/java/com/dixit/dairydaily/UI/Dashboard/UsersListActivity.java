@@ -31,7 +31,7 @@ public class UsersListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private static final String TAG = "UsersListActivity";
 
-    private String date, from, shift;
+    private String date, from, shift, date_in_string;
 
     UsersListAdapter adapter;
 
@@ -56,6 +56,7 @@ public class UsersListActivity extends AppCompatActivity {
         from = getIntent().getStringExtra("From");
         date = getIntent().getStringExtra("Date");
         shift = getIntent().getStringExtra("Shift");
+        date_in_string = getIntent().getStringExtra("Date_In_Long");
 
         if(from.equals("MilkBuyEntryActivity"))
             populateSellerView();
@@ -93,7 +94,7 @@ public class UsersListActivity extends AppCompatActivity {
                 list.add(model);
                 Log.d(TAG, "populateSellerView: " + status);
             }
-            adapter = new UsersListAdapter(list, this, from, shift, date);
+            adapter = new UsersListAdapter(list, this, from, shift, date, date_in_string);
             recyclerView.setAdapter(adapter);
             search.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -132,7 +133,7 @@ public class UsersListActivity extends AppCompatActivity {
                 list.add(model);
                 Log.d(TAG, "populateSellerView: " + status);
             }
-            adapter = new UsersListAdapter(list, this, from, shift, date);
+            adapter = new UsersListAdapter(list, this, from, shift, date, date_in_string);
             recyclerView.setAdapter(adapter);
             search.addTextChangedListener(new TextWatcher() {
                 @Override

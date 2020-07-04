@@ -41,6 +41,7 @@ public class BackupHandler {
         checkInternetConnect();
         if(isInternetConnected) {
             backupMilkBuyData();
+            backupReceiveCash();
         }
         else{
             toast(context, "Please connect to the internet");
@@ -82,6 +83,7 @@ public class BackupHandler {
                     values.put("ID", data.getInt(data.getColumnIndex("ID")));
                     values.put("Shift", data.getString(data.getColumnIndex("Shift")));
                     values.put("Weight", data.getString(data.getColumnIndex("Weight")));
+                    values.put("Date_In_Long", data.getString(data.getColumnIndex("Date_In_Long")));
                     jsonToUpload.put(String.valueOf(key), values);
                     key++;
                     //Log.d("BackupHandler", "backupReceiveCashData: onAdd" + jsonToUpload.toString());
@@ -96,17 +98,17 @@ public class BackupHandler {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
-                       backupMilkBuyData();
+                      // backupMilkBuyData();
                     }
                     else{
-                        Toast.makeText(context, "Data upload failed.", Toast.LENGTH_SHORT).show();
-                        backupMilkBuyData();
+                        //Toast.makeText(context, "Data upload failed.", Toast.LENGTH_SHORT).show();
+                        //backupMilkBuyData();
                     }
                 }
             });
         }
         else{
-            backupMilkBuyData();
+            //backupMilkBuyData();
         }
     }
 

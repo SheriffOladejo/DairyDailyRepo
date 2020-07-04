@@ -125,16 +125,7 @@ public class SendOtpActivity extends AppCompatActivity {
         final PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-                // This callback will be invoked in two situations:
-                // 1 - Instant verification. In some cases the phone number can be instantly
-                //     verified without needing to send or enter a verification code.
-                // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                //     detect the incoming verification SMS and perform verification without
-                //     user action.
-                otpCode = phoneAuthCredential.getSmsCode();
-                if(otpCode!= null){
-                    sendVerificationCode(otpCode);
-                }
+                signInWithPhoneAuthCredential(phoneAuthCredential);
             }
 
             @Override
@@ -206,21 +197,11 @@ public class SendOtpActivity extends AppCompatActivity {
                     progressDialog1.setTitle("Verifying");
                     progressDialog1.setCancelable(false);
                     progressDialog1.show();
-                    sendVerificationCode(otpCode);
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, otpCode);
+                    signInWithPhoneAuthCredential(credential);
                 }
             }
         });
-    }
-
-    // Primary method that sends the verifies the code sent to user.
-    private void sendVerificationCode(String number){
-        try{
-            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, number);
-            signInWithPhoneAuthCredential(credential);
-        }
-        catch(Exception e){
-            toast(SendOtpActivity.this, "Invalid OTP");
-        }
     }
 
     // Method that signs user in with verification code.
@@ -238,7 +219,10 @@ public class SendOtpActivity extends AppCompatActivity {
                             // Sign in failed, display a message and update the UI
                             //Log.w(TAG, "signInWithCredential:failure", task.getException());
                             useSnackBar("Operation Failed", linearLayout);
-                            progressDialog1.dismiss();
+                            try {
+                                progressDialog1.dismiss();
+                            }
+                            catch(Exception e){}
                         }
                     }
                 });

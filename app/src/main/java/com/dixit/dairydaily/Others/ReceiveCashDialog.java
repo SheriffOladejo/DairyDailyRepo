@@ -117,15 +117,15 @@ public class ReceiveCashDialog extends Dialog implements View.OnClickListener{
                         ReceiveCashActivity.totalCredit.setText(String.valueOf(truncate(ReceiveCashActivity.creditTotal)) + "Rs");
                         ReceiveCashActivity.totalDebit.setText(String.valueOf(truncate(ReceiveCashActivity.debitTotal)) + "Rs");
                         ReceiveCashActivity.remaining.setText(String.valueOf(truncate(-ReceiveCashActivity.remain)) + "Rs");
-                        InvoiceActivity.list = dbHelper.getReceiveCashList();
-                        InvoiceActivity.adapter = new InvoiceAdapter(getContext(), InvoiceActivity.list);
-                        InvoiceActivity.recyclerView.setAdapter(InvoiceActivity.adapter);
+//                        InvoiceActivity.list = dbHelper.getReceiveCashList();
+//                        InvoiceActivity.adapter = new InvoiceAdapter(getContext(), InvoiceActivity.list);
+//                        InvoiceActivity.recyclerView.setAdapter(InvoiceActivity.adapter);
                         new BackupHandler(context);
                         dismiss();
                     }
                     else{
                         Log.d("ReceiveCashDialog", "Trying to add new");
-                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift, "0", date_in_long)){
+                        if(!dbHelper.addReceiveCash(id, date, amountString, "0", titleString, shift, "0", System.currentTimeMillis()+"")){
                             toast(context, "Operation failed");
                             dismiss();
                         }

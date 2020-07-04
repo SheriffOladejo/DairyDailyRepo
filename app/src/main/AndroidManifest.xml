@@ -126,6 +126,7 @@
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
         <activity android:name=".UI.Dashboard.DrawerLayout.InitDrawerBoard"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        <activity android:name=".UI.Dashboard.DrawerLayout.WebViewActivity" />
     </application>
 
 </manifest>

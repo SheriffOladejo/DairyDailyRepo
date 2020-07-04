@@ -429,11 +429,11 @@ public class DbHelper extends SQLiteOpenHelper {
         contentValues.put(Rec_COL7, shift);
         contentValues.put(Rec_COL8, weight);
         contentValues.put(Rec_COL9, date_in_long);
-        Log.d(TAG, "addReceiveCash: " + title);
+        //Log.d(TAG, "addReceiveCash: " + title);
 
         long result = db.insert(receive_cash_table, null, contentValues);
         if(result == -1){
-            Log.d(TAG, "addReceiveCash: cannot add");
+            //Log.d(TAG, "addReceiveCash: cannot add");
             return false;
         }
         else{
@@ -600,6 +600,18 @@ public class DbHelper extends SQLiteOpenHelper {
                 }
             }
         }
+        for(int i=0; i<list.size();i++){
+            for(int j=0; j<list.size()-1; j++){
+                long value1 = Long.valueOf(list.get(j).getId());
+                long value2 = Long.valueOf(list.get(j+1).getId());
+                if(value1 > value2){
+                    ReceiveCashListModel temp;
+                    temp = list.get(j);
+                    list.set(j, list.get(j+1));
+                    list.set(j+1, temp);
+                }
+            }
+        }
         // Log.d(TAG, "List size: " + list.size());
         return list;
     }
@@ -634,21 +646,23 @@ public class DbHelper extends SQLiteOpenHelper {
         else{
 
         }
-        for(int i=0; i<list.size();i++){
-            for(int j=0; j<list.size()-1; j++){
-                long value1 = Long.valueOf(list.get(j).getDate_in_long());
-                long value2 = Long.valueOf(list.get(j+1).getDate_in_long());
-                if(value1 > value2){
-                    ReceiveCashModel temp;
-                    temp = list.get(j);
-                    list.set(j, list.get(j+1));
-                    list.set(j+1, temp);
-//                    int temp = 0;
-//                    temp = array[j];
-//                    array[j] = array[j+1];
-//                    array[j+1] = temp;
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                for (int j = 0; j < list.size() - 1; j++) {
+                    long value1 = Long.valueOf(list.get(j).getDate_in_long());
+                    long value2 = Long.valueOf(list.get(j + 1).getDate_in_long());
+                    if (value1 > value2) {
+                        ReceiveCashModel temp;
+                        temp = list.get(j);
+                        list.set(j, list.get(j + 1));
+                        list.set(j + 1, temp);
+                    }
                 }
             }
+        }
+        catch (Exception e){}
+        for(int i =0; i<list.size(); i++){
+            Log.d(TAG, "Date: " + list.get(i).getDate() + " Date in long: " + list.get(i).getDate_in_long());
         }
         return list;
     }
@@ -764,14 +778,13 @@ public class DbHelper extends SQLiteOpenHelper {
         ArrayList<ReportByDateModels> startDay = new ArrayList<>();
         ArrayList<ReportByDateModels> endDay = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        Log.d(TAG, "getReportByDate: " + beginDate+ " " + endDate);
-        String query = "SELECT Date, Rate, Weight, Amount, Shift, Credit, Debit FROM " + milk_sale_table + " WHERE " + Sale_COL1 + " ='" + id + "' AND "  + Sale_COL7 + " BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+        String query = "SELECT * FROM " + milk_sale_table + " WHERE " + Sale_COL1 + " ='" + id + "' AND "  + Sale_COL7 + " BETWEEN '" + beginDate + "' AND '" + endDate + "'";
         Cursor data = db.rawQuery(query, null);
-        Log.d(TAG, "getReportByDate: after");
-        String month = beginDate.substring(3,5);
 
         if(data.getCount() != 0){
+            Log.d(TAG, "data count is not 0" + " " + data.getCount());
             while(data.moveToNext()){
+
                 String date = data.getString(data.getColumnIndex(Sale_COL7));
                 String rate = data.getString(data.getColumnIndex(Sale_COL5));
                 String weight = data.getString(data.getColumnIndex(Sale_COL3));
@@ -780,10 +793,12 @@ public class DbHelper extends SQLiteOpenHelper {
                 String credit = data.getString(data.getColumnIndex(Sale_COL9));
                 String debit = data.getString(data.getColumnIndex(Sale_COL8));
                 String date_in_long = data.getString(data.getColumnIndex(Sale_COL10));
+                Log.d(TAG, "called");
                 ReportByDateModels model = new ReportByDateModels(date, rate, weight, amount, shift, credit, debit,date_in_long);
                 list.add(model);
             }
             // Sort list further by shift
+            Log.d(TAG, "list count is not 0 " + list.size());
             for(ReportByDateModels model : list){
                 if(!endDate.equals(beginDate)){
                     if(model.getDate().equals(beginDate))
@@ -820,17 +835,19 @@ public class DbHelper extends SQLiteOpenHelper {
                 long value1 = Long.valueOf(list.get(j).getDate_in_long());
                 long value2 = Long.valueOf(list.get(j+1).getDate_in_long());
                 if(value1 > value2){
+                    Log.d(TAG, "switching " + value1 + " for " + value2);
                     ReportByDateModels temp;
                     temp = list.get(j);
                     list.set(j, list.get(j+1));
                     list.set(j+1, temp);
-//                    int temp = 0;
-//                    temp = array[j];
-//                    array[j] = array[j+1];
-//                    array[j+1] = temp;
                 }
             }
         }
+
+        for(int i=0; i<list.size(); i++){
+            Log.d(TAG, "Date " + list.get(i).getDate() + " Date in long " + list.get(i).getDate_in_long());
+        }
+        Log.d(TAG, "list size: " + list.size());
         return list;
     }
 
@@ -997,22 +1014,20 @@ public class DbHelper extends SQLiteOpenHelper {
                 }
             }
         }
+
         for(int i=0; i<users.size();i++){
             for(int j=0; j<users.size()-1; j++){
-                long value1 = Long.valueOf(users.get(j).getDate_in_long());
-                long value2 = Long.valueOf(users.get(j+1).getDate_in_long());
+                int value1 = users.get(j).getId();
+                int value2 = users.get(j+1).getId();
                 if(value1 > value2){
                     PaymentRegisterModel temp;
                     temp = users.get(j);
                     users.set(j, users.get(j+1));
                     users.set(j+1, temp);
-//                    int temp = 0;
-//                    temp = array[j];
-//                    array[j] = array[j+1];
-//                    array[j+1] = temp;
                 }
             }
         }
+
         return users;
     }
 
@@ -1112,7 +1127,7 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + milk_buy_table+ " WHERE " + Buy_COL1 + " ='" + id + "' AND " +
                 Buy_COL7 + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
-        Log.d(TAG, "getCustomerReport: Data count is 0" + startDate + endDate);
+        //Log.d(TAG, "getCustomerReport: Data count is 0" + startDate + endDate);
         Cursor data = db.rawQuery(query, null);
         if(data.getCount() != 0){
             while(data.moveToNext()){
@@ -1123,7 +1138,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 String weight = data.getString(data.getColumnIndex(Buy_COL3));
                 String amount = data.getString(data.getColumnIndex(Buy_COL6));
                 String date_in_long = data.getString(data.getColumnIndex(Buy_COL11));
-                Log.d(TAG, "getCustomerReport: Date " + date);
+                Log.d(TAG, "getCustomerReport: Date " + date_in_long);
                 CustomerReportModel model = new CustomerReportModel(date, fat, snf, weight, amount, shift, date_in_long);
                 list.add(model);
             }
@@ -1140,10 +1155,6 @@ public class DbHelper extends SQLiteOpenHelper {
                     temp = list.get(j);
                     list.set(j, list.get(j+1));
                     list.set(j+1, temp);
-//                    int temp = 0;
-//                    temp = array[j];
-//                    array[j] = array[j+1];
-//                    array[j+1] = temp;
                 }
             }
         }

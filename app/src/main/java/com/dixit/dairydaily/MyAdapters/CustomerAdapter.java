@@ -90,7 +90,6 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
             }
             FilterResults results = new FilterResults();
             results.values = filteredList;
-
             return results;
         }
 
@@ -131,7 +130,6 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
                             String phoneNumberToPass = list.get(getAdapterPosition()).getPhone_number();
                             String addressToPass = list.get(getAdapterPosition()).getAddress();
                             String statusToPass = list.get(getAdapterPosition()).getStatus();
-
                             Intent intent = new Intent(context, AddCustomers.class);
                             intent.putExtra("ID", idToPass);
                             intent.putExtra("firstname", firstNameToPass);
@@ -140,7 +138,6 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
                             intent.putExtra("address", addressToPass);
                             intent.putExtra("status", statusToPass);
                             intent.putExtra("update", true);
-
                             context.startActivity(intent);
                             break;
                         case 2:

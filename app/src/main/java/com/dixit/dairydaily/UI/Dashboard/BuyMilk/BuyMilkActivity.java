@@ -234,7 +234,9 @@ public class BuyMilkActivity extends InitDrawerBoard implements DatePickerDialog
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                date_in_long = view.getDate();
+                Calendar c = Calendar.getInstance();
+                c.set(year, month, dayOfMonth);
+                date_in_long = c.getTimeInMillis();
                 Log.d(TAG, "second date_in_long: " + date_in_long);
                 if(String.valueOf(month).length() == 1){
                     if(String.valueOf(dayOfMonth).length() == 1){

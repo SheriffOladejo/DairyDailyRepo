@@ -89,6 +89,8 @@ public class InitDrawerBoard extends AppCompatActivity {
         progressDialog.setMessage("Updating...");
         progressDialog.setCancelable(true);
 
+        Paper.init(this);
+
         versionName.setText(Paper.book().read(Prevalent.version_name) == null ? "Version 3.0.2" : "Version "+Paper.book().read(Prevalent.version_name));
 
         retrieve_data.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +113,7 @@ public class InitDrawerBoard extends AppCompatActivity {
                     public void onClick(View v) {
                         rpd = new ProgressDialog(InitDrawerBoard.this);
                         rpd.setMessage("Retrieving...");
-                        rpd.setCancelable(false);
+                        rpd.setCancelable(true);
                         rpd.show();
                         new DataRetrievalHandler(InitDrawerBoard.this);
                         dialog.dismiss();

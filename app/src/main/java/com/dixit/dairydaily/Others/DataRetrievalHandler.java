@@ -30,7 +30,9 @@ public class DataRetrievalHandler {
     public DataRetrievalHandler(Context context){
         this.context = context;
         dbHelper = new DbHelper(context);
+        retrieveReceiveCash();
         retrieveMilkSaleData();
+
     }
 
     private void retrieveReceiveCash(){
@@ -74,7 +76,7 @@ public class DataRetrievalHandler {
             }
         };
         ref.addListenerForSingleValueEvent(valueEventListener);
-        retrieveMilkSaleData();
+        //retrieveMilkSaleData();
     }
 
     private static final String TAG = "DataRetrievalHandler";
@@ -104,7 +106,7 @@ public class DataRetrievalHandler {
                             String credit = truncate(Double.valueOf(obj.getString("Credit")));
                             String debit = truncate(Double.valueOf(obj.getString("Debit")));
                             dbHelper.addSalesEntry(id, name, weight, amount, rate, shift, date, debit, credit, date_in_long);
-                            dbHelper.addReceiveCash(id,date,credit,debit,"Sale",shift,weight, date_in_long);
+                            //dbHelper.addReceiveCash(id,date,credit,debit,"Sale",shift,weight, date_in_long);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

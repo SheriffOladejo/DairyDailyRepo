@@ -163,7 +163,7 @@ public class ProductSaleAdapter extends RecyclerView.Adapter<ProductSaleAdapter.
             TextView amountView = view.findViewById(R.id.amount);
 
             dateView.setText(date);
-            nameView.setText(String.valueOf(id) + "." + getFirstname(name));
+            nameView.setText(getFirstname(name));
             productView.setText(getFirstname(product));
             unitsView.setText(units);
             amountView.setText(amount);

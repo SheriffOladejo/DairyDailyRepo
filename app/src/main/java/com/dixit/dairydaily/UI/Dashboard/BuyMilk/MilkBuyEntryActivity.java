@@ -148,7 +148,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
         boolean received_a_name = getIntent().getBooleanExtra("passed", false);
         shift = getIntent().getStringExtra("Shift");
         date = getIntent().getStringExtra("Date");
-        date_in_long = getIntent().getStringExtra("Date_In_Long").equals("0") ? System.currentTimeMillis()+"":getIntent().getStringExtra("Date_In_Long");
+        date_in_long = getIntent().getStringExtra("Date_In_Long").equals("0") ? System.currentTimeMillis() + "" : getIntent().getStringExtra("Date_In_Long");
         Log.d(TAG, "date_in_long: " + date_in_long);
         passedDate = getIntent().getStringExtra("PassedDate");
 
@@ -260,6 +260,7 @@ public class MilkBuyEntryActivity extends InitDrawerBoard {
                 intent.putExtra("From", "MilkBuyEntryActivity");
                 intent.putExtra("Shift", shift);
                 intent.putExtra("Date", date);
+                intent.putExtra("Date_In_Long", date_in_long);
                 startActivity(intent);
             }
         });

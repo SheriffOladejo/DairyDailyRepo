@@ -21,6 +21,7 @@ import com.dixit.dairydaily.Others.Prevalent;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
+import com.paytm.pgsdk.PaytmMerchant;
 import com.paytm.pgsdk.PaytmOrder;
 import com.paytm.pgsdk.PaytmPGService;
 import com.paytm.pgsdk.PaytmPaymentTransactionCallback;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import cz.msebera.android.httpclient.Header;
 import io.paperdb.Paper;
@@ -59,7 +61,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
         custormerid = intent.getExtras().getString("customerId");
         price = intent.getExtras().getString("price");
 
-        mid = "avFYoj33073251095335"; // your merchant ID
+        mid = "aNSZJV20122648162244"; // your merchant ID
 
         RequestParams requestParams = new RequestParams();
         requestParams.put("MID", mid);
@@ -71,10 +73,11 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
         requestParams.put("WEBSITE", "DEFAULT");
         requestParams.put("INDUSTRY_TYPE_ID", "Retail");
         AsyncHttpClient client = new AsyncHttpClient();
-        client.post(url, requestParams, new TextHttpResponseHandler() {
+        client.get(url, requestParams, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 toast(CheckSum.this, "Failure");
+                toast(CheckSum.this, "response string "+responseString);
             }
 
             @Override
@@ -83,12 +86,14 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                     JSONObject jsonObject1 = new JSONObject(responseString);
                     if(jsonObject1.has("CHECKSUMHASH")){
                         CHECKSUMHASH = jsonObject1.getString("CHECKSUMHASH");
-                        PaytmPGService Service = PaytmPGService.getProductionService();
+                        Log.d(TAG, "checksumhash " + CHECKSUMHASH);
+                        PaytmPGService Service = PaytmPGService.getStagingService("");
+                        //PaytmPGService Service = PaytmPGService.getStagingService();
                         // when app is ready to publish use production service
                         // PaytmPGService  Service = PaytmPGService.getProductionService();
 
                         // now call paytm service here
-                        //below parameter map is required to construct PaytmOrder object, Merchant should replace below map values with his own values
+                        // below parameter map is required to construct PaytmOrder object, Merchant should replace below map values with his own values
                         HashMap<String, String> paramMap = new HashMap<String, String>();
                         //these are mandatory parameters
                         paramMap.put("MID", mid);
@@ -96,7 +101,7 @@ public class CheckSum extends AppCompatActivity implements PaytmPaymentTransacti
                         paramMap.put("CUST_ID", custormerid);
                         paramMap.put("CHANNEL_ID", "WAP");
                         paramMap.put("TXN_AMOUNT", price);
-                        paramMap.put("WEBSITE", "DEFAULT");
+                        paramMap.put("WEBSITE", "WEBSTAGING");
                         paramMap.put("CALLBACK_URL" ,verifyurl);
                         paramMap.put("CHECKSUMHASH" ,CHECKSUMHASH);
                         paramMap.put("INDUSTRY_TYPE_ID", "Retail");

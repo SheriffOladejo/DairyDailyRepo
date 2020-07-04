@@ -127,6 +127,8 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
         date = getIntent().getStringExtra("Date");
         date_in_long = getIntent().getStringExtra("Date_In_Long").equals("0") ? System.currentTimeMillis()+"":getIntent().getStringExtra("Date_In_Long");
 
+        Log.d(TAG, "Date in long: " + date_in_long);
+
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -245,6 +247,7 @@ public class MilkSaleEntryActivity extends InitDrawerBoard {
                 intent.putExtra("From", "MilkSaleEntryActivity");
                 intent.putExtra("Shift", shift);
                 intent.putExtra("Date", date);
+                intent.putExtra("Date_In_Long", date_in_long);
                 startActivity(intent);
             }
         });

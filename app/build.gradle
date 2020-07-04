@@ -28,8 +28,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         //25/05/2020 - 7
-        versionCode 8
-        versionName "3.0.5"
+        versionCode 15
+        versionName "4.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -63,7 +63,7 @@ dependencies {
     implementation 'io.paperdb:paperdb:2.6'
     implementation 'com.android.volley:volley:1.1.0'
     implementation 'org.jsoup:jsoup:1.11.1'
-    implementation('com.paytm:pgplussdk:1.4.1') {
+    implementation('com.paytm:pgplussdk:1.4.4') {
         transitive = true
     }
     implementation 'com.itextpdf:itextg:5.5.10'

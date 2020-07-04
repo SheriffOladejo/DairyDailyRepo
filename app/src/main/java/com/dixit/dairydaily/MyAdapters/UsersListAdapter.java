@@ -43,16 +43,18 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
     private DbHelper dbHelper;
     private static final String TAG = "CustomerAdapter";
     private String shift, date;
+    private String date_in_long;
     private String from;
 
     private Context context;
 
-    public UsersListAdapter(List<CustomerModels> list, Context context, String from, String shift, String date){
+    public UsersListAdapter(List<CustomerModels> list, Context context, String from, String shift, String date, String date_in_long){
         this.context = context;
         this.shift = shift;
         this.date = date;
         this.from = from;
         this.list = list;
+        this.date_in_long = date_in_long;
         listFull = new ArrayList<>(list);
         dbHelper = new DbHelper(context);
     }
@@ -138,12 +140,14 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
                     intent2.putExtra("passed", true);
                     intent2.putExtra("Shift", shift);
                     intent2.putExtra("Date", date);
+                    intent2.putExtra("Date_In_Long", date_in_long);
                     intent2.putExtra("id", id2);
 
                     int id = dbHelper.getBuyerId(name, phone_number);
                     intent.putExtra("name", name);
                     intent.putExtra("passed", true);
                     intent.putExtra("Shift", shift);
+                    intent.putExtra("Date_In_Long", date_in_long);
                     intent.putExtra("Date", date);
                     intent.putExtra("id", id);
 

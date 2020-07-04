@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dixit.dairydaily.Models.CustomerModels;
+import com.dixit.dairydaily.Models.PaymentRegisterModel;
 import com.dixit.dairydaily.MyAdapters.CustomerAdapter;
 import com.dixit.dairydaily.Others.DbHelper;
 import com.dixit.dairydaily.R;
@@ -36,13 +37,13 @@ public class CustomersActivity extends AppCompatActivity {
     EditText search;
     Button buyers, sellers;
     DbHelper dbHelper;
-    private List<CustomerModels> buyer_list = new ArrayList<>();
-    private List<CustomerModels> seller_list = new ArrayList<>();
-    private RecyclerView buyers_recyclerview, sellers_recyclerview;
+    public List<CustomerModels> buyer_list = new ArrayList<>();
+    public List<CustomerModels> seller_list = new ArrayList<>();
+    public RecyclerView buyers_recyclerview, sellers_recyclerview;
     private static final String TAG = "CustomersActivity";
 
-    CustomerAdapter buyer_adapter;
-    CustomerAdapter seller_adapter;
+    public static CustomerAdapter buyer_adapter;
+    public static CustomerAdapter seller_adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -133,6 +134,20 @@ public class CustomersActivity extends AppCompatActivity {
                 seller_list.add(model);
                 Log.d(TAG, "populateSellerView: " + status);
             }
+
+            for(int i=0; i<seller_list.size();i++){
+                for(int j=0; j<seller_list.size()-1; j++){
+                    int value1 = seller_list.get(j).getId();
+                    int value2 = seller_list.get(j+1).getId();
+                    if(value1 > value2){
+                        CustomerModels temp;
+                        temp = seller_list.get(j);
+                        seller_list.set(j, seller_list.get(j+1));
+                        seller_list.set(j+1, temp);
+                    }
+                }
+            }
+
             seller_adapter = new CustomerAdapter(seller_list, this);
             sellers_recyclerview.setAdapter(seller_adapter);
 
@@ -173,6 +188,20 @@ public class CustomersActivity extends AppCompatActivity {
                 buyer_list.add(model);
                 Log.d(TAG, "populateBuyerView: status " + status +" id: " + id);
             }
+
+            for(int i=0; i<buyer_list.size();i++){
+                for(int j=0; j<buyer_list.size()-1; j++){
+                    int value1 = buyer_list.get(j).getId();
+                    int value2 = buyer_list.get(j+1).getId();
+                    if(value1 > value2){
+                        CustomerModels temp;
+                        temp = buyer_list.get(j);
+                        buyer_list.set(j, buyer_list.get(j+1));
+                        buyer_list.set(j+1, temp);
+                    }
+                }
+            }
+
             buyer_adapter = new CustomerAdapter(buyer_list, this);
             buyers_recyclerview.setAdapter(buyer_adapter);
             search.addTextChangedListener(new TextWatcher() {
